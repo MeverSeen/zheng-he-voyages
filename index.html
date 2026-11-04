@@ -333,6 +333,7 @@
       <div class="prose">
         <p class="note">本图航线依据上述史料所记停靠顺序，在主要海道上绘出示意路线，并非精确航迹。第一至六次各港停靠的具体日期大多失载，图中仅标年份；第七次日期出自《前闻记》。公历日期按史学惯例折算为儒略历。古今地名对应以通行说法为准，有争议者注明"一说"。</p>
       </div>
+      <p class="note">地图底色为约 1415 年各政权的大致疆域，参照通行历史地图集手绘，边界仅为示意；未着色地区为部族地区或资料不详。</p>
       <p class="credits">海岸线：Natural Earth（公有领域）。地图引擎：Leaflet（BSD-2）。可选在线底图：Esri。</p>
     </section>
   </aside>
@@ -345,6 +346,11 @@
         <button type="button" data-base="scroll" aria-pressed="true">古卷</button>
         <button type="button" data-base="ocean" aria-pressed="false">海图</button>
         <button type="button" data-base="sat" aria-pressed="false">卫星</button>
+      </div>
+      <div class="seg" role="group" aria-label="疆域着色">
+        <button type="button" data-pol="off" aria-pressed="false">无疆域</button>
+        <button type="button" data-pol="states" aria-pressed="true">诸国</button>
+        <button type="button" data-pol="rel" aria-pressed="false">与明关系</button>
       </div>
       <div class="toggles">
         <label><input type="checkbox" id="opt-labels" checked> 地名</label>
@@ -370,6 +376,7 @@
         <span><i class="glyph">人</i>生平</span>
         <span><i class="glyph g-卒">卒</i>去世</span>
       </div>
+      <div class="pol-legend" id="pol-legend"></div>
     </div>
 
     <button class="float compass-float" type="button" id="compass-float" aria-label="二十四向罗盘：查看航海术"></button>
@@ -398,6 +405,7 @@
 
 <script src="vendor/leaflet/leaflet.js"></script>
 <script src="data/land.js"></script>
+<script src="data/polities.js"></script>
 <script src="js/data.js"></script>
 <script src="js/route.js"></script>
 <script src="js/app.js"></script>

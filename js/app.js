@@ -62,11 +62,11 @@
   map.attributionControl.setPrefix('<a href="https://leafletjs.com" target="_blank" rel="noopener">Leaflet</a>');
   var container = map.getContainer();
 
-  [['basePane', 150], ['landPane', 200], ['gratPane', 205], ['seaPane', 230], ['routePane', 410], ['hitPane', 415],
-    ['portPane', 430], ['shipPane', 640]].forEach(function (p) {
+  [['basePane', 150], ['landPane', 200], ['polityPane', 202], ['coastPane', 203], ['gratPane', 205], ['polLabelPane', 226],
+    ['seaPane', 230], ['routePane', 410], ['hitPane', 415], ['portPane', 430], ['shipPane', 640]].forEach(function (p) {
     map.createPane(p[0]).style.zIndex = p[1];
   });
-  map.getPane('seaPane').style.pointerEvents = 'none';
+  ['seaPane', 'coastPane', 'polLabelPane'].forEach(function (n) { map.getPane(n).style.pointerEvents = 'none'; });
 
   // 古卷底图：Natural Earth 海岸线，外加一圈浅色"水纹"
   var shoreLayer = L.geoJSON(window.ZH_LAND, { pane: 'landPane', interactive: false, style: { className: 'shore' } });
@@ -74,7 +74,9 @@
   var grat = L.layerGroup();
   for (var la = -30; la <= 50; la += 10) grat.addLayer(L.polyline([[la, 10], [la, 160]], { pane: 'gratPane', className: 'grat', interactive: false }));
   for (var lo = 20; lo <= 150; lo += 10) grat.addLayer(L.polyline([[-35, lo], [58, lo]], { pane: 'gratPane', className: 'grat', interactive: false }));
-  var scrollBase = L.layerGroup([shoreLayer, landLayer, grat]).addTo(map);
+  // 海岸线单独画在疆域色块之上，保证海岸始终是实线
+  var coastLayer = L.geoJSON(window.ZH_LAND, { pane: 'coastPane', interactive: false, style: { className: 'coastline' } });
+  var scrollBase = L.layerGroup([shoreLayer, landLayer, coastLayer, grat]).addTo(map);
 
   var esriAttr = '底图 &copy; <a href="https://www.esri.com" target="_blank" rel="noopener">Esri</a>';
   var tileBases = {
@@ -123,6 +125,65 @@
       icon: L.divIcon({ className: 'sea-label' + (s.t.length <= 3 ? ' minor' : ''), html: '<span>' + esc(s.t) + '</span>', iconSize: [0, 0] })
     }).addTo(map);
   });
+
+  /* ---------- 约 1415 年政治势力 ---------- */
+  var REL = { ming: '明朝直辖', visit: '郑和船队到访', loose: '明朝羁縻（都司、卫所、宣慰司）', tribute: '遣使往来', other: '其他政权' };
+  var REL_ORDER = ['ming', 'visit', 'loose', 'tribute', 'other'];
+  var plain = function (t) { return String(t || '').replace(/\s+/g, ''); };
+  function polityPopup(p) {
+    var lab = plain(p.label);
+    var ports = p.ports.map(function (id) { return D.ports[id].name; }).join('、');
+    return '<div class="pop">' +
+      '<div class="hd"><i class="pol-sw sw-pc' + p.c + '"></i><div><h4>' + esc(p.name) + (lab && lab !== p.name ? ' · ' + esc(lab) : '') + '</h4>' +
+      '<div class="sub">' + esc(p.alt) + '</div></div></div>' +
+      '<span class="rel-chip sw-' + p.rel + '">' + esc(REL[p.rel]) + '</span>' +
+      '<p>' + esc(p.desc) + '</p>' +
+      (ports ? '<div class="sub">境内港口：' + esc(ports) + '</div>' : '') +
+      '<div class="sub">约 1415 年形势，疆界为示意。</div></div>';
+  }
+  var polLayer = L.geoJSON(window.ZH_POLITIES, {
+    pane: 'polityPane',
+    style: function (f) { return { className: 'polity pc' + f.properties.c + ' rel-' + f.properties.rel }; },
+    onEachFeature: function (f, layer) {
+      layer.bindPopup(function () { return polityPopup(f.properties); }, { className: 'zh-popup', maxWidth: 320, autoPanPadding: [40, 40] });
+    }
+  });
+  var polLabels = L.layerGroup();
+  window.ZH_POLITIES.features.forEach(function (f) {
+    var p = f.properties;
+    if (!p.label || !p.lp) return;
+    polLabels.addLayer(L.marker(p.lp, {
+      pane: 'polLabelPane', interactive: false, keyboard: false,
+      icon: L.divIcon({ className: 'pol-label r' + p.rank, html: '<span>' + esc(p.label) + '</span>', iconSize: [0, 0] })
+    }));
+  });
+
+  var polMode = null;
+  function renderPolLegend() {
+    var box = $('#pol-legend');
+    if (polMode === 'states') {
+      box.innerHTML = '<span class="ttl">疆域 · 约 1415 年</span>' +
+        '<span class="strip">' + [0, 1, 2, 3, 4, 5, 6, 7, 8].map(function (c) { return '<i class="sw-pc' + c + '"></i>'; }).join('') + '</span>' +
+        '<span>一色一国，黄色为明朝；点击色块看简介</span>';
+    } else if (polMode === 'rel') {
+      box.innerHTML = '<span class="ttl">与明朝的关系 · 约 1415 年</span><span class="sws">' +
+        REL_ORDER.map(function (r) { return '<span><i class="sw-' + r + '"></i>' + esc(REL[r].replace(/（.*）/, '')) + '</span>'; }).join('') + '</span>';
+    } else {
+      box.innerHTML = '';
+    }
+  }
+  function setPolMode(m) {
+    if (['off', 'states', 'rel'].indexOf(m) < 0) m = 'states';
+    polMode = m;
+    container.classList.toggle('pol-states', m === 'states');
+    container.classList.toggle('pol-rel', m === 'rel');
+    if (m === 'off') { map.removeLayer(polLayer); map.removeLayer(polLabels); }
+    else { if (!map.hasLayer(polLayer)) polLayer.addTo(map); if (!map.hasLayer(polLabels)) polLabels.addTo(map); }
+    $$('.seg [data-pol]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.pol === m)); });
+    renderPolLegend();
+    store('pol', m);
+  }
+  $$('.seg [data-pol]').forEach(function (b) { b.addEventListener('click', function () { setPolMode(b.dataset.pol); }); });
 
   // 缩放级别 → 标签显示密度
   function zoomClass() {
@@ -404,6 +465,7 @@
       '<div class="stat"><b>六十二</b><span>首航大型宝船</span></div>' +
       '</div>' +
       '<p>明人所说的"西洋"，大致指南海西部以西直到印度洋沿岸的广大海域。明末张燮《东西洋考》以文莱为东、西洋的分界。</p>' +
+      '<p>地图底色是约 1415 年（第四、五次下西洋之间）各政权的大致疆域。右上角可在"诸国"和"与明关系"两种着色之间切换，后者区分明朝直辖、船队到访、明朝羁縻和遣使往来的地区。点击色块可查看各国简介。</p>' +
       '<h3>七次航程</h3>' +
       '<ol class="vlist">' + list + '</ol>' +
       '<blockquote class="source">' + esc(voyage(7).quote.t) + '<cite>' + esc(voyage(7).quote.s) + '</cite></blockquote>' +
@@ -861,6 +923,7 @@
   renderChron();
   map.fitBounds(allBounds(), { paddingTopLeft: [30, 40], paddingBottomRight: [30, 110] });
   zoomClass();
+  setPolMode(store('pol') || 'states');
   var savedBase = store('base');
   if (savedBase === 'ocean' || savedBase === 'sat') setBase(savedBase);
   if (!readHash()) selectVoyage(0, { fit: false, noHash: true });

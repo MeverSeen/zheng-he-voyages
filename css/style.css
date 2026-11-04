@@ -28,6 +28,11 @@
   --v1: #b8402f; --v2: #b0701a; --v3: #2f7d52; --v4: #1f5a96;
   --v5: #73479a; --v6: #13777a; --v7: #8a2f55;
   --ghost: #8e968d;
+  /* 约 1415 年诸国着色（0 为明朝） */
+  --pc0: #f0cf6a; --pc1: #e7b8a4; --pc2: #b9d4a6; --pc3: #a9c7dd; --pc4: #cdb7dc;
+  --pc5: #edc8a0; --pc6: #a6d1c8; --pc7: #e4bfcf; --pc8: #cfd09c;
+  --rel-ming: #f0cf6a; --rel-visit: #8fc7a3; --rel-loose: #e9bf8e; --rel-tribute: #a9c4de; --rel-other: #dcd6c8;
+  --pol-border: #7d6f58;
   /* 字体 */
   --f-display: "Ma Shan Zheng", "STXingkai", "Xingkai SC", "STKaiti", "Kaiti SC", "KaiTi", serif;
   --f-body: "Noto Serif SC", "Source Han Serif SC", "Source Han Serif CN", "Songti SC", "STSong", "SimSun", serif;
@@ -46,6 +51,10 @@
     --accent: #8fbdd8; --accent-soft: #1d3240; --seal: #e0644f; --seal-ink: #1a0f0c; --focus: #8fbdd8;
     --v1: #f07d68; --v2: #e8a64e; --v3: #62c98f; --v4: #74a9ea; --v5: #bb92e6; --v6: #4cc7c4; --v7: #e57aa6;
     --ghost: #56625f;
+    --pc0: #7c6624; --pc1: #6c463a; --pc2: #4b6342; --pc3: #3d5a70; --pc4: #594a70;
+    --pc5: #6c5336; --pc6: #355f59; --pc7: #684556; --pc8: #5b5c37;
+    --rel-ming: #7c6624; --rel-visit: #3f6e55; --rel-loose: #775634; --rel-tribute: #3d5a74; --rel-other: #394039;
+    --pol-border: #a69a7c;
     --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 8px 22px rgb(0 0 0 / 0.35);
     color-scheme: dark;
   }
@@ -56,6 +65,10 @@
   --accent: #8fbdd8; --accent-soft: #1d3240; --seal: #e0644f; --seal-ink: #1a0f0c; --focus: #8fbdd8;
   --v1: #f07d68; --v2: #e8a64e; --v3: #62c98f; --v4: #74a9ea; --v5: #bb92e6; --v6: #4cc7c4; --v7: #e57aa6;
   --ghost: #56625f;
+  --pc0: #7c6624; --pc1: #6c463a; --pc2: #4b6342; --pc3: #3d5a70; --pc4: #594a70;
+  --pc5: #6c5336; --pc6: #355f59; --pc7: #684556; --pc8: #5b5c37;
+  --rel-ming: #7c6624; --rel-visit: #3f6e55; --rel-loose: #775634; --rel-tribute: #3d5a74; --rel-other: #394039;
+  --pol-border: #a69a7c;
   --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 8px 22px rgb(0 0 0 / 0.35);
   color-scheme: dark;
 }
@@ -420,6 +433,47 @@ path.grat { stroke: var(--grat); stroke-width: 0.7px; stroke-dasharray: 2 4; fil
 .sea-label span { position: absolute; left: 0; top: 0; transform: translate(-50%, -50%); }
 .map-tiles .sea-label { color: #e8f1f4; opacity: 0.8; text-shadow: 0 1px 2px rgb(0 0 0 / 0.5); }
 .z-lo .sea-label.minor { display: none; }
+
+
+/* 约 1415 年政治势力 */
+path.polity { stroke: var(--pol-border); stroke-width: 0.7px; stroke-dasharray: 3 2.5; fill-opacity: 0.78; transition: fill-opacity 0.15s; }
+path.polity:hover { fill-opacity: 0.95; }
+.map-tiles path.polity { fill-opacity: 0.45; }
+.pol-states path.polity.pc0 { fill: var(--pc0); } .pol-states path.polity.pc1 { fill: var(--pc1); }
+.pol-states path.polity.pc2 { fill: var(--pc2); } .pol-states path.polity.pc3 { fill: var(--pc3); }
+.pol-states path.polity.pc4 { fill: var(--pc4); } .pol-states path.polity.pc5 { fill: var(--pc5); }
+.pol-states path.polity.pc6 { fill: var(--pc6); } .pol-states path.polity.pc7 { fill: var(--pc7); }
+.pol-states path.polity.pc8 { fill: var(--pc8); }
+.pol-rel path.polity.rel-ming { fill: var(--rel-ming); } .pol-rel path.polity.rel-visit { fill: var(--rel-visit); }
+.pol-rel path.polity.rel-loose { fill: var(--rel-loose); } .pol-rel path.polity.rel-tribute { fill: var(--rel-tribute); }
+.pol-rel path.polity.rel-other { fill: var(--rel-other); }
+path.coastline { fill: none; stroke: var(--coast); stroke-width: 0.8px; stroke-linejoin: round; }
+.pol-label { pointer-events: none; }
+.pol-label span {
+  position: absolute; left: 0; top: 0; transform: translate(-50%, -50%);
+  white-space: nowrap; color: var(--ink-2); font-family: var(--f-body); font-weight: 700; letter-spacing: 0.18em;
+  text-shadow: 0 0 2px var(--land), 0 0 4px var(--land);
+}
+.pol-label.r1 span { font-size: 15px; letter-spacing: 0.3em; }
+.pol-label.r2 span { font-size: 12.5px; }
+.pol-label.r3 span { font-size: 11px; font-weight: 600; opacity: 0.85; }
+.z-xlo .pol-label.r2, .z-lo .pol-label.r3 { display: none; }
+.map-tiles .pol-label span { color: #fff; text-shadow: 0 0 2px #000, 0 0 4px #000; }
+.pol-sw { flex: none; width: 14px; height: 14px; border-radius: 2px; border: 1px solid var(--pol-border); margin-top: 4px; }
+.rel-chip { align-self: flex-start; font-family: var(--f-ui); font-size: 0.6875rem; padding: 0 7px; border-radius: 3px; color: var(--ink); line-height: 1.8; }
+.sw-pc0 { background: var(--pc0); } .sw-pc1 { background: var(--pc1); } .sw-pc2 { background: var(--pc2); } .sw-pc3 { background: var(--pc3); }
+.sw-pc4 { background: var(--pc4); } .sw-pc5 { background: var(--pc5); } .sw-pc6 { background: var(--pc6); } .sw-pc7 { background: var(--pc7); }
+.sw-pc8 { background: var(--pc8); }
+.sw-ming { background: var(--rel-ming); } .sw-visit { background: var(--rel-visit); } .sw-loose { background: var(--rel-loose); }
+.sw-tribute { background: var(--rel-tribute); } .sw-other { background: var(--rel-other); }
+.pol-legend { display: flex; flex-direction: column; gap: 4px; border-top: 1px solid var(--rule); padding-top: 6px; }
+.pol-legend:empty { display: none; }
+.pol-legend .ttl { color: var(--ink); font-weight: 600; }
+.pol-legend .sws { display: grid; grid-template-columns: repeat(2, max-content); gap: 3px 12px; }
+.pol-legend .sws span { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
+.pol-legend i { display: inline-block; width: 14px; height: 10px; border-radius: 2px; border: 1px solid var(--pol-border); }
+.pol-legend .strip { display: flex; gap: 2px; }
+.pol-legend .strip i { width: 12px; }
 
 /* 航线 */
 path.route { fill: none; stroke-linecap: round; stroke-linejoin: round; stroke-width: 2.6px; transition: opacity 0.25s; }
