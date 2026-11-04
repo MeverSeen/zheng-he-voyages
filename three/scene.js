@@ -40,7 +40,14 @@ export function createScene(container,onPick,onQuality) {
     // Perspective vertical FOV and aspect both matter on narrow phones.
     distance=extent/(2*Math.tan(THREE.MathUtils.degToRad(camera.fov/2)))*Math.max(1,1/camera.aspect)*1.02;
     camera.far=Math.max(30000,distance*3);camera.updateProjectionMatrix();controls.maxDistance=distance*4;
-    water.visible=!section;grid.visible=!section;
+    water.visible=!section;grid.visible=!section&&!next.userData.waterline;
+    // Open hatches must reveal the hold, not the infinite sea plane inside it.
+    water.geometry.dispose();
+    if(next.userData.waterline) {
+      const outline=new THREE.Shape();outline.moveTo(-12000,-12000);outline.lineTo(12000,-12000);outline.lineTo(12000,12000);outline.lineTo(-12000,12000);outline.closePath();
+      const hole=new THREE.Path(next.userData.waterline.map(([x,z])=>new THREE.Vector2(x,-z)));hole.closePath();outline.holes.push(hole);
+      water.geometry=new THREE.ShapeGeometry(outline);
+    } else water.geometry=new THREE.PlaneGeometry(24000,24000);
     const s=Math.max(100,extent);sun.shadow.camera.left=-s;sun.shadow.camera.right=s;sun.shadow.camera.top=s;sun.shadow.camera.bottom=-s;sun.shadow.camera.far=s*5;sun.shadow.camera.updateProjectionMatrix();sun.position.set(s,s*2,s);sun.target.position.copy(center);scene.add(sun.target);
     view();
   }

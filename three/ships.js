@@ -6,7 +6,10 @@ export function buildShip(typeId, {variant='estimated',lod=0,cutaway=false}={}) 
   const spec=globalThis.ZH_FLEET.types[typeId];
   if(!spec) throw new Error('Unknown ship '+typeId);
   const dims=spec.variants[variant]||spec.variants.estimated;
-  const {L,B}=dims, D=L*.045, F=L*.055, segments=lod===2?14:32;
+  const {L,B}=dims, D=dims.draft??spec.model.draft, F=dims.freeboard??spec.model.freeboard, segments=lod===2?14:48;
+  const layout={hatches:[],masts:[],cargo:[],decks:[]};
+  const timber=Math.min(.22,L*.0035), storey=2.25;
+  const holdFloor=-D*.42;
   const ship=new THREE.Group(); ship.name=typeId;
   const mats={wood:material('#6b4528'), plank:material('#aa7a49'), dark:material('#32291f'), red:material('#8e3327'),
     sail:material('#d5bd86',THREE.DoubleSide), rope:material('#44392b'), trim:material('#d6aa58'), sack:material('#a49a70')};
@@ -19,7 +22,7 @@ export function buildShip(typeId, {variant='estimated',lod=0,cutaway=false}={}) 
   const rod=(a,b,r,mat,g)=>{const av=new THREE.Vector3(...a),bv=new THREE.Vector3(...b),v=bv.clone().sub(av);
     const m=mesh(new THREE.CylinderGeometry(r*.8,r,v.length(),lod===2?4:6),mat,g);m.position.copy(av).add(bv).multiplyScalar(.5);m.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),v.normalize());return m;};
   function shape(t) {
-    const w=B*.5*(.12+.88*Math.pow(Math.sin(Math.PI*t),.53))*(1-.18*Math.max(0,(t-.75)/.25));
+    const w=B*.5/1.0218*(.34*(1-t)+.10*t+.80*Math.pow(Math.sin(Math.PI*t),.65));
     const sheer=F+L*(.045*Math.pow(1-t,5)+.032*Math.pow(t,6));
     return {x:(t-.5)*L,w,y:sheer};
   }
@@ -38,8 +41,36 @@ export function buildShip(typeId, {variant='estimated',lod=0,cutaway=false}={}) 
       groups.hull.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(points),new THREE.LineBasicMaterial({color:0x443020})));
     }
   }
-  // Deck planks follow the hull contour. Starboard deck is removed in section mode.
-  for(let i=0;i<segments;i++) {const t=(i+.5)/segments,s=shape(t);box(s.x,s.y-.07,cutaway?-s.w*.5:0,L/segments+.01,.14,cutaway?s.w:s.w*2,mats.plank,groups.cabins);}
+  // Hatch openings are real holes, shared by full and section geometry.
+  const n=spec.model.compartments;
+  for(const i of [...new Set([Math.floor(n*.34),Math.floor(n*.58),Math.floor(n*.78)])]) {
+    const x=((i+.5)/n-.5)*L;
+    layout.hatches.push({x,z:0,w:L/n*.52,d:B*.22,y:shape(x/L+.5).y});
+  }
+  const cuts=[0,1,...Array.from({length:segments-1},(_,i)=>(i+1)/segments),
+    ...layout.hatches.flatMap(h=>[(h.x-h.w/2)/L+.5,(h.x+h.w/2)/L+.5])].sort((a,b)=>a-b);
+  for(let i=0;i<cuts.length-1;i++) {
+    const a=cuts[i],b=cuts[i+1];if(b-a<1e-8)continue;
+    const mid=shape((a+b)/2),hole=layout.hatches.find(h=>Math.abs(mid.x-h.x)<h.w/2);
+    const ranges=hole?[[-mid.w,-hole.d/2],[hole.d/2,mid.w]]:[[-mid.w,mid.w]];
+    for(let [z0,z1] of ranges) {
+      if(cutaway)z1=Math.min(z1,0);if(z1<=z0)continue;
+      box(mid.x,mid.y-.10,(z0+z1)/2,(b-a)*L,.20,z1-z0,mats.plank,groups.cabins);
+    }
+  }
+  for(const h of layout.hatches) {
+    for(const side of [-1,1]) {
+      if(!(cutaway&&side===1))box(h.x,h.y+.18,side*h.d/2,h.w+.18,.5,.16,mats.dark,groups.cabins);
+      box(h.x+side*h.w/2,h.y+.18,cutaway?-h.d/4:0,.16,.5,cutaway?h.d/2:h.d,mats.dark,groups.cabins);
+    }
+    if(lod===0) {
+      // Lifted cover and a ladder descend within the same watertight compartment.
+      box(h.x,h.y+.08,-h.d*.85,h.w,.16,h.d*.5,mats.wood,groups.cabins);
+      const x=h.x-h.w*.25,z=-h.d*.25,steps=Math.ceil((h.y-holdFloor)/.3);
+      for(const dz of [-.3,.3])rod([x,holdFloor,z+dz],[x+.65,h.y,z+dz],.06,mats.wood,groups.cabins);
+      for(let j=0;j<=steps;j++)box(x+.65*j/steps,holdFloor+(h.y-holdFloor)*j/steps,z,.12,.08,.7,mats.plank,groups.cabins);
+    }
+  }
   if(lod<2) {
     // Wale strakes, railings and timber frames.
     for(const side of [-1,1]) {
@@ -56,57 +87,103 @@ export function buildShip(typeId, {variant='estimated',lod=0,cutaway=false}={}) 
       for(let j=1;j<end;j++)v.push(...r[0],...r[j],...r[j+1]);
       if(cutaway)v.push(...r[0],...r[3],r[3][0],shape(t).y,0);
       const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(v,3));g.computeVertexNormals();
-      const mat=mats.plank.clone();mat.side=THREE.DoubleSide;mesh(g,mat,groups.bulkheads);
+      mats.plank.side=THREE.DoubleSide;mesh(g,mats.plank,groups.bulkheads);
       if(cutaway)for(let j=0;j<3;j++)rod(r[j],r[j+1],L*.003,mats.dark,groups.bulkheads);
     }
   }
-  // Aft deckhouse tiers, window bays, projecting eaves and bow working platform.
+  // Frames, keelson, deck beams and a raised cargo sole remain in place in section.
+  if(lod<2) {
+    box(0,-D+.24,0,L*.90,.35,B*.045,mats.dark,groups.bulkheads);
+    for(let i=1;i<24;i++) {
+      const t=i/24,r=ring(t),w=shape(t).w;
+      for(let j=0;j<(cutaway?3:6);j++)rod(r[j],r[j+1],timber*.5,mats.wood,groups.bulkheads);
+      const hatch=layout.hatches.find(h=>Math.abs(r[0][0]-h.x)<h.w/2+timber);
+      for(let [a,b] of (hatch?[[-w,-hatch.d/2],[hatch.d/2,w]]:[[-w,w]])) {
+        if(cutaway)b=Math.min(b,0);if(b>a)box(r[0][0],shape(t).y-.3,(a+b)/2,timber,.3,b-a,mats.dark,groups.bulkheads);
+      }
+      // Floor width stays within the chine at this height.
+      box(r[0][0],holdFloor-.12,cutaway?-w*.26:0,L/24,.2,cutaway?w*.52:w*1.04,mats.plank,groups.bulkheads);
+      if(i%2===0)rod([r[0][0],holdFloor,-w*.38],[r[0][0],shape(t).y-.35,-w*.38],timber*.45,mats.wood,groups.bulkheads);
+    }
+  }
+  // Hollow deckhouse: separate floors, posts, window openings and forward doorway.
+  const houseX=-L*.35,houseBase=shape(.15).y+.10;
   for(let level=0;level<spec.model.decks;level++) {
-    const w=L*(.24-level*.035),d=B*(.72-level*.12),h=F*.62,x=-L*.29,y=F+L*.012+level*h;
-    const z=cutaway?-d*.25:0,depth=cutaway?d*.5:d;
-    box(x,y+h/2,z,w,h,depth,mats.red,groups.cabins);
-    box(x,y+h+.05,z,w+L*.025,.16,depth+B*.055,mats.dark,groups.cabins);
-    if(lod<2)for(let k=0;k<5;k++)for(const side of [-1,1]) {
+    const w=L*(.20-level*.025),d=B*(.58-level*.09),h=storey,x=houseX,y=houseBase+level*h;
+    layout.decks.push({x,y,w,d,h});
+    // External stairs serve each terrace; a separate door serves its room.
+    const stairW=.9,stairZ=-d*.25,stairRun=2.7,front=x+w/2;
+    for(const side of [-1,1]) {
       if(cutaway&&side===1)continue;
-      box(x-w*.4+k*w*.2,y+h*.56,side*d*.505,w*.10,h*.44,.04,mats.trim,groups.cabins);
-      box(x-w*.4+k*w*.2,y+h*.56,side*d*.51,w*.065,h*.32,.05,mats.dark,groups.cabins);
+      const z=side*d/2;
+      box(x,y+.35,z,w,.70,timber,mats.red,groups.cabins);
+      box(x,y+h-.22,z,w,.44,timber,mats.red,groups.cabins);
+      for(let k=0;k<=6;k++)box(x-w/2+k*w/6,y+h/2,z,timber,h,timber,mats.wood,groups.cabins);
+      if(lod===0)for(let k=0;k<6;k++)for(let bar=1;bar<=2;bar++)box(x-w/2+(k+bar/3)*w/6,y+h*.52,z,.055,h*.48,.06,mats.trim,groups.cabins);
+    }
+    // A doorway divides the forward wall; rear wall follows the same section cut.
+    const keptD=cutaway?d/2:d,zc=cutaway?-d/4:0;
+    box(x-w/2,y+h/2,zc,timber,h,keptD,mats.red,groups.cabins);
+    for(const [a,b] of [[-d/2,stairZ-stairW/2],[stairZ+stairW/2,cutaway?0:d/2]])if(b>a)
+      box(front,y+h/2,(a+b)/2,timber,h,b-a,mats.red,groups.cabins);
+    box(front,y+h-.15,stairZ,timber,.3,stairW,mats.dark,groups.cabins);
+    box(x,y-.08,zc,w,.16,keptD,mats.plank,groups.cabins);
+    box(x,y+h,zc,w+.35,.18,keptD,mats.dark,groups.cabins);
+    if(lod===0) {
+      // Ascend aft, ending at the terrace's forward edge, beside the doorway.
+      const z=-d*.43,steps=12;
+      for(let j=0;j<steps;j++)box(front+stairRun*(1-(j+.5)/steps),y+h*(j+1)/steps,z,stairRun/steps,.12,.85,mats.plank,groups.cabins);
+      for(const dz of [-.46,.46])rod([front+stairRun,y+1,z+dz],[front,y+h+1,z+dz],.045,mats.wood,groups.cabins);
+      // Bunks and a table are human-scaled, not proportional to a giant hull.
+      box(x,y+.45,-d*.3,1.9,.18,.72,mats.wood,groups.cabins);
+      box(x+w*.2,y+.75,-d*.22,1.2,.12,.7,mats.plank,groups.cabins);
+      for(const dx of [-.5,.5])rod([x+w*.2+dx,y,-d*.22],[x+w*.2+dx,y+.7,-d*.22],.07,mats.wood,groups.cabins);
     }
   }
-  box(L*.37,F+L*.014,cutaway?-B*.1:0,L*.15,.3,cutaway?B*.2:B*.4,mats.plank,groups.cabins);
-  if(lod===0) {
-    // Access stair to the aft house; tread placement is an illustrative layout.
-    for(let step=0;step<8;step++)box(-L*.14+step*L*.006,F+step*F*.075,-B*.27,L*.008,.12,B*.12,mats.plank,groups.cabins);
-    if(typeId==='zhanchuan')for(const side of [-1,1])for(let i=0;i<5;i++) {
-      const x=L*(.08+i*.035),z=side*B*.35;
-      rod([x,F,z],[x-L*.008,F+L*.06,z],L*.0016,mats.wood,groups.cabins);
-      const tip=mesh(new THREE.ConeGeometry(L*.003,L*.012,4),mats.dark,groups.cabins);tip.position.set(x-L*.008,F+L*.065,z);
+  // Cargo always belongs in the hold; sectioning removes the shell, never moves cargo.
+  if(lod===0)for(let i=2;i<n-1;i++) {
+    const x=((i+.5)/n-.5)*L,z=-shape((i+.5)/n).w*.38,y=holdFloor;
+    layout.cargo.push({x,y,z});
+    if(spec.model.cargo==='sacks') {
+      for(let k=0;k<3;k++){const m=mesh(new THREE.SphereGeometry(.38,6,4),mats.sack,groups.cabins);m.scale.set(1,.65,1.4);m.position.set(x+(k-1)*.65,y+.26,z);}
+    } else if(spec.model.cargo==='stalls') {
+      for(const dx of [-.9,.9])for(const dz of [-.5,.5])rod([x+dx,y,z+dz],[x+dx,y+1.45,z+dz],.065,mats.wood,groups.cabins);
+      for(const dx of [-.9,.9])for(const h of [.55,1.15])rod([x+dx,y+h,z-.5],[x+dx,y+h,z+.5],.045,mats.wood,groups.cabins);
+    } else {
+      box(x,y+.4,z,spec.model.cargo==='quarters'?1.9:1.2,.8,.75,mats.wood,groups.cabins);
+      if(spec.model.cargo==='weapons')for(let k=0;k<4;k++)rod([x+(k-1.5)*.22,y+.8,z],[x+(k-1.5)*.22,y+2,z],.035,mats.dark,groups.cabins);
+      else for(const dx of [-.4,.4])box(x+dx,y+.4,z,.06,.83,.78,mats.dark,groups.cabins);
     }
   }
-  // Cargo visualises different roles; positions and object counts are assumptions.
-  if(lod===0)for(let i=0;i<7;i++) {
-    const x=-L*.14+i*L*.055,z=-B*.2,y=cutaway?-D*.25:F+.18;
-    if(spec.model.cargo==='sacks') {const m=mesh(new THREE.SphereGeometry(L*.018,8,6),mats.sack,groups.cabins);m.scale.set(1,.7,.8);m.position.set(x,y+L*.012,z);}
-    else if(spec.model.cargo==='stalls') {for(const dx of [-.012,.012])rod([x+L*dx,y,z-B*.1],[x+L*dx,y+L*.035,z-B*.1],L*.0025,mats.wood,groups.cabins);rod([x-L*.012,y+L*.025,z-B*.1],[x+L*.012,y+L*.025,z-B*.1],L*.0025,mats.wood,groups.cabins);}
-    else box(x,y+L*.013,z,L*.035,L*.025,B*.13,mats.plank,groups.cabins);
-  }
-  // Masts stagger across the beam. Main masts carry battened, slightly cambered sails.
-  const mastCount=spec.model.masts;
-  for(let i=0;i<mastCount;i++) {
-    const t=.14+.73*i/(mastCount-1),x=(t-.5)*L,z=(i%2===0?-1:1)*B*.13;
-    const height=L*(.27+.14*Math.sin(Math.PI*t)),base=shape(t).y;
-    rod([x,base,z],[x+L*.015,base+height,z],L*.005,mats.wood,groups.sails);
-    const sw=L*(mastCount>7?.105:.125),sh=height*.72,bottom=base+height*.2;
-    const rows=lod===2?4:8,cols=lod===2?2:5,v=[],ix=[];
+  // Explicit unequal stations: main sails amidships, smaller end sails.
+  // This is a display hypothesis, not a historical rigging survey.
+  const stations=spec.model.rig;
+  for(const station of stations) {
+    const [along,across,rise,breadth]=station,t=along+.5,x=along*L,z=across*B;
+    const height=L*rise,base=shape(t).y,sw=L*breadth;
+    const bottom=Math.max(base+height*.20,along<-.4?houseBase+spec.model.decks*storey+.45:0),sh=base+height*.92-bottom;
+    const foot=across===0?-D+.45:-D*.20;
+    layout.masts.push({x,z,base,height,sw,foot});
+    rod([x,foot,z],[x+L*.008,base+height,z],L*.004,mats.wood,groups.sails);
+    if(lod<2) {
+      box(x,foot-.1,z,L*.035,.4,B*.06,mats.dark,groups.bulkheads);
+      box(x,base+.18,z,L*.022,.36,B*.055,mats.wood,groups.sails);
+    }
+    const rows=lod===2?4:6,cols=lod===2?2:4,v=[],ix=[];
     for(let r=0;r<=rows;r++)for(let c=0;c<=cols;c++) {
       const u=c/cols,q=r/rows,width=sw*(1-.35*q);
-      v.push(x+(u-.18)*width+q*L*.012,bottom+q*sh,z+Math.sin(u*Math.PI)*sw*.12+u*sw*.28);
+      v.push(x+(u-.18)*width+q*L*.008,bottom+q*sh,z+Math.sin(u*Math.PI)*sw*.12+u*sw*.28);
     }
     for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){const a=r*(cols+1)+c,b=a+cols+1;ix.push(a,b,a+1,b,b+1,a+1);}
     const sg=new THREE.BufferGeometry();sg.setAttribute('position',new THREE.Float32BufferAttribute(v,3));sg.setIndex(ix);sg.computeVertexNormals();mesh(sg,mats.sail,groups.sails);
     if(lod<2)for(let r=0;r<=rows;r++){for(let c=0;c<cols;c++){const a=(r*(cols+1)+c)*3,b=a+3;const pa=v.slice(a,a+3),pb=v.slice(b,b+3);pa[2]+=.025;pb[2]+=.025;rod(pa,pb,L*.0022,mats.wood,groups.sails);}}
     if(lod===0) {
-      for(const side of [-1,1])rod([x+L*.015,base+height,z],[x-L*.045,base,side*shape(t).w*.92],L*.0007,mats.rope,groups.sails);
-      rod([x,base,z],[x+L*.015,base+height,z+L*.003],L*.0008,mats.rope,groups.sails);
+      // Halyard and a fan of sheets lead from the battens to a deck belaying point.
+      rod([x,base+.4,z],[x+L*.008,base+height,z+L*.003],L*.0006,mats.rope,groups.sails);
+      for(let r=0;r<rows;r+=2) {
+        const j=(r*(cols+1)+cols)*3;
+        rod(v.slice(j,j+3),[x-sw*.28,base+.4,z+sw*.22],L*.00055,mats.rope,groups.sails);
+      }
     }
   }
   // Stern rudder and head-stock.
@@ -134,7 +211,13 @@ export function buildShip(typeId, {variant='estimated',lod=0,cutaway=false}={}) 
     }
     for(const [mat,geos] of batches) {const merged=mergeGeometries(geos);if(!merged)throw new Error('Incompatible ship geometry');mesh(merged,mat,group);geos.forEach(g=>g.dispose());}
   }
-  ship.userData={typeId,variant,lod,L,B,groups,anchors:{hull:[0,0,B*.45],sails:[L*.05,L*.31,0],bulkheads:[0,-D*.3,0],rudder:[-L*.5,0,0],anchor:[L*.39,F*.5,B*.32],cabins:[-L*.29,F*2,0]}};
+  const waterline=[];
+  for(const side of [-1,1])for(let j=0;j<=segments;j++) {
+    const t=side===-1?j/segments:1-j/segments,s=shape(t);
+    const q=(-.15+D*.25)/(s.y+D*.25);
+    waterline.push([s.x,side*s.w*(.78+.22*q)]);
+  }
+  ship.userData={waterline,typeId,variant,lod,L,B,D,F,layout,groups,anchors:{hull:[0,0,B*.45],sails:[L*.05,L*.31,0],bulkheads:[0,-D*.3,0],rudder:[-L*.5,0,0],anchor:[L*.39,F*.5,B*.32],cabins:[-L*.29,F*2,0]}};
   return ship;
 }
 function material(color,side=THREE.FrontSide) {return new THREE.MeshStandardMaterial({color,roughness:.85,side});}
