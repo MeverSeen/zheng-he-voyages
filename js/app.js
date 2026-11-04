@@ -496,7 +496,8 @@
       '<span class="when"><b>' + esc(v.years) + '</b>' + esc(v.reign) + '</span></div>' +
       '<dl class="facts"><dt>规模</dt><dd>' + esc(v.fleet) + '</dd><dt>人物</dt><dd>' + esc(v.people) + '</dd><dt>最远</dt><dd>' + esc(v.farthest) + '</dd></dl>' +
       '<div class="actions"><button type="button" class="btn-play" id="btn-play" style="--vc:' + vcolor(n) + '"><svg viewBox="0 0 16 16"><path d="M4 2l10 6-10 6z"/></svg>回放航程</button>' +
-      '<button type="button" class="btn-line" id="btn-fit">查看全程</button></div>' +
+      '<button type="button" class="btn-line" id="btn-fit">查看全程</button>' +
+      '<a class="btn-line" href="voyages.html#v' + n + '">航次档案 →</a></div>' +
       '<div class="summary">' + v.summary.map(function (p) { return '<p>' + esc(p) + '</p>'; }).join('') + '</div>' +
       '<blockquote class="source">' + esc(v.quote.t) + '<cite>' + esc(v.quote.s) + '</cite></blockquote>' +
       '<h3>航程 · ' + v.stops.length + ' 站</h3><ol class="stops" id="stops">' + stops + '</ol>' +

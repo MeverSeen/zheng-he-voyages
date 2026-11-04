@@ -9,7 +9,7 @@
   var PAGES = [
     { id: 'map', href: 'index.html', name: '航海图' },
     { id: 'world', href: 'world.html', name: '天下全图', ready: false },
-    { id: 'voyages', href: 'voyages.html', name: '航次档案', ready: false },
+    { id: 'voyages', href: 'voyages.html', name: '航次档案' },
     { id: 'fleet', href: 'fleet.html', name: '舰队复原', ready: false },
     { id: 'people', href: 'people.html', name: '人物复原', ready: false }
   ];

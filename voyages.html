@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>郑和航次档案</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="郑和七下西洋逐次档案：人数、主要官员、船队、航程统计、成果与史料原文。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/voyages.css">
+<script src="js/nav.js"></script>
+</head>
+<body data-page="voyages">
+<header class="masthead">
+  <div class="seal" aria-hidden="true">郑和</div>
+  <div class="title-block">
+    <h1>七下西洋</h1>
+    <p class="sub">航次档案 · 人数、官员、船队、航程与成果</p>
+  </div>
+  <div class="mast-actions">
+    <button class="btn-quiet" id="theme-toggle" type="button" aria-label="切换昼夜配色">夜航</button>
+  </div>
+</header>
+
+<main class="doc">
+  <section class="intro">
+    <h2 class="page-title">航次档案</h2>
+    <p class="lede">从永乐三年（1405）到宣德八年（1433），郑和七次率船队出海。下面先把七次放在一起比较，再逐次列出人数、主要官员、船队规模、航程统计、成果和史料原文。史料没有记载的项目标为"史料未载"，不作推测。</p>
+  </section>
+
+  <section class="block" aria-labelledby="cmp-h">
+    <div class="block-head">
+      <h3 id="cmp-h">七次对比</h3>
+      <p class="note">里程按图上的示意航线计算，只用于比较各次远近，并非实测航迹。点击任一行查看该次详情。</p>
+    </div>
+    <div class="charts">
+      <figure class="chart-card">
+        <figcaption class="chart-title">起止时间<span>受命至回国</span></figcaption>
+        <div class="chart" id="chart-gantt"></div>
+      </figure>
+      <figure class="chart-card">
+        <figcaption class="chart-title">示意航程<span>公里</span></figcaption>
+        <div class="legend-row" id="legend-km"></div>
+        <div class="chart" id="chart-km"></div>
+      </figure>
+    </div>
+    <div class="table-wrap">
+      <table class="data cmp" id="cmp-table">
+        <thead>
+          <tr><th scope="col">航次</th><th scope="col">年份</th><th scope="col">历时</th><th scope="col">人数</th><th scope="col">船只</th><th scope="col">停靠</th><th scope="col">所到国家与地区</th><th scope="col">示意航程</th><th scope="col">最远</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="block detail" id="detail" aria-labelledby="detail-h">
+    <div class="block-head">
+      <h3 id="detail-h">逐次详情</h3>
+    </div>
+    <div class="vpick" id="vpick" role="tablist" aria-label="选择航次"></div>
+    <div id="detail-body"></div>
+  </section>
+</main>
+
+<div class="tip" id="tip" role="status" hidden></div>
+
+<script src="js/data.js"></script>
+<script src="js/route.js"></script>
+<script src="js/voyages-detail.js"></script>
+<script src="js/stats.js"></script>
+<script src="js/voyages-page.js"></script>
+</body>
+</html>

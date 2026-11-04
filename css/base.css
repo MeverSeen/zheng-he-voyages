@@ -32,6 +32,8 @@
   --pc5: #edc8a0; --pc6: #a6d1c8; --pc7: #e4bfcf; --pc8: #cfd09c;
   --rel-ming: #f0cf6a; --rel-visit: #8fc7a3; --rel-loose: #e9bf8e; --rel-tribute: #a9c4de; --rel-other: #dcd6c8;
   --pol-border: #7d6f58;
+  /* 图表（已用 dataviz 校验脚本验证：明暗两套均通过） */
+  --chart-1: #1d67ad; --chart-2: #b06a12; --chart-3: #2f8f68; --chart-muted: #b4bfc4; --chart-grid: #d8d4c6;
   /* 字体 */
   --f-display: "Ma Shan Zheng", "STXingkai", "Xingkai SC", "STKaiti", "Kaiti SC", "KaiTi", serif;
   --f-body: "Noto Serif SC", "Source Han Serif SC", "Source Han Serif CN", "Songti SC", "STSong", "SimSun", serif;
@@ -54,6 +56,7 @@
     --pc5: #6c5336; --pc6: #355f59; --pc7: #684556; --pc8: #5b5c37;
     --rel-ming: #7c6624; --rel-visit: #3f6e55; --rel-loose: #775634; --rel-tribute: #3d5a74; --rel-other: #394039;
     --pol-border: #a69a7c;
+    --chart-1: #3b87d4; --chart-2: #c47b1c; --chart-3: #2f9a72; --chart-muted: #3e4b52; --chart-grid: #26323a;
     --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 8px 22px rgb(0 0 0 / 0.35);
     color-scheme: dark;
   }
@@ -68,6 +71,7 @@
   --pc5: #6c5336; --pc6: #355f59; --pc7: #684556; --pc8: #5b5c37;
   --rel-ming: #7c6624; --rel-visit: #3f6e55; --rel-loose: #775634; --rel-tribute: #3d5a74; --rel-other: #394039;
   --pol-border: #a69a7c;
+  --chart-1: #3b87d4; --chart-2: #c47b1c; --chart-3: #2f9a72; --chart-muted: #3e4b52; --chart-grid: #26323a;
   --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 8px 22px rgb(0 0 0 / 0.35);
   color-scheme: dark;
 }
@@ -178,6 +182,7 @@ button { font: inherit; color: inherit; }
   border: 1px solid var(--rule); background: transparent; border-radius: 4px; padding: 7px 12px; cursor: pointer; font-size: var(--t-sm);
 }
 .btn-line:hover { background: var(--paper-2); }
+a.btn-line { color: var(--ink); text-decoration: none; display: inline-flex; align-items: center; }
 
 /* 史料引文 */
 .source {
