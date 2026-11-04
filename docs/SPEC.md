@@ -114,14 +114,15 @@ y   = (90 − lat)  × K        // 0 … 1800
 window.WM_GEO = {
   proj: { K: 10, C: 0.8660254, phi0: 30 },     // 与 §2.1 一致，供校验
   rasters: [
-    { id: 'world', src: 'assets/terrain_world.jpg', box: [0, 0, 3117.7, 1800], minZoom: 0 },
-    { id: 'io',    src: 'assets/terrain_io.jpg',    box: [x0, y0, w, h],        minZoom: 2 }
+    { id: 'world', src: 'assets/terrain_world.jpg', box: [0, 0, 3117.7, 1800], minScale: 0 },
+    { id: 'io',    src: 'assets/terrain_io.jpg',    box: [x0, y0, w, h],        minScale: 0.9 }   // minScale：屏幕像素/世界单位
   ],
   land:   'M…z…',                // 陆地轮廓（SVG path，世界坐标，用于裁剪疆域）
   coast:  'M…',                  // 海岸线（描边用）
   lakes:  'M…z…',
-  rivers: [ { n: '尼罗河', en: 'Nile', w: 2, d: 'M…', lab: '55%' } ],  // w：1 小河，2 大河；lab：沿线注记位置
-  ranges: [ { n: '喜马拉雅山', at: [86.9, 28.0], rot: -12 } ]          // 山脉注记，[经度, 纬度]，旋转角度
+  rivers: [ { n: '尼罗河', en: 'Nile', w: 2, d: 'M…', ld: 'M…', len: 512 } ],  // w：1 小河，2 大河；d：全部河段；ld：最长一段，沿线注记用；len：最长段长度（u）
+  ranges: [ { n: '喜马拉雅山脉', at: [84.5, 28.6], rot: -14, rank: 1 } ],  // 山脉、高原、沙漠注记，[经度, 纬度]，旋转角度，显示级别
+  seas:   [ { n: '印度洋', at: [78, -15], rank: 1 } ]
 };
 ```
 
@@ -142,10 +143,14 @@ wm.unproject(x, y)          // → [lon, lat]
 wm.layer(name)              // → <g>，name 见 §2.5
 wm.fit([lonW, latS, lonE, latN], { pad: 40, animate: true })
 wm.zoom                     // 当前缩放倍数（只读）
-wm.on('zoom' | 'move' | 'click', fn)
+wm.on('zoom' | 'move' | 'click' | 'polity', fn)   // polity：点击政权色块，回调参数为该政权的 properties
 wm.symbol(el, lon, lat, { rot })   // 放置不随缩放变大的符号（注记、城池、箭头标签）
 wm.label(text, lon, lat, { cls, rank })  // 带避让的注记；rank 1—3，缩放不够时隐藏
-wm.setPolities(fc, { mode: 'states' | 'rel' | 'off', relColors })
+wm.line(lonlats, { cls, layer })   // 折线，返回 <path>
+wm.setPolities(fc, { mode: 'states' | 'rel' | 'off' })
+wm.setPolityMode(mode)
+wm.zoomBy(factor)
+wm.refresh()
 wm.destroy()
 ```
 
@@ -317,33 +322,13 @@ ZHStats.all() → [ voyage(1) … voyage(7) ]
 
 ## 6 人物 `ZH_PEOPLE`
 
-```js
-window.ZH_PEOPLE = {
-  roles: [
-    {
-      id: 'eunuch-envoy', name: '正使太监', example: '郑和、王景弘',
-      rank: '内官监太监（正四品）',
-      duty: '统领全军，宣读诏敕，主持册封与赏赐',
-      costume: [
-        { part: 'hat',  name: '乌纱帽 / 三山帽', note: '……', src: '刘若愚《酌中志》' },
-        { part: 'robe', name: '曳撒',           note: '……', src: '……' },
-        { part: 'belt', name: '革带',           note: '……', src: '……' },
-        { part: 'boots', name: '皂靴',          note: '……', src: '……' }
-      ],
-      items: [ { name: '诏敕', note: '……' } ],
-      palette: { robe: '#7d1f1a', trim: '#c9a54a', hat: '#1f1d1a' },   // 插画与 3D 共用
-      svg: 'art/people/eunuch-envoy.svg',
-      caution: '郑和无同时代画像传世，此为职官典型服饰示意'
-    }
-  ]
-};
-```
+完整格式、各角色要求和史料核查表见 [`PEOPLE-PLAN.md`](PEOPLE-PLAN.md) §5；这里只列接口。
 
-角色 `id`：`eunuch-envoy` 正使太监 · `eunuch-deputy` 副使太监 · `commander` 都指挥 · `soldier` 旗军 · `pilot` 火长 · `interpreter` 通事 · `physician` 医官 · `sailor` 水手或舵工。
-
-`part` 取值：`hat` 冠帽 · `robe` 袍服 · `badge` 补子 · `belt` 腰带 · `boots` 靴鞋 · `armor` 甲胄 · `weapon` 兵器 · `item` 器物。
-
-`buildFigure(roleId, { lod })` 读 `palette`，返回高约 1.7 米的 `THREE.Group`，脚底在 y = 0。
+- `js/people-data.js` 挂 `ZH_PEOPLE = { sources, note, roles }`。每个角色含 `id name example rank duty figure palette costume caution`；`figure` 是 2D 与 3D 共用的部件参数（hat robe sleeve badge belt feet legs beard items），`palette` 是两者共用的颜色。
+- 角色 `id`：`eunuch-envoy` 正使太监 · `eunuch-deputy` 副使太监 · `commander` 都指挥 · `soldier` 旗军 · `pilot` 火长 · `interpreter` 通事 · `physician` 医官 · `sailor` 水手。
+- `costume[].part` 取值：`hat` 冠帽 · `robe` 袍服 · `badge` 补子 · `belt` 腰带 · `boots` 靴鞋 · `armor` 甲胄 · `weapon` 兵器 · `item` 器物。
+- `js/figure2d.js`：`ZHFigure.svg(roleOrId, { annotate: false | 'labels' | 'numbers' })` 返回 SVG 字符串；`ZHFigure.anchors(role)` 返回标注起点。
+- `three/figures.js`：`buildFigure(roleId, { lod })` 返回高约 1.7 米的 `THREE.Group`，脚底在 y = 0，面向 +Z；网格 `userData.part` 同上，另加 `body`。`disposeFigure(group)` 释放资源。
 
 ---
 
@@ -418,7 +403,8 @@ window.ZH_PEOPLE = {
 ## 9 构建与发布
 
 - `node tools/check-routes.mjs`：航线不穿陆地（已有）。
-- `node tools/build-polities.mjs`：旧的政局生成脚本，A8 完成后由 `worldmap/scripts/build_polities.mjs` 取代。
+- `node worldmap/scripts/build_polities.mjs 1415 --center ming --ports js/data.js`：生成政局数据（取代已删除的 tools/build-polities.mjs）。
 - `npm run build`：为现有每个页面生成 `dist/<page>.html`（离线单文件），并生成 Artifact 多文件发布包 `dist/artifact/`。
 - 世界底图：`python3 -I worldmap/scripts/fetch_world.py`，然后 `python3 -I worldmap/scripts/build_world.py`（需要 numpy、scipy、matplotlib、Pillow）。
-- 提交前：对改过的页面截图检查（桌面 1440×900、手机 390×844，昼夜各一张），确认控制台没有报错、页面没有横向滚动。
+- `npm run check:pages`（需另装 Playwright 与 Chromium）：每个页面在桌面 1440×900、手机 390×844、昼夜两种配色下打开并执行典型操作，检查控制台报错、请求失败和横向滚动，截图存入 `.screens/`；源码页面与 `dist/` 各查一遍。新页面上线时，在 `tools/check-pages.mjs` 的 `STEPS` 中加上该页的典型操作。
+- 提交前：运行上面的检查，并亲自看一遍改过页面的截图。

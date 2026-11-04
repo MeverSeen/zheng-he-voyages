@@ -115,13 +115,16 @@ button { font: inherit; color: inherit; }
   background: var(--seal);
   color: var(--seal-ink);
   border-radius: 3px;
-  display: grid;
-  place-items: center;
+  /* 两个字上下排：用固定宽度强制每行一字，不依赖竖排和网络字体（字体加载失败时竖排会错位） */
+  display: block;
+  box-sizing: border-box;
+  padding: 2px 12px;
+  overflow: hidden;
+  text-align: center;
+  word-break: break-all;
   font-family: var(--f-display);
-  font-size: 1.15rem;
-  line-height: 1;
-  writing-mode: vertical-rl;
-  letter-spacing: 0.08em;
+  font-size: 18px;
+  line-height: 20px;
   box-shadow: inset 0 0 0 2px var(--seal), inset 0 0 0 3.5px var(--seal-ink);
 }
 .title-block { min-width: 0; flex: 1; display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
@@ -158,6 +161,8 @@ button { font: inherit; color: inherit; }
 @media (max-width: 760px) {
   .masthead { flex-wrap: wrap; row-gap: 4px; }
   .site-nav { order: 3; width: 100%; margin-inline: -10px; }
+  /* 窄屏时导航已标出当前页，副标题省去，给地图和正文留出高度 */
+  .title-block .sub { display: none; }
 }
 
 /* ---------- 共用排版与组件 ---------- */

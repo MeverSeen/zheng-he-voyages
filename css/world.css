@@ -1,0 +1,113 @@
+/*
+ * 天下全图（world.html）样式。地图图层样式在 worldmap/worldmap.css。
+ * 布局：左侧地图（占满剩余高度），右侧说明栏；窄屏时地图在上、说明在下。
+ */
+html, body { height: 100%; }
+body { display: flex; flex-direction: column; }
+.world-app { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 360px; }
+.world-stage { position: relative; min-width: 0; min-height: 0; }
+#worldmap { position: absolute; inset: 0; }
+.world-panel {
+  min-width: 0; overflow-y: auto; border-left: 1px solid var(--rule); background: var(--paper);
+  padding-block: 18px 32px; padding-left: 20px; padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: flex; flex-direction: column; gap: 14px;
+}
+.wtitle { font-family: var(--f-display); font-weight: 400; font-size: var(--t-xl); letter-spacing: 0.08em; }
+.wh3 { font-size: var(--t-md); display: flex; align-items: center; gap: 10px; }
+.wh3::after { content: ""; flex: 1; height: 1px; background: var(--rule); }
+
+.jump { display: flex; flex-wrap: wrap; gap: 6px; }
+.jump button { border: 1px solid var(--rule); background: var(--paper); border-radius: 999px; padding: 3px 12px; cursor: pointer; font-family: var(--f-ui); font-size: var(--t-xs); color: var(--ink-2); }
+.jump button:hover { border-color: var(--accent); color: var(--ink); }
+
+.card { border: 1px solid var(--rule); border-radius: 6px; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; background: var(--paper-2); }
+.card h4 { font-size: var(--t-md); display: flex; align-items: center; gap: 8px; }
+.card .sw { width: 14px; height: 14px; border-radius: 3px; border: 1px solid var(--pol-border); flex: none; }
+.card .sub { font-family: var(--f-ui); font-size: var(--t-xs); color: var(--muted); }
+.card .chip { align-self: flex-start; font-family: var(--f-ui); font-size: 0.6875rem; padding: 0 8px; border-radius: 3px; line-height: 1.8; color: var(--ink); }
+.card p { font-size: var(--t-sm); }
+.sw-pc0 { background: var(--pc0); } .sw-pc1 { background: var(--pc1); } .sw-pc2 { background: var(--pc2); } .sw-pc3 { background: var(--pc3); }
+.sw-pc4 { background: var(--pc4); } .sw-pc5 { background: var(--pc5); } .sw-pc6 { background: var(--pc6); } .sw-pc7 { background: var(--pc7); }
+.sw-pc8 { background: var(--pc8); }
+.sw-ming { background: var(--rel-ming); } .sw-visit { background: var(--rel-visit); } .sw-loose { background: var(--rel-loose); }
+.sw-tribute { background: var(--rel-tribute); } .sw-other { background: var(--rel-other); }
+
+.wevents { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.wevents li button {
+  all: unset; box-sizing: border-box; width: 100%; cursor: pointer; display: grid; grid-template-columns: 3.4em minmax(0, 1fr); gap: 2px 10px;
+  padding: 8px 4px; border-bottom: 1px solid var(--rule); border-radius: 4px;
+}
+.wevents li button:hover { background: var(--paper-2); }
+.wevents li button:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; }
+.wevents .y { font-family: var(--f-ui); font-size: var(--t-sm); font-weight: 600; font-variant-numeric: tabular-nums; color: var(--accent); }
+.wevents .t { font-size: var(--t-sm); }
+.wevents .t b { display: block; font-size: var(--t-base); }
+
+/* 地图浮层 */
+.wfloat {
+  position: absolute; z-index: 5; background: color-mix(in srgb, var(--paper) 94%, transparent); border: 1px solid var(--rule);
+  border-radius: 6px; box-shadow: var(--shadow); font-family: var(--f-ui); font-size: var(--t-xs); color: var(--ink-2);
+}
+.wtools { top: 10px; right: 10px; padding: 8px; display: flex; flex-direction: column; gap: 8px; }
+.seg { display: flex; border: 1px solid var(--rule); border-radius: 4px; overflow: hidden; }
+.seg button { flex: 1; border: 0; background: transparent; padding: 4px 10px; cursor: pointer; font-size: var(--t-xs); color: var(--ink-2); white-space: nowrap; }
+.seg button + button { border-left: 1px solid var(--rule); }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--paper); }
+.toggles { display: flex; gap: 10px; flex-wrap: wrap; }
+.toggles label { display: inline-flex; align-items: center; gap: 4px; cursor: pointer; white-space: nowrap; }
+.toggles input { accent-color: var(--accent); margin: 0; }
+.wzoom { top: 10px; left: 10px; display: flex; flex-direction: column; overflow: hidden; }
+.wzoom button { width: 32px; height: 30px; border: 0; background: transparent; cursor: pointer; font-size: 16px; color: var(--ink); }
+.wzoom button + button { border-top: 1px solid var(--rule); }
+.wzoom #zoom-home { font-family: var(--f-body); font-size: 13px; }
+.wzoom button:hover { background: var(--paper-2); }
+.wlegend { left: 10px; bottom: 10px; padding: 8px 10px; display: flex; flex-direction: column; gap: 5px; max-width: calc(100% - 20px); }
+.wlegend .ttl { color: var(--ink); font-weight: 600; }
+.wlegend .sws { display: grid; grid-template-columns: repeat(2, max-content); gap: 3px 12px; }
+.wlegend .sws span, .wlegend .row { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.wlegend i { display: inline-block; width: 14px; height: 10px; border-radius: 2px; border: 1px solid var(--pol-border); }
+.wlegend .strip { display: flex; gap: 2px; }
+.wlegend .strip i { width: 12px; }
+.wlegend .ln { width: 22px; height: 0; border: 0; border-top: 2.5px solid var(--v4); border-radius: 0; }
+.wlegend .ln.old { border-top: 2px dashed #4f8396; }
+
+.wlegend-panel { display: none; }
+.wlegend-panel { flex-direction: column; gap: 5px; font-family: var(--f-ui); font-size: var(--t-xs); color: var(--ink-2); border: 1px solid var(--rule); border-radius: 6px; padding: 8px 10px; }
+.wlegend-panel .ttl { color: var(--ink); font-weight: 600; }
+.wlegend-panel .sws { display: grid; grid-template-columns: repeat(2, max-content); gap: 3px 12px; }
+.wlegend-panel .sws span, .wlegend-panel .row { display: inline-flex; align-items: center; gap: 6px; }
+.wlegend-panel i { display: inline-block; width: 14px; height: 10px; border-radius: 2px; border: 1px solid var(--pol-border); }
+.wlegend-panel .strip { display: flex; gap: 2px; }
+.wlegend-panel .strip i { width: 12px; }
+.wlegend-panel .ln { width: 22px; height: 0; border: 0; border-top: 2.5px solid var(--v4); border-radius: 0; }
+.wlegend-panel .ln.old { border-top: 2px dashed #4f8396; }
+
+/* 地图上的要素 */
+.wm .zroute { fill: none; stroke-width: 1.8px; vector-effect: non-scaling-stroke; stroke-linecap: round; stroke-linejoin: round; opacity: 0.9; }
+.wm .zroute.v1 { stroke: var(--v1); } .wm .zroute.v2 { stroke: var(--v2); } .wm .zroute.v3 { stroke: var(--v3); } .wm .zroute.v4 { stroke: var(--v4); }
+.wm .zroute.v5 { stroke: var(--v5); } .wm .zroute.v6 { stroke: var(--v6); } .wm .zroute.v7 { stroke: var(--v7); }
+.wm .zroute.br { stroke-dasharray: 2 4; stroke-width: 1.5px; }
+.wm .huang-old { fill: none; stroke: #3f7c90; stroke-width: 2px; stroke-dasharray: 5 4; vector-effect: non-scaling-stroke; }
+.wm .port circle { fill: var(--paper); stroke: var(--ink); stroke-width: 1.4; }
+.wm .port text { font-size: 11px; }
+.wm .cap circle.o { fill: var(--paper); stroke: var(--ink); stroke-width: 1.4; }
+.wm .cap circle.i { fill: var(--ink); }
+.wm .cap text { font-size: 11.5px; font-weight: 700; }
+.wm .wev { cursor: pointer; }
+.wm .wev rect { fill: var(--seal); stroke: var(--seal-ink); stroke-width: 1.2; }
+.wm .wev text.g { fill: var(--seal-ink); stroke: none; font-size: 12px; font-weight: 700; font-family: var(--f-body); }
+.wm .wev:hover rect, .wm .wev.on rect { stroke: var(--ink); stroke-width: 2; }
+.no-routes .wm-routes, .no-events .wevs, .no-rivers .wm-water, .no-rivers .wm-river-label { display: none; }
+.wm-z1 .port text, .wm-z1 .port, .wm-z2 .port text { display: none; }
+.wm-z1 .cap text { display: none; }
+
+@media (max-width: 860px) {
+  html, body { height: auto; }
+  body { display: block; }
+  .world-app { display: flex; flex-direction: column; }
+  .world-stage { height: 64svh; min-height: 420px; }
+  .world-panel { border-left: 0; border-top: 1px solid var(--rule); overflow: visible; padding-left: max(16px, env(safe-area-inset-left, 0px)); }
+  .wtools { right: 8px; top: 8px; padding: 6px; }
+  .wlegend { display: none; }
+  .wlegend-panel { display: flex; }
+}

@@ -136,23 +136,25 @@
     return '<div class="pop">' +
       '<div class="hd"><i class="pol-sw sw-pc' + p.c + '"></i><div><h4>' + esc(p.name) + (lab && lab !== p.name ? ' · ' + esc(lab) : '') + '</h4>' +
       '<div class="sub">' + esc(p.alt) + '</div></div></div>' +
-      '<span class="rel-chip sw-' + p.rel + '">' + esc(REL[p.rel]) + '</span>' +
+      '<span class="rel-chip sw-' + p.tags.rel + '">' + esc(REL[p.tags.rel]) + '</span>' +
       '<p>' + esc(p.desc) + '</p>' +
       (ports ? '<div class="sub">境内港口：' + esc(ports) + '</div>' : '') +
       '<div class="sub">约 1415 年形势，疆界为示意。</div></div>';
   }
-  var polLayer = L.geoJSON(window.ZH_POLITIES, {
+  // 与天下全图共用 worldmap/polities/1415.js；坐标为 [经度, 纬度]，注记位置 lp 亦然
+  var POLITIES = window.WM_POLITIES['1415'];
+  var polLayer = L.geoJSON(POLITIES, {
     pane: 'polityPane',
-    style: function (f) { return { className: 'polity pc' + f.properties.c + ' rel-' + f.properties.rel }; },
+    style: function (f) { return { className: 'polity pc' + f.properties.c + ' rel-' + f.properties.tags.rel }; },
     onEachFeature: function (f, layer) {
       layer.bindPopup(function () { return polityPopup(f.properties); }, { className: 'zh-popup', maxWidth: 320, autoPanPadding: [40, 40] });
     }
   });
   var polLabels = L.layerGroup();
-  window.ZH_POLITIES.features.forEach(function (f) {
+  POLITIES.features.forEach(function (f) {
     var p = f.properties;
     if (!p.label || !p.lp) return;
-    polLabels.addLayer(L.marker(p.lp, {
+    polLabels.addLayer(L.marker([p.lp[1], p.lp[0]], {
       pane: 'polLabelPane', interactive: false, keyboard: false,
       icon: L.divIcon({ className: 'pol-label r' + p.rank, html: '<span>' + esc(p.label) + '</span>', iconSize: [0, 0] })
     }));

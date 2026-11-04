@@ -28,14 +28,14 @@
 
 | 编号 | 任务 | 依赖 | 验收标准 | 状态 | 记录 |
 |---|---|---|---|---|---|
-| A1 | `worldmap/scripts/fetch_world.py`：下载 Terrarium 高程瓦片（全球 z4，印度洋—东亚 z5）、Natural Earth 1:50m 海岸与湖泊、1:10m 河流 | — | 重复运行不重复下载；输出在 `worldmap/data/raw/`（git 忽略） | 待办 | |
-| A2 | `worldmap/scripts/build_world.py`：按统一投影渲染晕渲加分层设色底图，包括全球图和印度洋—东亚细图；配色沿用 `songjin-zhizhan` 的 `LAND` 色阶 | A1 | `worldmap/assets/terrain_world.jpg`（约 3100×1800）与 `terrain_io.jpg`（约 2800×1900），每张不超过 2.5 MB | 待办 | |
-| A3 | 同一脚本生成矢量：陆地轮廓、海岸线、湖泊、主要河流（带中文名），输出 `worldmap/geo/world.geo.js` | A1 | 与底图严格对齐（误差 < 1 个底图像素）；文件不超过 1.5 MB | 待办 | |
-| A4 | `worldmap/worldmap.js` 渲染引擎：投影换算、平移缩放、按缩放切换高清底图、"不随缩放变大"的符号层、注记避让 | A2 A3 | 按 SPEC §2 的接口实现；桌面和手机都能拖动、双指缩放 | 待办 | |
-| A5 | 1415 年世界政局数据：把 `tools/polities-src.mjs` 迁到 `worldmap/polities/1415.mjs`，补全欧洲、非洲、美洲、大洋洲、北亚；增加宗主关系、附属样式等字段 | — | 按 SPEC §3；核心区（亚非沿岸）保持现有精度，其他地区为"粗略"级并在界面注明 | 待办 | |
-| A6 | `worldmap/scripts/build_polities.mjs`：裁剪、去重、配色，输出 `worldmap/polities/1415.js` | A3 A5 | 相邻政权颜色不同；藩属用斜线或点纹 | 待办 | |
-| A7 | `world.html` 天下全图：政局（诸国、与明关系两种模式）、郑和七次航线、都城、同期大事注记（如 1405 帖木儿去世、1415 葡萄牙占领休达、1428 阿兹特克三国同盟等） | A4 A6 | 点击政权弹出简介；可直接跳到某一航次的视野 | 待办 | |
-| A8 | 航海图（Leaflet）改读统一政局数据（`worldmap/polities/1415.js`），删除旧的 `data/polities.js`；可选：把 A2 底图切成瓦片，作为 Leaflet 的"地形"底图 | A6 | 航海图功能不退化；`tools/check-routes.mjs` 仍通过 | 待办 | |
+| A1 | `worldmap/scripts/fetch_world.py`：下载 Terrarium 高程瓦片（全球 z4，印度洋—东亚 z5）、Natural Earth 1:50m 海岸与湖泊、1:10m 河流 | — | 重复运行不重复下载；输出在 `worldmap/data/raw/`（git 忽略） | 完成 | 下载 256 张 z4 与 104 张 z5 高程瓦片及三份 Natural Earth 数据，共约 36 MB，不入库 |
+| A2 | `worldmap/scripts/build_world.py`：按统一投影渲染晕渲加分层设色底图，包括全球图和印度洋—东亚细图；配色沿用 `songjin-zhizhan` 的 `LAND` 色阶 | A1 | `worldmap/assets/terrain_world.jpg`（约 3100×1800）与 `terrain_io.jpg`（约 2800×1900），每张不超过 2.5 MB | 完成 | terrain_world.jpg 3118×1800（648 KB）、terrain_io.jpg 2815×1875（723 KB）；两极按纬度横向平滑以消除拉伸条纹 |
+| A3 | 同一脚本生成矢量：陆地轮廓、海岸线、湖泊、主要河流（带中文名），输出 `worldmap/geo/world.geo.js` | A1 | 与底图严格对齐（误差 < 1 个底图像素）；文件不超过 1.5 MB | 完成 | world.geo.js 615 KB：1349 个陆地环、373 个湖泊、88 条带中文名的河流，另有山脉与海洋注记；陆地轮廓与底图同源，严格对齐 |
+| A4 | `worldmap/worldmap.js` 渲染引擎：投影换算、平移缩放、按缩放切换高清底图、"不随缩放变大"的符号层、注记避让 | A2 A3 | 按 SPEC §2 的接口实现；桌面和手机都能拖动、双指缩放 | 完成 | worldmap/worldmap.js + worldmap.css；注记分级与细图切换按绝对比例尺，手机与桌面一致；离线版可读内嵌的 WM_RASTER_DATA |
+| A5 | 1415 年世界政局数据：把 `tools/polities-src.mjs` 迁到 `worldmap/polities/1415.mjs`，补全欧洲、非洲、美洲、大洋洲、北亚；增加宗主关系、附属样式等字段 | — | 按 SPEC §3；核心区（亚非沿岸）保持现有精度，其他地区为"粗略"级并在界面注明 | 完成 | worldmap/polities/1415.mjs：120 个政权（核心区 73，粗略区 47：欧洲、北非、西非、中南非、美洲）；新增 kind、suzerain、style、detail 字段 |
+| A6 | `worldmap/scripts/build_polities.mjs`：裁剪、去重、配色，输出 `worldmap/polities/1415.js` | A3 A5 | 相邻政权颜色不同；藩属用斜线或点纹 | 完成 | worldmap/scripts/build_polities.mjs：155 KB，邻国不同色，藩属斜线、部族联盟点纹；可选 --ports 统计境内港口 |
+| A7 | `world.html` 天下全图：政局（诸国、与明关系两种模式）、郑和七次航线、都城、同期大事注记（如 1405 帖木儿去世、1415 葡萄牙占领休达、1428 阿兹特克三国同盟等） | A4 A6 | 点击政权弹出简介；可直接跳到某一航次的视野 | 完成 | world.html：诸国／与明关系两种着色、七次航线、28 座都城、13 条同期世界大事、黄河夺淮故道；五个快速视野 |
+| A8 | 航海图（Leaflet）改读统一政局数据（`worldmap/polities/1415.js`），删除旧的 `data/polities.js`；可选：把 A2 底图切成瓦片，作为 Leaflet 的"地形"底图 | A6 | 航海图功能不退化；`tools/check-routes.mjs` 仍通过 | 完成 | 航海图改读 WM_POLITIES[1415]，删除 data/polities.js、tools/polities-src.mjs、tools/build-polities.mjs；check-routes 通过。Leaflet 地形瓦片暂未做（可选项） |
 
 ## B 航次档案
 
@@ -60,13 +60,15 @@
 
 ## D 人物复原
 
+人物复原由项目负责人分步完成，需求表、各角色要求与史料核查表见 [`PEOPLE-PLAN.md`](PEOPLE-PLAN.md)。
+
 | 编号 | 任务 | 依赖 | 验收标准 | 状态 | 记录 |
 |---|---|---|---|---|---|
-| D1 | `js/people-data.js`：八类典型角色（正使太监、副使太监、都指挥、旗军、火长、通事、医官、水手或舵工）的身份说明、服饰部件、器物、出处 | — | 按 SPEC §6；服饰依据《明史·舆服志》《明会典》《酌中志》《三才图会》等 | 待办 | |
-| D2 | 2D 服饰插画：每个角色一张 SVG 立绘，配部件标注（冠帽、袍服、补子、腰带、靴鞋、器物） | D1 | 统一画风与线宽（SPEC §7.4）；明暗两套配色 | 待办 | |
-| D3 | `three/figures.js`：同一套角色的低多边形 3D 人物 | D1, three.js | `buildFigure(roleId)` 返回 `THREE.Group`，高约 1.7 米（与船同一比例尺） | 待办 | |
-| D4 | `people.html`：插画图版 + 3D 查看，两种形式可切换 | D2 D3 | 每个角色有"服饰说明"与"出处" | 待办 | |
-| D5 | 把 3D 人物放到舰队场景中的宝船甲板上（近景才显示） | C5 D3 | 不明显降低帧率 | 待办 | |
+| D1 | `js/people-data.js`：八类典型角色（正使太监、副使太监、都指挥、旗军、火长、通事、医官、水手）的身份说明、服饰部件、配色、出处 | — | 详细要求与史料核查表见 [`PEOPLE-PLAN.md`](PEOPLE-PLAN.md)（P1、§6） | 草稿 | 出处待逐条核对原文 |
+| D2 | 2D 服饰立绘与部件标注 | D1 | PEOPLE-PLAN P2、P3、§4.1；草稿生成器 `js/figure2d.js` | 草稿 | |
+| D3 | `three/figures.js`：同一套角色的低多边形 3D 人物 | D1, three.js | PEOPLE-PLAN P4、§4.2；`buildFigure(roleId, { lod })` | 草稿 | lod 0 约 3,500 三角面 |
+| D4 | `people.html`：立绘、3D、群像三种视图 | D2 D3 | PEOPLE-PLAN P5、P6、§4.3 | 待办 | |
+| D5 | 把 3D 人物放到舰队场景中的宝船甲板上（近景才显示） | C5 D3 | PEOPLE-PLAN P7、§4.4；由舰队页维护者合入 | 待办 | |
 
 ## E 共用
 
@@ -74,8 +76,8 @@
 |---|---|---|---|---|---|
 | E1 | 拆出 `css/base.css`（设计令牌、页眉、导航、按钮、引文等共用样式），五个页面共用一个页眉导航 | — | 现有航海图外观不变 | 完成 | `js/nav.js` 生成导航并接管昼夜切换（派发 `zh:theme` 事件）；页面完成后把 `PAGES` 中对应项的 `ready: false` 删去 |
 | E2 | 引入 three.js：从 npm 获取 `three@0.160.0`，放进 `vendor/three/`（`three.module.min.js` 与 `OrbitControls.js`），附许可证 | — | 页面通过 import map 加载，见 SPEC §1.3 | 完成 | 另带 `addons/utils/BufferGeometryUtils.js`（合并几何体用）；离线单文件版需用 esbuild 打包（file:// 下浏览器不加载 ES 模块），在 E3 处理 |
-| E3 | `tools/build.mjs` 改为多页面：为每个页面生成离线单文件；为 Artifact 生成多文件发布包 | 各页面 | `dist/` 下每个页面都能双击打开 | 进行中 | 已支持现有航海图、航次档案、舰队三页的离线构建和多文件包；世界、人物页待实现后接入。 |
-| E4 | 检查与文档：每个页面截图检查（桌面、手机、昼夜）；更新 README | 全部 | 无控制台报错，无横向滚动 | 进行中 | 舰队页验收与README已更新；全站其余页面留待后续。 |
+| E3 | `tools/build.mjs` 改为多页面：为每个页面生成离线单文件；为 Artifact 生成多文件发布包 | 各页面 | `dist/` 下每个页面都能双击打开 | 完成 | 航海图、天下全图、航次档案、舰队四页均已接入；天下全图内嵌地形底图，舰队页内嵌宝船 GLB。人物页上线时按 PEOPLE-PLAN P11 接入 |
+| E4 | 检查与文档：每个页面截图检查（桌面、手机、昼夜）；更新 README | 全部 | 无控制台报错，无横向滚动 | 完成 | 新增 `tools/check-pages.mjs`（`npm run check:pages`）：四页 × 桌面/手机 × 昼夜，另含典型操作，源码与 `dist/` 各一遍，全部通过；窄屏统一隐藏页眉副标题；README 按四个页面重写 |
 
 ## 建议顺序
 

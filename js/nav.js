@@ -8,7 +8,7 @@
   // ready: false 的页面尚未完成，不出现在导航中（完成一个就改一个，见 docs/ROADMAP.md）
   var PAGES = [
     { id: 'map', href: 'index.html', name: '航海图' },
-    { id: 'world', href: 'world.html', name: '天下全图', ready: false },
+    { id: 'world', href: 'world.html', name: '天下全图' },
     { id: 'voyages', href: 'voyages.html', name: '航次档案' },
     { id: 'fleet', href: 'fleet.html', name: '舰队复原' },
     { id: 'people', href: 'people.html', name: '人物复原', ready: false }

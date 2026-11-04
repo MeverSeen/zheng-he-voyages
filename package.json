@@ -9,9 +9,11 @@
     "model:init-master": "node tools/ship-pipeline.mjs init-master",
     "model:export": "node tools/ship-pipeline.mjs export",
     "model:render": "node tools/ship-pipeline.mjs render",
-    "model:check": "node tools/ship-pipeline.mjs check"
+    "model:check": "node tools/ship-pipeline.mjs check",
+    "check:pages": "node tools/check-pages.mjs && node tools/check-pages.mjs --dist"
   },
   "devDependencies": {
-    "esbuild": "0.25.12"
+    "esbuild": "0.25.12",
+    "polygon-clipping": "0.15.7"
   }
 }
