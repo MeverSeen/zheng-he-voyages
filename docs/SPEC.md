@@ -279,52 +279,39 @@ ZHStats.all() → [ voyage(1) … voyage(7) ]
 
 ---
 
-## 5 舰队
+## 5 舰队（2026-11-04 实现约定）
 
-### 5.1 船型 `ZH_FLEET.types`
+### 5.1 数据与证据
 
-长度单位为米，3D 场景中 1 单位 = 1 米。
+`js/fleet-data.js` 挂载 `ZH_FLEET`，依赖 `ZH_DETAIL`。`sources` 保存出处标题、链接和适用限制。`types` 包含 `baochuan`、`machuan`、`liangchuan`、`zuochuan`、`zhanchuan`。
 
-```js
-window.ZH_FLEET = {
-  chiToM: 0.311,                          // 明尺换算（营造尺），可在界面说明
-  types: {
-    baochuan: {
-      name: '宝船', role: '正使座船，载赏赐与货物',
-      variants: {
-        recorded:  { L: 138, B: 56, label: '史载（《明史》四十四丈四尺 × 十八丈）', src: '《明史·郑和传》' },
-        estimated: { L: 61.2, B: 13.8, label: '学界估计（二千料船复原，约 61 米）', src: '待核：席龙飞等对二千料海船的复原' }
-      },
-      masts: 9, decks: 4, rudder: 'balanced',  // 桅数、甲板层数、舵型
-      hull: 'fu',                               // fu 福船型 | sha 沙船型（船型之争，默认福船）
-      parts: ['水密隔舱', '平衡舵', '硬帆（竹篾撑条）', '锚'],
-      src: '罗懋登《西洋记》（小说，尺度存疑）'
-    }
-    // machuan 马船、liangchuan 粮船、zuochuan 坐船、zhanchuan 战船
-  },
-  hotspots: { baochuan: [ { id: 'rudder', name: '舵', at: [-60, 4, 0], text: '……', src: '……' } ] }
-};
-```
+每个船型有 `name`、`role`、`variants`、`model` 和 `src`。每个尺度方案含 `L`、`B`（米）、`label`、`evidence`、`src`。宝船 `estimated` 为金国平文章第557页介绍的61.2×13.8米解释，`recorded` 按《明史》44丈×18丈、尺长0.311米折算为136.84×55.98米，不混同44丈4尺的另一版本。其余四类船尺度明确为建模假设，不称为研究定论。
 
-### 5.2 各次舰队构成 `ZH_FLEET.voyages`
+`model` 保存展示桅数、船楼层数、隔舱数、用途布置和假设说明。吃水、干舷及构件比例由模型的长度比例推定；并非原船图纸。五至九桅采用传统模型展示体系，不能作为同时代实测证据。
 
-```js
-voyages: {
-  1: {
-    recorded: { text: '大船 62 艘', src: '《明史》' },
-    model: { baochuan: 62, machuan: 40, liangchuan: 40, zuochuan: 50, zhanchuan: 40 },  // 用于 3D 场景
-    estimate: true,                                     // model 中有估计成分时必须为 true
-    basis: '大船数取《明史》；其余按……比例估计'
-  }
-}
-```
+### 5.2 七次舰队
 
-### 5.3 3D 约定
+`voyages[n].recorded` 含 `n`、`text`、`src`、`scope`；未知数量为 null。第一次62艘为大舶数，第二次249艘为改造数（不能当出航数），第三次48号为海舶记载。其余保留未载。
 
-- 坐标系：+X 指向船首，+Y 向上，+Z 指向右舷；水线在 y = 0。
-- `buildShip(typeId, { variant: 'estimated' | 'recorded', lod: 0 | 1 | 2, color })` 返回 `THREE.Group`；`lod 0` 为近景全细节，`lod 2` 为远景（只有船体与帆的简化形）。
-- 舰队场景用 `InstancedMesh` 按船型分批渲染；阵型函数 `formation(voyageModel, { spacing })` 返回每艘船的位置与朝向。
-- 画质自适应：像素比不超过 2；连续低于 40 帧时降低 LOD 并关闭阴影。
+`model` 是船型到数量的映射，`estimate: true`、`basis` 必填。现用250艘统一教学编成；七次共用同一假设，不能用于比较历史规模。记载模式的重复船形仅是计数符号，不断言全部同型。
+
+### 5.3 模型接口
+
+`buildShip(typeId, { variant: 'estimated' | 'recorded', lod: 0 | 1 | 2, cutaway: boolean })` 返回 `THREE.Group`。
+
+- +X 船首、+Y 向上、+Z 右舷、水线 y=0，1单位=1米。
+- `userData` 提供 `L`、`B`、`groups`、`anchors`。构件键为 hull/sails/bulkheads/rudder/anchor/cabins。
+- 同一构件内按材质合并几何体，保留构件点击；近景宝船约20,409三角面。
+- `lod=0` 全细节；`1` 减少索具、货物和细节；`2` 舰队远景。
+- `disposeObject` 释放共享几何体和材质；`triangleCount` 用于预算检查。
+
+`buildFleet(n, { mode, variant, filter, spacing, lod })` 返回实例化舰队，`userData.count` 是实际展示数。布局按最大船长船宽留间距，并非历史阵型。当前舰队采用低细节，点击可进入单船全细节查看。
+
+### 5.4 页面与渲染
+
+`fleet.html#mode=fleet&v=3` 直达第三次；`ship=baochuan&scale=recorded` 选择船型与尺度；`counts=estimated` 选择教学编成。
+
+`js/fleet-info.js` 为普通脚本，独立渲染文字资料；三维上下文不可用时仍能查看船型和航次。`three/scene.js` 提供相机、光照、海面、昼夜同步、尺寸适配和低帧率降级。移动端限制像素比，隐藏页面暂停渲染。资料出处不依赖在线请求，外部链接只用于查阅。
 
 ---
 
@@ -432,6 +419,6 @@ window.ZH_PEOPLE = {
 
 - `node tools/check-routes.mjs`：航线不穿陆地（已有）。
 - `node tools/build-polities.mjs`：旧的政局生成脚本，A8 完成后由 `worldmap/scripts/build_polities.mjs` 取代。
-- `node tools/build.mjs`：E3 完成后为每个页面生成 `dist/<page>.html`（离线单文件），并生成 Artifact 多文件发布包 `dist/artifact/`。
+- `npm run build`：为现有每个页面生成 `dist/<page>.html`（离线单文件），并生成 Artifact 多文件发布包 `dist/artifact/`。
 - 世界底图：`python3 -I worldmap/scripts/fetch_world.py`，然后 `python3 -I worldmap/scripts/build_world.py`（需要 numpy、scipy、matplotlib、Pillow）。
 - 提交前：对改过的页面截图检查（桌面 1440×900、手机 390×844，昼夜各一张），确认控制台没有报错、页面没有横向滚动。

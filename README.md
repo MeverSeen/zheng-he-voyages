@@ -13,6 +13,20 @@
 - **政治疆域**：以约 1415 年（第四、五次下西洋之间）为准，为明朝、交趾、帖木儿帝国、马穆鲁克苏丹国、阿瑜陀耶、满者伯夷、孟加拉苏丹国、毗奢耶那伽罗等 73 个政权着色。可切换"诸国"（一色一国）与"与明关系"（明朝直辖 / 郑和船队到访 / 明朝羁縻 / 遣使往来 / 其他）两种着色，点击色块可查看各国简介与境内港口。
 - **底图**：默认"古卷"底图由内置的 Natural Earth 海岸线绘制，无需联网；也可切换 Esri 在线海图或卫星图。支持昼/夜两种配色和手机屏幕。
 
+## 舰队复原
+
+打开 `fleet.html`，可观察五类船型的船体、桅帆、艉舵、锚及隔舱，切换宝船尺度、剖视和七次舰队。复原方案与假设均附说明，舰队数量未知时保留“史料未载”。250艘编成为统一教学假设，不代表各次真实规模。
+
+计划与依据见 [`docs/FLEET-PLAN.md`](docs/FLEET-PLAN.md)，验收范围见 [`docs/FLEET-VALIDATION.md`](docs/FLEET-VALIDATION.md)。
+
+```bash
+npm ci
+npm run check
+npm run build
+```
+
+`dist/index.html`、`dist/voyages.html`、`dist/fleet.html` 均为离线单文件；放在同一目录可互相跳转。`dist/zheng-he-voyages-standalone.html` 为航海图兼容文件名。生成的 `dist/artifact/` 是多文件发布包。
+
 ## 开发计划
 
 第二阶段（统一世界底图与 1415 年世界政局、航次档案、舰队 3D 复原、人物复原）的任务清单见 [`docs/ROADMAP.md`](docs/ROADMAP.md)，接口、数据格式与样式规范见 [`docs/SPEC.md`](docs/SPEC.md)。

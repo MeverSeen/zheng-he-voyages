@@ -6,9 +6,9 @@
 <title>郑和七下西洋</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <meta name="description" content="交互地图：郑和船队 1405—1433 年七次下西洋的航线、停靠港口、重要事件与史料原文。">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;600;700&display=swap">
+
+
+
 <style>
 /* required styles */
 
@@ -675,9 +675,8 @@ svg.leaflet-image-layer.leaflet-interactive path {
 </style>
 <style>
 /*
- * 郑和七下西洋 · 样式
- * 布局：左侧"书页"面板（史事、航程、人物），右侧海图；窄屏时海图在上、面板在下。
- * 配色取自青绿山水的矿物颜料：石青、石绿、绢色，朱砂只用于印章与用兵。
+ * 郑和七下西洋 · 共用样式（设计令牌、页眉导航、按钮、引文、印章标记、表格）
+ * 各页面先引入本文件，再引入自己的样式。令牌说明见 docs/SPEC.md §7。
  */
 :root {
   /* 纸与墨 */
@@ -709,6 +708,8 @@ svg.leaflet-image-layer.leaflet-interactive path {
   --pc5: #edc8a0; --pc6: #a6d1c8; --pc7: #e4bfcf; --pc8: #cfd09c;
   --rel-ming: #f0cf6a; --rel-visit: #8fc7a3; --rel-loose: #e9bf8e; --rel-tribute: #a9c4de; --rel-other: #dcd6c8;
   --pol-border: #7d6f58;
+  /* 图表（已用 dataviz 校验脚本验证：明暗两套均通过） */
+  --chart-1: #1d67ad; --chart-2: #b06a12; --chart-3: #2f8f68; --chart-muted: #b4bfc4; --chart-grid: #d8d4c6;
   /* 字体 */
   --f-display: "Ma Shan Zheng", "STXingkai", "Xingkai SC", "STKaiti", "Kaiti SC", "KaiTi", serif;
   --f-body: "Noto Serif SC", "Source Han Serif SC", "Source Han Serif CN", "Songti SC", "STSong", "SimSun", serif;
@@ -731,6 +732,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
     --pc5: #6c5336; --pc6: #355f59; --pc7: #684556; --pc8: #5b5c37;
     --rel-ming: #7c6624; --rel-visit: #3f6e55; --rel-loose: #775634; --rel-tribute: #3d5a74; --rel-other: #394039;
     --pol-border: #a69a7c;
+    --chart-1: #3b87d4; --chart-2: #c47b1c; --chart-3: #2f9a72; --chart-muted: #3e4b52; --chart-grid: #26323a;
     --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 8px 22px rgb(0 0 0 / 0.35);
     color-scheme: dark;
   }
@@ -745,13 +747,13 @@ svg.leaflet-image-layer.leaflet-interactive path {
   --pc5: #6c5336; --pc6: #355f59; --pc7: #684556; --pc8: #5b5c37;
   --rel-ming: #7c6624; --rel-visit: #3f6e55; --rel-loose: #775634; --rel-tribute: #3d5a74; --rel-other: #394039;
   --pol-border: #a69a7c;
+  --chart-1: #3b87d4; --chart-2: #c47b1c; --chart-3: #2f9a72; --chart-muted: #3e4b52; --chart-grid: #26323a;
   --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 8px 22px rgb(0 0 0 / 0.35);
   color-scheme: dark;
 }
 
 /* ---------- 基础 ---------- */
 *, *::before, *::after { box-sizing: border-box; }
-html, body { height: 100%; }
 body {
   margin: 0;
   background: var(--paper);
@@ -759,8 +761,6 @@ body {
   font-family: var(--f-body);
   font-size: var(--t-base);
   line-height: 1.75;
-  display: flex;
-  flex-direction: column;
   -webkit-font-smoothing: antialiased;
 }
 [hidden] { display: none !important; }
@@ -822,6 +822,104 @@ button { font: inherit; color: inherit; }
 }
 .btn-quiet:hover { background: var(--paper-2); }
 
+/* 栏目导航（js/nav.js 生成） */
+.site-nav { display: flex; align-items: center; gap: 2px; overflow-x: auto; scrollbar-width: none; min-width: 0; }
+.site-nav::-webkit-scrollbar { display: none; }
+.site-nav a {
+  flex: none; padding: 6px 10px; color: var(--ink-2); text-decoration: none; white-space: nowrap;
+  font-size: var(--t-sm); letter-spacing: 0.06em; border-radius: 4px;
+}
+.site-nav a:hover { background: var(--paper-2); color: var(--ink); }
+.site-nav a[aria-current="page"] { color: var(--ink); font-weight: 700; border-radius: 0; box-shadow: inset 0 -2px 0 var(--accent); }
+@media (max-width: 760px) {
+  .masthead { flex-wrap: wrap; row-gap: 4px; }
+  .site-nav { order: 3; width: 100%; margin-inline: -10px; }
+}
+
+/* ---------- 共用排版与组件 ---------- */
+.lede { font-size: var(--t-md); line-height: 1.8; }
+.note { color: var(--muted); font-size: var(--t-sm); }
+.kicker { font-family: var(--f-ui); font-size: var(--t-xs); letter-spacing: 0.12em; color: var(--muted); }
+.btn-play {
+  --vc: var(--accent);
+  border: 0;
+  background: var(--vc);
+  color: var(--paper);
+  border-radius: 4px;
+  padding: 8px 16px 8px 12px;
+  display: inline-flex; align-items: center; gap: 8px;
+  cursor: pointer;
+  font-size: var(--t-base);
+  letter-spacing: 0.06em;
+}
+.btn-play svg { width: 16px; height: 16px; fill: currentColor; }
+.btn-play:hover { filter: brightness(1.08); }
+.btn-line {
+  border: 1px solid var(--rule); background: transparent; border-radius: 4px; padding: 7px 12px; cursor: pointer; font-size: var(--t-sm);
+}
+.btn-line:hover { background: var(--paper-2); }
+a.btn-line { color: var(--ink); text-decoration: none; display: inline-flex; align-items: center; }
+
+/* 史料引文 */
+.source {
+  margin: 0;
+  padding: 12px 14px 12px 16px;
+  background: var(--paper-2);
+  border-left: 3px solid var(--accent);
+  font-size: var(--t-sm);
+  line-height: 1.85;
+}
+.source cite { display: block; margin-top: 6px; font-style: normal; font-family: var(--f-ui); font-size: var(--t-xs); color: var(--muted); }
+.source cite::before { content: "—— "; }
+
+/* 印章式小标记（大事类型） */
+.glyph {
+  display: inline-grid; place-items: center;
+  width: 24px; height: 24px;
+  border: 1.5px solid var(--ink-2);
+  border-radius: 3px;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-weight: 700;
+  font-style: normal;
+  font-size: 13px;
+  line-height: 1;
+}
+.glyph.g-战 { background: var(--seal); border-color: var(--seal); color: var(--seal-ink); }
+.glyph.g-卒 { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+.glyph.g-碑 { border-color: var(--accent); color: var(--accent); }
+.glyph.g-贡 { border-color: var(--v2); color: var(--v2); }
+
+.prose { display: flex; flex-direction: column; gap: 10px; }
+.kv { margin: 0; display: grid; grid-template-columns: 4.6em minmax(0, 1fr); gap: 4px 12px; font-size: var(--t-sm); }
+.kv dt { color: var(--muted); font-family: var(--f-ui); font-size: var(--t-xs); padding-top: 2px; }
+.kv dd { margin: 0; }
+.table-wrap { overflow-x: auto; }
+table.data { border-collapse: collapse; width: 100%; font-size: var(--t-sm); font-variant-numeric: tabular-nums; }
+table.data th, table.data td { text-align: left; padding: 6px 10px 6px 0; border-bottom: 1px solid var(--rule); vertical-align: top; }
+table.data th { font-family: var(--f-ui); font-size: var(--t-xs); color: var(--muted); font-weight: 600; letter-spacing: 0.06em; }
+figure { margin: 0; display: flex; flex-direction: column; gap: 6px; }
+figcaption { font-size: var(--t-xs); color: var(--muted); font-family: var(--f-ui); }
+.refs { margin: 0; padding-left: 1.2em; display: flex; flex-direction: column; gap: 8px; font-size: var(--t-sm); }
+.refs li::marker { color: var(--muted); }
+.refs b { font-weight: 700; }
+.credits { font-size: var(--t-xs); color: var(--muted); font-family: var(--f-ui); border-top: 1px solid var(--rule); padding-top: 12px; line-height: 1.7; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+}
+
+</style>
+<style>
+/*
+ * 航海图（index.html）样式；共用令牌与组件在 base.css。
+ * 布局：左侧"书页"面板（史事、航程、人物），右侧海图；窄屏时海图在上、面板在下。
+ * 配色取自青绿山水的矿物颜料：石青、石绿、绢色，朱砂只用于印章与用兵。
+ */
+html, body { height: 100%; }
+body { display: flex; flex-direction: column; }
+
 /* ---------- 主体布局 ---------- */
 .app {
   flex: 1;
@@ -881,9 +979,6 @@ button { font: inherit; color: inherit; }
 }
 .pane h3::after { content: ""; flex: 1; height: 1px; background: var(--rule); }
 .pane p { max-width: 38em; }
-.lede { font-size: var(--t-md); line-height: 1.8; }
-.note { color: var(--muted); font-size: var(--t-sm); }
-.kicker { font-family: var(--f-ui); font-size: var(--t-xs); letter-spacing: 0.12em; color: var(--muted); }
 
 /* ---------- 航次选择 ---------- */
 .vchips { display: flex; flex-wrap: wrap; gap: 6px; }
@@ -950,24 +1045,6 @@ button { font: inherit; color: inherit; }
 .facts dt { color: var(--muted); font-family: var(--f-ui); font-size: var(--t-xs); padding-top: 2px; letter-spacing: 0.08em; }
 .facts dd { margin: 0; }
 .actions { display: flex; flex-wrap: wrap; gap: 8px; }
-.btn-play {
-  --vc: var(--accent);
-  border: 0;
-  background: var(--vc);
-  color: var(--paper);
-  border-radius: 4px;
-  padding: 8px 16px 8px 12px;
-  display: inline-flex; align-items: center; gap: 8px;
-  cursor: pointer;
-  font-size: var(--t-base);
-  letter-spacing: 0.06em;
-}
-.btn-play svg { width: 16px; height: 16px; fill: currentColor; }
-.btn-play:hover { filter: brightness(1.08); }
-.btn-line {
-  border: 1px solid var(--rule); background: transparent; border-radius: 4px; padding: 7px 12px; cursor: pointer; font-size: var(--t-sm);
-}
-.btn-line:hover { background: var(--paper-2); }
 .summary { display: flex; flex-direction: column; gap: 10px; }
 
 /* 航程列表：竖向时间线 */
@@ -1014,39 +1091,7 @@ button { font: inherit; color: inherit; }
 .evcard strong { font-size: var(--t-base); }
 .evcard .meta { font-family: var(--f-ui); font-size: var(--t-xs); color: var(--muted); }
 
-/* 史料引文 */
-.source {
-  margin: 0;
-  padding: 12px 14px 12px 16px;
-  background: var(--paper-2);
-  border-left: 3px solid var(--accent);
-  font-size: var(--t-sm);
-  line-height: 1.85;
-}
-.source cite { display: block; margin-top: 6px; font-style: normal; font-family: var(--f-ui); font-size: var(--t-xs); color: var(--muted); }
-.source cite::before { content: "—— "; }
-
-/* 印章式小标记（大事类型） */
-.glyph {
-  display: inline-grid; place-items: center;
-  width: 24px; height: 24px;
-  border: 1.5px solid var(--ink-2);
-  border-radius: 3px;
-  background: var(--paper);
-  color: var(--ink);
-  font-family: var(--f-body);
-  font-weight: 700;
-  font-style: normal;
-  font-size: 13px;
-  line-height: 1;
-}
-.glyph.g-战 { background: var(--seal); border-color: var(--seal); color: var(--seal-ink); }
-.glyph.g-卒 { background: var(--ink); border-color: var(--ink); color: var(--paper); }
-.glyph.g-碑 { border-color: var(--accent); color: var(--accent); }
-.glyph.g-贡 { border-color: var(--v2); color: var(--v2); }
-
 /* ---------- 知识页 ---------- */
-.prose { display: flex; flex-direction: column; gap: 10px; }
 .cards { display: flex; flex-direction: column; gap: 0; }
 .person { padding: 12px 0; border-bottom: 1px solid var(--rule); display: flex; flex-direction: column; gap: 4px; }
 .person:first-child { padding-top: 0; }
@@ -1054,15 +1099,6 @@ button { font: inherit; color: inherit; }
 .person .name strong { font-size: var(--t-md); }
 .person .name span { font-family: var(--f-ui); font-size: var(--t-xs); color: var(--muted); }
 .person p { font-size: var(--t-sm); color: var(--ink-2); }
-.kv { margin: 0; display: grid; grid-template-columns: 4.6em minmax(0, 1fr); gap: 4px 12px; font-size: var(--t-sm); }
-.kv dt { color: var(--muted); font-family: var(--f-ui); font-size: var(--t-xs); padding-top: 2px; }
-.kv dd { margin: 0; }
-.table-wrap { overflow-x: auto; }
-table.data { border-collapse: collapse; width: 100%; font-size: var(--t-sm); font-variant-numeric: tabular-nums; }
-table.data th, table.data td { text-align: left; padding: 6px 10px 6px 0; border-bottom: 1px solid var(--rule); vertical-align: top; }
-table.data th { font-family: var(--f-ui); font-size: var(--t-xs); color: var(--muted); font-weight: 600; letter-spacing: 0.06em; }
-figure { margin: 0; display: flex; flex-direction: column; gap: 6px; }
-figcaption { font-size: var(--t-xs); color: var(--muted); font-family: var(--f-ui); }
 .scale-svg { width: 100%; height: auto; display: block; }
 .scale-svg text { font-family: var(--f-ui); font-size: 11px; fill: var(--ink-2); }
 .scale-svg .lbl { fill: var(--ink); font-size: 12px; }
@@ -1086,10 +1122,6 @@ figcaption { font-size: var(--t-xs); color: var(--muted); font-family: var(--f-u
 .chron .t .go { align-self: flex-start; margin-top: 2px; border: 0; background: none; padding: 0; color: var(--accent); cursor: pointer; font-size: var(--t-xs); font-family: var(--f-ui); text-decoration: underline; text-underline-offset: 2px; }
 .chron .vtag { font-family: var(--f-ui); font-size: 0.6875rem; color: var(--vc, var(--muted)); }
 .chron-h { font-family: var(--f-ui); font-size: var(--t-xs); letter-spacing: 0.16em; color: var(--accent); padding: 14px 0 4px; border-bottom: 1px solid var(--accent); }
-.refs { margin: 0; padding-left: 1.2em; display: flex; flex-direction: column; gap: 8px; font-size: var(--t-sm); }
-.refs li::marker { color: var(--muted); }
-.refs b { font-weight: 700; }
-.credits { font-size: var(--t-xs); color: var(--muted); font-family: var(--f-ui); border-top: 1px solid var(--rule); padding-top: 12px; line-height: 1.7; }
 
 /* ---------- 地图：底图与要素 ---------- */
 .leaflet-container { background: var(--sea); font-family: var(--f-body); }
@@ -1109,7 +1141,6 @@ path.grat { stroke: var(--grat); stroke-width: 0.7px; stroke-dasharray: 2 4; fil
 .sea-label span { position: absolute; left: 0; top: 0; transform: translate(-50%, -50%); }
 .map-tiles .sea-label { color: #e8f1f4; opacity: 0.8; text-shadow: 0 1px 2px rgb(0 0 0 / 0.5); }
 .z-lo .sea-label.minor { display: none; }
-
 
 /* 约 1415 年政治势力 */
 path.polity { stroke: var(--pol-border); stroke-width: 0.7px; stroke-dasharray: 3 2.5; fill-opacity: 0.78; transition: fill-opacity 0.15s; }
@@ -1368,13 +1399,85 @@ path.port.on { fill: var(--ink); }
   .vhead .big { font-size: 2rem; }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { transition: none !important; animation: none !important; }
-}
 
 </style>
+<script>
+/*
+ * 共用页眉：栏目导航与昼夜切换。各页面在 <body data-page="…"> 上写本页 id，
+ * 页眉里放 <div class="mast-actions"><button id="theme-toggle">…</button></div>，其余由本脚本生成。
+ * 切换昼夜时在 window 上派发 'zh:theme' 事件（detail.dark 为布尔值），供需要重绘的页面监听。
+ */
+(function () {
+  'use strict';
+  // ready: false 的页面尚未完成，不出现在导航中（完成一个就改一个，见 docs/ROADMAP.md）
+  var PAGES = [
+    { id: 'map', href: 'index.html', name: '航海图' },
+    { id: 'world', href: 'world.html', name: '天下全图', ready: false },
+    { id: 'voyages', href: 'voyages.html', name: '航次档案' },
+    { id: 'fleet', href: 'fleet.html', name: '舰队复原' },
+    { id: 'people', href: 'people.html', name: '人物复原', ready: false }
+  ];
+  var root = document.documentElement;
+
+  function store(k, v) {
+    try {
+      if (v === undefined) return window.localStorage.getItem('zh:' + k);
+      window.localStorage.setItem('zh:' + k, v);
+    } catch (e) { return null; }
+  }
+  // 尽早应用保存的配色，避免闪烁
+  var saved = store('theme');
+  if (saved === 'dark' || saved === 'light') root.setAttribute('data-theme', saved);
+
+  function isDark() {
+    var t = root.getAttribute('data-theme');
+    if (t) return t === 'dark';
+    return !!(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  }
+
+  function mount() {
+    var head = document.querySelector('.masthead');
+    if (!head) return;
+    var current = document.body.getAttribute('data-page');
+    var pages = PAGES.filter(function (p) { return p.ready !== false || p.id === current; });
+    if (pages.length > 1) {
+      var nav = document.createElement('nav');
+      nav.className = 'site-nav';
+      nav.setAttribute('aria-label', '栏目');
+      nav.innerHTML = pages.map(function (p) {
+        return '<a href="' + p.href + '"' + (p.id === current ? ' aria-current="page"' : '') + '>' + p.name + '</a>';
+      }).join('');
+      head.insertBefore(nav, head.querySelector('.mast-actions'));
+    }
+    var btn = document.getElementById('theme-toggle');
+    if (!btn) return;
+    var sync = function () { btn.textContent = isDark() ? '昼航' : '夜航'; };
+    btn.addEventListener('click', function () {
+      var next = isDark() ? 'light' : 'dark';
+      root.setAttribute('data-theme', next);
+      store('theme', next);
+      sync();
+      window.dispatchEvent(new CustomEvent('zh:theme', { detail: { dark: next === 'dark' } }));
+    });
+    sync();
+    if (window.matchMedia) {
+      var mq = window.matchMedia('(prefers-color-scheme: dark)');
+      if (mq.addEventListener) mq.addEventListener('change', function () {
+        sync();
+        window.dispatchEvent(new CustomEvent('zh:theme', { detail: { dark: isDark() } }));
+      });
+    }
+    new MutationObserver(sync).observe(root, { attributes: true, attributeFilter: ['data-theme'] });
+  }
+
+  window.ZHNav = { pages: PAGES, isDark: isDark, store: store };
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mount);
+  else mount();
+})();
+
+</script>
 </head>
-<body>
+<body data-page="map">
 <header class="masthead">
   <div class="seal" aria-hidden="true">郑和</div>
   <div class="title-block">
@@ -1476,6 +1579,7 @@ path.port.on { fill: var(--ink); }
 
     <!-- 宝船 -->
     <section class="pane" id="pane-ships" role="tabpanel" aria-labelledby="tab-ships" hidden>
+      <p><a class="btn-line" href="fleet.html">查看船只三维复原 →</a></p>
       <h2>宝船与船队</h2>
       <div class="prose">
         <p>下西洋船队的主体是被称为"宝船"的大型海船，主要在南京龙江宝船厂建造，另有大量船只由福建、浙江、江苏等地建造或改装。每次出航官兵、水手等约两万七千余人，是十五世纪世界上规模最大的远洋船队。</p>
@@ -2888,7 +2992,8 @@ window.ZH = (function () {
       '<span class="when"><b>' + esc(v.years) + '</b>' + esc(v.reign) + '</span></div>' +
       '<dl class="facts"><dt>规模</dt><dd>' + esc(v.fleet) + '</dd><dt>人物</dt><dd>' + esc(v.people) + '</dd><dt>最远</dt><dd>' + esc(v.farthest) + '</dd></dl>' +
       '<div class="actions"><button type="button" class="btn-play" id="btn-play" style="--vc:' + vcolor(n) + '"><svg viewBox="0 0 16 16"><path d="M4 2l10 6-10 6z"/></svg>回放航程</button>' +
-      '<button type="button" class="btn-line" id="btn-fit">查看全程</button></div>' +
+      '<button type="button" class="btn-line" id="btn-fit">查看全程</button>' +
+      '<a class="btn-line" href="voyages.html#v' + n + '">航次档案 →</a></div>' +
       '<div class="summary">' + v.summary.map(function (p) { return '<p>' + esc(p) + '</p>'; }).join('') + '</div>' +
       '<blockquote class="source">' + esc(v.quote.t) + '<cite>' + esc(v.quote.s) + '</cite></blockquote>' +
       '<h3>航程 · ' + v.stops.length + ' 站</h3><ol class="stops" id="stops">' + stops + '</ol>' +
@@ -3286,29 +3391,10 @@ window.ZH = (function () {
   });
   if (window.matchMedia('(max-width: 760px)').matches) { legend.classList.add('collapsed'); $('#legend-toggle').setAttribute('aria-expanded', 'false'); }
 
-  // 昼夜
-  var root = document.documentElement;
-  function isDark() {
-    var t = root.getAttribute('data-theme');
-    if (t) return t === 'dark';
-    return !!(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
-  }
-  function syncThemeBtn() { $('#theme-toggle').textContent = isDark() ? '昼航' : '夜航'; }
-  var savedTheme = store('theme');
-  if (savedTheme === 'dark' || savedTheme === 'light') root.setAttribute('data-theme', savedTheme);
-  $('#theme-toggle').addEventListener('click', function () {
-    var next = isDark() ? 'light' : 'dark';
-    root.setAttribute('data-theme', next);
-    store('theme', next);
-    syncThemeBtn();
-    if (player.trail) player.trail.setStyle({ color: getComputedStyle(root).getPropertyValue('--v' + player.n).trim() });
+  // 昼夜切换由 js/nav.js 负责；这里只更新回放轨迹的颜色（它是 Leaflet 属性色，不随 CSS 变量变化）
+  window.addEventListener('zh:theme', function () {
+    if (player.trail) player.trail.setStyle({ color: getComputedStyle(document.documentElement).getPropertyValue('--v' + player.n).trim() });
   });
-  syncThemeBtn();
-  if (window.matchMedia) {
-    var mq = window.matchMedia('(prefers-color-scheme: dark)');
-    if (mq.addEventListener) mq.addEventListener('change', syncThemeBtn);
-  }
-  new MutationObserver(syncThemeBtn).observe(root, { attributes: true, attributeFilter: ['data-theme'] });
 
   /* ---------- 启动 ---------- */
   renderChips();

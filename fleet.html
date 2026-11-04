@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>舰队复原 · 七下西洋</title>
+<meta name="description" content="郑和船只的三维示意复原：船体、硬帆、隔舱与艉舵，以及七次船队数量记载。">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/fleet.css">
+<script src="js/nav.js"></script>
+<script type="importmap">{"imports":{"three":"./vendor/three/three.module.min.js","three/addons/":"./vendor/three/addons/"}}</script>
+</head>
+<body data-page="fleet">
+<header class="masthead"><div class="seal" aria-hidden="true">郑和</div><div class="title-block"><h1>七下西洋</h1><p class="sub">舰队复原 · 观船形，识构造</p></div><div class="mast-actions"><button class="btn-quiet" id="theme-toggle" type="button">夜航</button></div></header>
+<main class="fleet-page">
+<div class="fleet-heading"><div><p class="eyebrow">舟师 · 船舶图录</p><h2>舰队复原</h2></div><p>从船体到桅帆，观察远洋木帆船的构造。<br>模型是有依据的示意，未有完整原船图纸传世。</p></div>
+<div class="mode-row" aria-label="查看内容"><button id="single-mode" aria-pressed="true">单船复原</button><button id="fleet-mode" aria-pressed="false">历次舰队</button></div>
+<div class="workspace">
+<section class="model-section" aria-label="模型展示">
+<div class="toolbar">
+<label>船型<select id="ship-type"></select></label>
+<label>尺度<select id="variant"><option value="estimated">二千料尺度解释</option><option value="recorded">《明史》尺度折算</option></select></label>
+<label class="fleet-control" hidden>航次<select id="voyage"></select></label>
+<label class="fleet-control" hidden>数量<select id="count-mode"><option value="recorded">记载数量展示</option><option value="estimated">假设编成 · 250 艘</option></select></label>
+<label class="fleet-control" hidden>筛选<select id="ship-filter"><option value="all">全部船型</option></select></label>
+</div>
+<div class="viewport-wrap"><div id="viewport"></div><div id="hotspots" aria-label="构件热点"></div><div class="model-caption"><b id="model-name">宝船</b><span id="model-dimensions"></span></div><p id="scene-message" role="status">正在准备船只模型…</p><div class="model-watermark">示意复原 · 米制比例</div><div id="scale-bar"><span></span><small></small></div></div>
+<div class="view-controls" aria-label="视角"><button data-view="perspective">重置视角</button><button data-view="side">侧视</button><button data-view="bow">船首</button><button data-view="stern">船尾</button><button data-view="top">俯视</button></div>
+<div class="options"><label class="single-control"><input type="checkbox" id="cutaway">剖开右舷 · 查看隔舱</label><label class="single-control"><input type="checkbox" id="labels" checked>构件标注</label><label class="single-control"><input type="checkbox" id="reference">人物与 105×68 米场地参照</label><label class="fleet-control" hidden>船间距 <input type="range" id="spacing" min="1.1" max="2.5" step=".1" value="1.4"></label></div>
+<p class="interaction-note">拖动旋转 · 滚轮或双指缩放 · 点击构件查看说明。键盘可使用视角按钮和下方构件目录。</p>
+</section>
+<aside class="ship-info" aria-label="船只资料"><p class="eyebrow" id="info-kicker">船型档案</p><h3 id="info-title">宝船</h3><div id="ship-facts"></div><div id="fleet-facts" hidden></div><h4>构件目录</h4><div id="part-list"></div><article id="part-detail" aria-live="polite"></article><button id="open-selected" hidden>查看选中船只</button></aside>
+</div>
+<section class="evidence"><h3>复原依据与边界</h3><p id="caution"></p><div id="source-list"></div><p>港口环境为后续扩展；当前优先呈现船只主体。人物只作为身高比例参照。</p></section>
+<noscript><p>请启用 JavaScript 查看模型与资料。源码中的 js/fleet-data.js 保存全部船型参数及出处。</p></noscript>
+</main>
+<script src="js/voyages-detail.js"></script>
+<script src="js/fleet-data.js"></script>
+<script src="js/fleet-info.js"></script>
+<script type="module" src="three/fleet-page.js"></script>
+</body>
+</html>

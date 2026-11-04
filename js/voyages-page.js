@@ -243,7 +243,7 @@
       };
       el.innerHTML = '<div class="facts2">' + fc('总船数', d.fleet.total) + (n === 7 ? fc('船名', d.fleet.large, true) : fc('大船', d.fleet.large)) + '</div>' +
         (d.fleet.note ? '<p>' + esc(d.fleet.note) + '</p>' : '') +
-        '<p class="note">各次船只的型号构成史无明载。宝船、马船、粮船、坐船、战船等船型及其 3D 复原，将在"舰队复原"页给出。</p>';
+        '<p class="note">各次船只的型号构成史无明载。宝船、马船、粮船、坐船、战船等船型及其 3D 复原，可在舰队复原页查看。</p><p><a href="fleet.html#mode=fleet&v=' + n + '">查看本次舰队复原 →</a></p>';
     } else if (t === 'route') {
       renderRoute(el, n, v, s);
     } else if (t === 'results') {

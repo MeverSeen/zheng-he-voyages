@@ -1,0 +1,1786 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>郑和航次档案</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="郑和七下西洋逐次档案：人数、主要官员、船队、航程统计、成果与史料原文。">
+
+
+
+<style>
+/*
+ * 郑和七下西洋 · 共用样式（设计令牌、页眉导航、按钮、引文、印章标记、表格）
+ * 各页面先引入本文件，再引入自己的样式。令牌说明见 docs/SPEC.md §7。
+ */
+:root {
+  /* 纸与墨 */
+  --paper: #ecebe1;
+  --paper-2: #e3e1d4;
+  --ink: #24221d;
+  --ink-2: #4a463c;
+  --muted: #6e6a5d;
+  --rule: #cbc6b4;
+  /* 海图 */
+  --sea: #cfdcd6;
+  --sea-deep: #b9cbc4;
+  --land: #e8dfc7;
+  --coast: #5f5442;
+  --shore: #8fb1a6;
+  --grat: #9fb5ad;
+  /* 强调 */
+  --accent: #24506e;        /* 石青 */
+  --accent-soft: #d5e0e4;
+  --seal: #b23a2b;          /* 朱砂 */
+  --seal-ink: #fbf5ec;
+  --focus: #24506e;
+  /* 七次航程 */
+  --v1: #b8402f; --v2: #b0701a; --v3: #2f7d52; --v4: #1f5a96;
+  --v5: #73479a; --v6: #13777a; --v7: #8a2f55;
+  --ghost: #8e968d;
+  /* 约 1415 年诸国着色（0 为明朝） */
+  --pc0: #f0cf6a; --pc1: #e7b8a4; --pc2: #b9d4a6; --pc3: #a9c7dd; --pc4: #cdb7dc;
+  --pc5: #edc8a0; --pc6: #a6d1c8; --pc7: #e4bfcf; --pc8: #cfd09c;
+  --rel-ming: #f0cf6a; --rel-visit: #8fc7a3; --rel-loose: #e9bf8e; --rel-tribute: #a9c4de; --rel-other: #dcd6c8;
+  --pol-border: #7d6f58;
+  /* 图表（已用 dataviz 校验脚本验证：明暗两套均通过） */
+  --chart-1: #1d67ad; --chart-2: #b06a12; --chart-3: #2f8f68; --chart-muted: #b4bfc4; --chart-grid: #d8d4c6;
+  /* 字体 */
+  --f-display: "Ma Shan Zheng", "STXingkai", "Xingkai SC", "STKaiti", "Kaiti SC", "KaiTi", serif;
+  --f-body: "Noto Serif SC", "Source Han Serif SC", "Source Han Serif CN", "Songti SC", "STSong", "SimSun", serif;
+  --f-ui: system-ui, -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+  /* 字号 */
+  --t-xs: 0.75rem; --t-sm: 0.8125rem; --t-base: 0.9375rem; --t-md: 1.0625rem;
+  --t-lg: 1.3125rem; --t-xl: 1.75rem; --t-2xl: 2.5rem;
+  --panel-w: 440px;
+  --shadow: 0 1px 2px rgb(36 34 29 / 0.12), 0 6px 18px rgb(36 34 29 / 0.10);
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #131a1e; --paper-2: #1a2329; --ink: #e9e4d6; --ink-2: #cfc9b9; --muted: #9c9786; --rule: #2d393e;
+    --sea: #0f1c23; --sea-deep: #0b161c; --land: #313c35; --coast: #a69a7c; --shore: #24443f; --grat: #23363b;
+    --accent: #8fbdd8; --accent-soft: #1d3240; --seal: #e0644f; --seal-ink: #1a0f0c; --focus: #8fbdd8;
+    --v1: #f07d68; --v2: #e8a64e; --v3: #62c98f; --v4: #74a9ea; --v5: #bb92e6; --v6: #4cc7c4; --v7: #e57aa6;
+    --ghost: #56625f;
+    --pc0: #7c6624; --pc1: #6c463a; --pc2: #4b6342; --pc3: #3d5a70; --pc4: #594a70;
+    --pc5: #6c5336; --pc6: #355f59; --pc7: #684556; --pc8: #5b5c37;
+    --rel-ming: #7c6624; --rel-visit: #3f6e55; --rel-loose: #775634; --rel-tribute: #3d5a74; --rel-other: #394039;
+    --pol-border: #a69a7c;
+    --chart-1: #3b87d4; --chart-2: #c47b1c; --chart-3: #2f9a72; --chart-muted: #3e4b52; --chart-grid: #26323a;
+    --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 8px 22px rgb(0 0 0 / 0.35);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #131a1e; --paper-2: #1a2329; --ink: #e9e4d6; --ink-2: #cfc9b9; --muted: #9c9786; --rule: #2d393e;
+  --sea: #0f1c23; --sea-deep: #0b161c; --land: #313c35; --coast: #a69a7c; --shore: #24443f; --grat: #23363b;
+  --accent: #8fbdd8; --accent-soft: #1d3240; --seal: #e0644f; --seal-ink: #1a0f0c; --focus: #8fbdd8;
+  --v1: #f07d68; --v2: #e8a64e; --v3: #62c98f; --v4: #74a9ea; --v5: #bb92e6; --v6: #4cc7c4; --v7: #e57aa6;
+  --ghost: #56625f;
+  --pc0: #7c6624; --pc1: #6c463a; --pc2: #4b6342; --pc3: #3d5a70; --pc4: #594a70;
+  --pc5: #6c5336; --pc6: #355f59; --pc7: #684556; --pc8: #5b5c37;
+  --rel-ming: #7c6624; --rel-visit: #3f6e55; --rel-loose: #775634; --rel-tribute: #3d5a74; --rel-other: #394039;
+  --pol-border: #a69a7c;
+  --chart-1: #3b87d4; --chart-2: #c47b1c; --chart-3: #2f9a72; --chart-muted: #3e4b52; --chart-grid: #26323a;
+  --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 8px 22px rgb(0 0 0 / 0.35);
+  color-scheme: dark;
+}
+
+/* ---------- 基础 ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-size: var(--t-base);
+  line-height: 1.75;
+  -webkit-font-smoothing: antialiased;
+}
+[hidden] { display: none !important; }
+h1, h2, h3, h4 { text-wrap: balance; margin: 0; }
+p { margin: 0; }
+a { color: var(--accent); text-underline-offset: 2px; }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ---------- 页眉 ---------- */
+.masthead {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding-block: 10px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  border-bottom: 1px solid var(--rule);
+  background: var(--paper);
+  position: relative;
+  z-index: 5;
+}
+.seal {
+  flex: none;
+  width: 44px; height: 44px;
+  background: var(--seal);
+  color: var(--seal-ink);
+  border-radius: 3px;
+  display: grid;
+  place-items: center;
+  font-family: var(--f-display);
+  font-size: 1.15rem;
+  line-height: 1;
+  writing-mode: vertical-rl;
+  letter-spacing: 0.08em;
+  box-shadow: inset 0 0 0 2px var(--seal), inset 0 0 0 3.5px var(--seal-ink);
+}
+.title-block { min-width: 0; flex: 1; display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+.title-block h1 {
+  font-family: var(--f-display);
+  font-weight: 400;
+  font-size: var(--t-xl);
+  line-height: 1.1;
+  letter-spacing: 0.06em;
+}
+.title-block .sub { color: var(--muted); font-size: var(--t-sm); font-family: var(--f-ui); }
+.mast-actions { display: flex; gap: 8px; align-items: center; }
+.btn-quiet {
+  border: 1px solid var(--rule);
+  background: transparent;
+  border-radius: 999px;
+  padding: 4px 12px;
+  font-family: var(--f-ui);
+  font-size: var(--t-sm);
+  cursor: pointer;
+  color: var(--ink-2);
+}
+.btn-quiet:hover { background: var(--paper-2); }
+
+/* 栏目导航（js/nav.js 生成） */
+.site-nav { display: flex; align-items: center; gap: 2px; overflow-x: auto; scrollbar-width: none; min-width: 0; }
+.site-nav::-webkit-scrollbar { display: none; }
+.site-nav a {
+  flex: none; padding: 6px 10px; color: var(--ink-2); text-decoration: none; white-space: nowrap;
+  font-size: var(--t-sm); letter-spacing: 0.06em; border-radius: 4px;
+}
+.site-nav a:hover { background: var(--paper-2); color: var(--ink); }
+.site-nav a[aria-current="page"] { color: var(--ink); font-weight: 700; border-radius: 0; box-shadow: inset 0 -2px 0 var(--accent); }
+@media (max-width: 760px) {
+  .masthead { flex-wrap: wrap; row-gap: 4px; }
+  .site-nav { order: 3; width: 100%; margin-inline: -10px; }
+}
+
+/* ---------- 共用排版与组件 ---------- */
+.lede { font-size: var(--t-md); line-height: 1.8; }
+.note { color: var(--muted); font-size: var(--t-sm); }
+.kicker { font-family: var(--f-ui); font-size: var(--t-xs); letter-spacing: 0.12em; color: var(--muted); }
+.btn-play {
+  --vc: var(--accent);
+  border: 0;
+  background: var(--vc);
+  color: var(--paper);
+  border-radius: 4px;
+  padding: 8px 16px 8px 12px;
+  display: inline-flex; align-items: center; gap: 8px;
+  cursor: pointer;
+  font-size: var(--t-base);
+  letter-spacing: 0.06em;
+}
+.btn-play svg { width: 16px; height: 16px; fill: currentColor; }
+.btn-play:hover { filter: brightness(1.08); }
+.btn-line {
+  border: 1px solid var(--rule); background: transparent; border-radius: 4px; padding: 7px 12px; cursor: pointer; font-size: var(--t-sm);
+}
+.btn-line:hover { background: var(--paper-2); }
+a.btn-line { color: var(--ink); text-decoration: none; display: inline-flex; align-items: center; }
+
+/* 史料引文 */
+.source {
+  margin: 0;
+  padding: 12px 14px 12px 16px;
+  background: var(--paper-2);
+  border-left: 3px solid var(--accent);
+  font-size: var(--t-sm);
+  line-height: 1.85;
+}
+.source cite { display: block; margin-top: 6px; font-style: normal; font-family: var(--f-ui); font-size: var(--t-xs); color: var(--muted); }
+.source cite::before { content: "—— "; }
+
+/* 印章式小标记（大事类型） */
+.glyph {
+  display: inline-grid; place-items: center;
+  width: 24px; height: 24px;
+  border: 1.5px solid var(--ink-2);
+  border-radius: 3px;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-weight: 700;
+  font-style: normal;
+  font-size: 13px;
+  line-height: 1;
+}
+.glyph.g-战 { background: var(--seal); border-color: var(--seal); color: var(--seal-ink); }
+.glyph.g-卒 { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+.glyph.g-碑 { border-color: var(--accent); color: var(--accent); }
+.glyph.g-贡 { border-color: var(--v2); color: var(--v2); }
+
+.prose { display: flex; flex-direction: column; gap: 10px; }
+.kv { margin: 0; display: grid; grid-template-columns: 4.6em minmax(0, 1fr); gap: 4px 12px; font-size: var(--t-sm); }
+.kv dt { color: var(--muted); font-family: var(--f-ui); font-size: var(--t-xs); padding-top: 2px; }
+.kv dd { margin: 0; }
+.table-wrap { overflow-x: auto; }
+table.data { border-collapse: collapse; width: 100%; font-size: var(--t-sm); font-variant-numeric: tabular-nums; }
+table.data th, table.data td { text-align: left; padding: 6px 10px 6px 0; border-bottom: 1px solid var(--rule); vertical-align: top; }
+table.data th { font-family: var(--f-ui); font-size: var(--t-xs); color: var(--muted); font-weight: 600; letter-spacing: 0.06em; }
+figure { margin: 0; display: flex; flex-direction: column; gap: 6px; }
+figcaption { font-size: var(--t-xs); color: var(--muted); font-family: var(--f-ui); }
+.refs { margin: 0; padding-left: 1.2em; display: flex; flex-direction: column; gap: 8px; font-size: var(--t-sm); }
+.refs li::marker { color: var(--muted); }
+.refs b { font-weight: 700; }
+.credits { font-size: var(--t-xs); color: var(--muted); font-family: var(--f-ui); border-top: 1px solid var(--rule); padding-top: 12px; line-height: 1.7; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+}
+
+</style>
+<style>
+/*
+ * 航次档案（voyages.html）样式。共用令牌与组件在 base.css。
+ * 布局：单栏文档，最大宽度 1160px；对比图两列并排，窄屏堆叠；详情区左侧数字、右侧标签页。
+ */
+.doc {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding-block: 28px 64px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+.intro { display: flex; flex-direction: column; gap: 10px; max-width: 46em; }
+.page-title { font-family: var(--f-display); font-weight: 400; font-size: var(--t-2xl); line-height: 1.1; letter-spacing: 0.08em; }
+.block { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.block-head { display: flex; flex-direction: column; gap: 4px; }
+.block-head h3, .pane-h {
+  font-size: var(--t-lg); font-weight: 700; display: flex; align-items: center; gap: 12px;
+}
+.block-head h3::after { content: ""; flex: 1; height: 1px; background: var(--rule); }
+
+/* ---------- 对比图 ---------- */
+.charts { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+.chart-card {
+  background: var(--paper-2);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  padding: 14px 16px 10px;
+  gap: 8px;
+  min-width: 0;
+}
+.chart-title { font-family: var(--f-body); font-size: var(--t-base); font-weight: 700; color: var(--ink); display: flex; gap: 8px; align-items: baseline; }
+.chart-title span { font-family: var(--f-ui); font-size: var(--t-xs); color: var(--muted); font-weight: 400; }
+.chart { position: relative; min-width: 0; }
+.chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+.chart text { font-family: var(--f-ui); font-size: 11px; fill: var(--muted); }
+.chart .rowlab { fill: var(--ink); font-family: var(--f-body); font-size: 12.5px; font-weight: 600; }
+.chart .val { fill: var(--ink-2); font-variant-numeric: tabular-nums; }
+.chart .grid { stroke: var(--chart-grid); stroke-width: 1; }
+.chart .row { cursor: pointer; }
+.chart .row:focus-visible { outline: none; }
+.chart .row:focus-visible .hl, .chart .row:hover .hl { fill: var(--accent); opacity: 0.07; }
+.chart .hl { fill: transparent; }
+.chart .row.on .rowlab { fill: var(--accent); }
+.chart .seg { transition: opacity 0.15s; }
+.chart .seg:hover { opacity: 0.82; }
+.chart .gbar { fill: var(--chart-muted); }
+.chart .row.on .gbar { fill: var(--chart-1); }
+.chart .reign { fill: var(--muted); font-size: 10px; letter-spacing: 0.2em; }
+.chart .reign-line { stroke: var(--muted); opacity: 0.5; }
+.s1 { fill: var(--chart-1); } .s2 { fill: var(--chart-2); } .s3 { fill: var(--chart-3); }
+.legend-row { display: flex; flex-wrap: wrap; gap: 4px 14px; font-family: var(--f-ui); font-size: var(--t-xs); color: var(--ink-2); }
+.legend-row span { display: inline-flex; align-items: center; gap: 6px; }
+.legend-row i { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+.legend-row i.s1 { background: var(--chart-1); } .legend-row i.s2 { background: var(--chart-2); } .legend-row i.s3 { background: var(--chart-3); }
+.legend-row i.mixed { background: repeating-linear-gradient(45deg, var(--chart-muted) 0 3px, transparent 3px 6px); border: 1px solid var(--chart-muted); }
+
+/* 对比表 */
+table.cmp td, table.cmp th { white-space: nowrap; }
+table.cmp tbody tr { cursor: pointer; }
+table.cmp tbody tr:hover td { background: var(--paper-2); }
+table.cmp tbody tr.on td { background: color-mix(in srgb, var(--accent) 9%, transparent); }
+table.cmp .vn { font-family: var(--f-body); font-weight: 700; display: inline-flex; align-items: center; gap: 6px; }
+table.cmp .vn i { width: 8px; height: 8px; border-radius: 50%; background: var(--vc); display: inline-block; }
+table.cmp .num { text-align: right; padding-right: 16px; }
+table.cmp .na { color: var(--muted); font-size: var(--t-xs); }
+
+/* ---------- 详情 ---------- */
+.vpick { display: flex; flex-wrap: wrap; gap: 6px; }
+.vpick button {
+  --vc: var(--accent);
+  border: 1px solid var(--rule); background: var(--paper); color: var(--ink-2);
+  border-radius: 999px; padding: 4px 14px 4px 10px; cursor: pointer;
+  font-family: var(--f-ui); font-size: var(--t-sm); display: inline-flex; align-items: center; gap: 6px;
+}
+.vpick button i { width: 9px; height: 9px; border-radius: 50%; background: var(--vc); }
+.vpick button:hover { border-color: var(--vc); }
+.vpick button[aria-selected="true"] { background: var(--vc); border-color: var(--vc); color: var(--paper); }
+.vpick button[aria-selected="true"] i { background: var(--paper); }
+
+.dhead { --vc: var(--accent); display: flex; flex-wrap: wrap; align-items: flex-end; gap: 8px 18px; padding-top: 6px; }
+.dhead .big { font-family: var(--f-display); font-size: 3rem; line-height: 1; color: var(--vc); letter-spacing: 0.05em; }
+.dhead .when { display: flex; flex-direction: column; font-family: var(--f-ui); font-size: var(--t-sm); color: var(--muted); padding-bottom: 4px; }
+.dhead .when b { font-family: var(--f-body); color: var(--ink); font-size: var(--t-lg); font-variant-numeric: tabular-nums; }
+.dhead .links { margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap; padding-bottom: 4px; }
+.dhead .links a { font-family: var(--f-ui); font-size: var(--t-sm); }
+
+.tiles { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+.tile { padding: 12px 12px 12px 0; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.tile + .tile { padding-left: 14px; border-left: 1px solid var(--rule); }
+.tile .lab { font-family: var(--f-ui); font-size: var(--t-xs); color: var(--muted); }
+.tile .v { font-family: var(--f-ui); font-weight: 600; font-size: 1.6rem; line-height: 1.2; color: var(--ink); }
+.tile .v small { font-size: var(--t-sm); font-weight: 400; color: var(--ink-2); margin-left: 2px; }
+.tile .sub { font-family: var(--f-ui); font-size: var(--t-xs); color: var(--ink-2); }
+.tile .v.na { font-size: var(--t-base); color: var(--muted); font-weight: 400; padding-top: 6px; }
+
+.dtabs { display: flex; gap: 2px; border-bottom: 1px solid var(--rule); overflow-x: auto; scrollbar-width: none; }
+.dtabs::-webkit-scrollbar { display: none; }
+.dtab {
+  flex: none; border: 0; background: none; padding: 10px 12px 8px; cursor: pointer; font-size: var(--t-base);
+  color: var(--muted); border-bottom: 2px solid transparent; letter-spacing: 0.04em;
+}
+.dtab:hover { color: var(--ink); }
+.dtab[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); font-weight: 600; }
+.dpane { display: flex; flex-direction: column; gap: 16px; padding-top: 4px; max-width: 60em; }
+.dpane p { max-width: 42em; }
+.pane-h { font-size: var(--t-md); }
+
+.fact { display: flex; flex-direction: column; gap: 4px; padding: 12px 14px; border: 1px solid var(--rule); border-radius: 6px; }
+.fact .k { font-family: var(--f-ui); font-size: var(--t-xs); color: var(--muted); }
+.fact .n { font-family: var(--f-ui); font-weight: 600; font-size: 1.5rem; line-height: 1.2; }
+.fact .n.na { font-size: var(--t-base); font-weight: 400; color: var(--muted); }
+.fact .t { font-size: var(--t-sm); }
+.fact .s { font-family: var(--f-ui); font-size: var(--t-xs); color: var(--muted); }
+.facts2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chips span { font-size: var(--t-sm); padding: 2px 10px; border-radius: 999px; background: var(--paper-2); border: 1px solid var(--rule); }
+
+table.data td:first-child b { white-space: nowrap; }
+.results { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.results li { display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 2px 12px; padding: 10px 0; border-bottom: 1px solid var(--rule); }
+.results .glyph { grid-row: span 2; }
+.results .t { font-size: var(--t-base); }
+.results .m { font-family: var(--f-ui); font-size: var(--t-xs); color: var(--muted); display: flex; gap: 12px; flex-wrap: wrap; }
+.glyph.g-封 { border-color: var(--chart-3); color: var(--chart-3); }
+.glyph.g-商 { border-color: var(--chart-2); color: var(--chart-2); }
+
+.legs { font-variant-numeric: tabular-nums; }
+.legs td.num, .legs th.num { text-align: right; padding-right: 14px; }
+.legs tr.port td { color: var(--ink-2); }
+.legs tr.mixed td { color: var(--muted); }
+.strip-wrap { display: flex; flex-direction: column; gap: 8px; }
+
+.tip {
+  position: fixed; z-index: 50; pointer-events: none;
+  background: var(--paper); color: var(--ink); border: 1px solid var(--rule); border-radius: 6px; box-shadow: var(--shadow);
+  padding: 8px 10px; font-family: var(--f-ui); font-size: var(--t-xs); line-height: 1.5; max-width: 260px;
+}
+.tip b { display: block; font-size: var(--t-base); font-weight: 600; color: var(--ink); }
+.tip .row { display: flex; align-items: center; gap: 6px; color: var(--ink-2); }
+.tip .row i { width: 12px; height: 2px; display: inline-block; }
+
+@media (max-width: 900px) {
+  .charts { grid-template-columns: minmax(0, 1fr); }
+  .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tile:nth-child(odd) { padding-left: 0; border-left: 0; }
+  .tile:nth-child(n+3) { border-top: 1px solid var(--rule); }
+  .tile:last-child:nth-child(odd) { grid-column: span 2; }
+  .dhead .links { margin-left: 0; width: 100%; }
+}
+@media (max-width: 420px) {
+  .page-title { font-size: 2rem; }
+  .dhead .big { font-size: 2.4rem; }
+}
+
+</style>
+<script>
+/*
+ * 共用页眉：栏目导航与昼夜切换。各页面在 <body data-page="…"> 上写本页 id，
+ * 页眉里放 <div class="mast-actions"><button id="theme-toggle">…</button></div>，其余由本脚本生成。
+ * 切换昼夜时在 window 上派发 'zh:theme' 事件（detail.dark 为布尔值），供需要重绘的页面监听。
+ */
+(function () {
+  'use strict';
+  // ready: false 的页面尚未完成，不出现在导航中（完成一个就改一个，见 docs/ROADMAP.md）
+  var PAGES = [
+    { id: 'map', href: 'index.html', name: '航海图' },
+    { id: 'world', href: 'world.html', name: '天下全图', ready: false },
+    { id: 'voyages', href: 'voyages.html', name: '航次档案' },
+    { id: 'fleet', href: 'fleet.html', name: '舰队复原' },
+    { id: 'people', href: 'people.html', name: '人物复原', ready: false }
+  ];
+  var root = document.documentElement;
+
+  function store(k, v) {
+    try {
+      if (v === undefined) return window.localStorage.getItem('zh:' + k);
+      window.localStorage.setItem('zh:' + k, v);
+    } catch (e) { return null; }
+  }
+  // 尽早应用保存的配色，避免闪烁
+  var saved = store('theme');
+  if (saved === 'dark' || saved === 'light') root.setAttribute('data-theme', saved);
+
+  function isDark() {
+    var t = root.getAttribute('data-theme');
+    if (t) return t === 'dark';
+    return !!(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  }
+
+  function mount() {
+    var head = document.querySelector('.masthead');
+    if (!head) return;
+    var current = document.body.getAttribute('data-page');
+    var pages = PAGES.filter(function (p) { return p.ready !== false || p.id === current; });
+    if (pages.length > 1) {
+      var nav = document.createElement('nav');
+      nav.className = 'site-nav';
+      nav.setAttribute('aria-label', '栏目');
+      nav.innerHTML = pages.map(function (p) {
+        return '<a href="' + p.href + '"' + (p.id === current ? ' aria-current="page"' : '') + '>' + p.name + '</a>';
+      }).join('');
+      head.insertBefore(nav, head.querySelector('.mast-actions'));
+    }
+    var btn = document.getElementById('theme-toggle');
+    if (!btn) return;
+    var sync = function () { btn.textContent = isDark() ? '昼航' : '夜航'; };
+    btn.addEventListener('click', function () {
+      var next = isDark() ? 'light' : 'dark';
+      root.setAttribute('data-theme', next);
+      store('theme', next);
+      sync();
+      window.dispatchEvent(new CustomEvent('zh:theme', { detail: { dark: next === 'dark' } }));
+    });
+    sync();
+    if (window.matchMedia) {
+      var mq = window.matchMedia('(prefers-color-scheme: dark)');
+      if (mq.addEventListener) mq.addEventListener('change', function () {
+        sync();
+        window.dispatchEvent(new CustomEvent('zh:theme', { detail: { dark: isDark() } }));
+      });
+    }
+    new MutationObserver(sync).observe(root, { attributes: true, attributeFilter: ['data-theme'] });
+  }
+
+  window.ZHNav = { pages: PAGES, isDark: isDark, store: store };
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mount);
+  else mount();
+})();
+
+</script>
+</head>
+<body data-page="voyages">
+<header class="masthead">
+  <div class="seal" aria-hidden="true">郑和</div>
+  <div class="title-block">
+    <h1>七下西洋</h1>
+    <p class="sub">航次档案 · 人数、官员、船队、航程与成果</p>
+  </div>
+  <div class="mast-actions">
+    <button class="btn-quiet" id="theme-toggle" type="button" aria-label="切换昼夜配色">夜航</button>
+  </div>
+</header>
+
+<main class="doc">
+  <section class="intro">
+    <h2 class="page-title">航次档案</h2>
+    <p class="lede">从永乐三年（1405）到宣德八年（1433），郑和七次率船队出海。下面先把七次放在一起比较，再逐次列出人数、主要官员、船队规模、航程统计、成果和史料原文。史料没有记载的项目标为"史料未载"，不作推测。</p>
+  </section>
+
+  <section class="block" aria-labelledby="cmp-h">
+    <div class="block-head">
+      <h3 id="cmp-h">七次对比</h3>
+      <p class="note">里程按图上的示意航线计算，只用于比较各次远近，并非实测航迹。点击任一行查看该次详情。</p>
+    </div>
+    <div class="charts">
+      <figure class="chart-card">
+        <figcaption class="chart-title">起止时间<span>受命至回国</span></figcaption>
+        <div class="chart" id="chart-gantt"></div>
+      </figure>
+      <figure class="chart-card">
+        <figcaption class="chart-title">示意航程<span>公里</span></figcaption>
+        <div class="legend-row" id="legend-km"></div>
+        <div class="chart" id="chart-km"></div>
+      </figure>
+    </div>
+    <div class="table-wrap">
+      <table class="data cmp" id="cmp-table">
+        <thead>
+          <tr><th scope="col">航次</th><th scope="col">年份</th><th scope="col">历时</th><th scope="col">人数</th><th scope="col">船只</th><th scope="col">停靠</th><th scope="col">所到国家与地区</th><th scope="col">示意航程</th><th scope="col">最远</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="block detail" id="detail" aria-labelledby="detail-h">
+    <div class="block-head">
+      <h3 id="detail-h">逐次详情</h3>
+    </div>
+    <div class="vpick" id="vpick" role="tablist" aria-label="选择航次"></div>
+    <div id="detail-body"></div>
+  </section>
+</main>
+
+<div class="tip" id="tip" role="status" hidden></div>
+
+<script>
+/*
+ * 郑和七下西洋 · 数据
+ * 公历日期：1582 年以前按史学惯例折算为儒略历（如永乐三年六月十五日 = 1405 年 7 月 11 日）。
+ * 坐标为今地经纬度的近似值；古今地名对应以学界通行说法为准，有争议者注明"一说"。
+ */
+window.ZH = (function () {
+  /* ---------------- 港口与地点 ---------------- */
+  // tier：1 主要港口；2 重要港口；3 次要港口或航海地标
+  var ports = {
+    nanjing: { name: '南京', alt: '应天府 · 龙江宝船厂', modern: '江苏南京', at: [32.08, 118.73], tier: 1,
+      desc: '明初京师。下西洋的宝船多在城西北龙江关一带的宝船厂建造，船队由龙江关出水，沿长江东下出海。宝船厂遗址今存作塘遗迹，1957 年在中保村出土一根长 11.07 米的铁力木舵杆。郑和晚年任南京守备，衣冠冢在城南牛首山。' },
+    liujiagang: { name: '刘家港', alt: '刘家河 · 娄东', modern: '江苏太仓浏河镇', at: [31.52, 121.30], tier: 1,
+      desc: '长江口的海港，船队在此集结、补给后出海，元明之际有"六国码头"之称。宣德六年（1431）春，郑和等在港内天妃宫立《通番事迹记》碑，原碑已佚，碑文经明人钱谷收入《吴都文粹续集》而流传。' },
+    changle: { name: '长乐太平港', alt: '五虎门', modern: '福建福州长乐', at: [25.98, 119.45], tier: 1,
+      desc: '闽江口内的港湾。船队冬季在此泊驻，等候东北季风出五虎门开洋，往往停留数月。宣德六年冬，郑和等在南山天妃行宫立《天妃灵应之记》碑，逐次记述七下西洋经过，是最重要的下西洋石刻史料，原碑今存长乐郑和史迹陈列馆。' },
+    quanzhou: { name: '泉州', alt: '刺桐', modern: '福建泉州', at: [24.87, 118.62], tier: 2,
+      desc: '宋元时期的东方大港，城中多阿拉伯、波斯侨民后裔。城东灵山圣墓相传是伊斯兰教早期来华贤者的墓地。永乐十五年（1417）第五次下西洋途中，郑和在此行香，当地官员立碑为记。' },
+    zhancheng: { name: '占城', alt: '新州港 · Champa', modern: '越南归仁一带', at: [13.78, 109.25], tier: 1,
+      desc: '今越南中南部的占婆王国，历次下西洋的第一站。马欢记：自五虎门开船往西南行，"好风十日可到"；国之东北百里有海口名新州港，"岸有一石塔为记，诸处船只到此舣泊登岸"。占城屡受安南侵逼，与明朝关系密切。' },
+    kunlun: { name: '昆仑山', alt: '昆仑洋', modern: '越南昆仑岛（昆山岛）', at: [8.68, 106.60], tier: 3,
+      desc: '南海航线上的重要地标。航海俗谚说"上怕七洲，下怕昆仑，针迷舵失，人船莫存"，形容海南岛东北的七洲洋与昆仑洋一带风浪之险。第七次下西洋归途于宣德八年五月二十三日过昆仑洋。' },
+    xianluo: { name: '暹罗', alt: 'Ayutthaya', modern: '泰国大城府', at: [14.35, 100.57], tier: 2,
+      desc: '湄南河下游的阿瑜陀耶王朝。船队自占城入暹罗湾，溯河而上可至王城。暹罗与满剌加、占城之间时有争端，明廷屡次遣使劝谕。大城府今有当地华人奉祀"三宝公"的寺庙。' },
+    zhaowa: { name: '爪哇', alt: '苏鲁马益 · 杜板 · 满者伯夷', modern: '印度尼西亚东爪哇泗水一带', at: [-7.20, 112.74], tier: 1,
+      desc: '满者伯夷（Majapahit）王国所在。马欢记外国船只先到杜板（今图班），再到新村（今锦石）、苏鲁马益（今泗水），换小船入内河至王城满者伯夷。当地已有不少来自广东、漳州、泉州的华人。第七次下西洋船队在苏鲁马益停泊四个多月。' },
+    jiugang: { name: '旧港', alt: '三佛齐 · Palembang', modern: '印度尼西亚巨港', at: [-2.98, 104.76], tier: 1,
+      desc: '昔日三佛齐国都，位于穆西河畔。明初已衰落，由广东等地华人聚居，海盗陈祖义一度盘踞于此。1407 年郑和擒陈祖义后，明廷设旧港宣慰司，以华人首领施进卿为宣慰使。' },
+    manlajia: { name: '满剌加', alt: 'Melaka', modern: '马来西亚马六甲', at: [2.19, 102.25], tier: 1,
+      desc: '扼马六甲海峡要冲，原受暹罗控制。永乐七年（1409）明廷封其首领拜里迷苏剌为王。船队在此设立"官厂"：立排栅如城垣，内建库藏仓廒，分赴各国的船只回到这里汇齐，"等候南风正顺，于五月中旬开洋回还"。马六甲今有三宝山、三宝井等遗迹。' },
+    pengheng: { name: '彭亨', alt: 'Pahang', modern: '马来西亚彭亨州', at: [3.50, 103.42], tier: 3,
+      desc: '马来半岛东岸小国，产片脑、沉香等，曾随船队遣使朝贡。' },
+    jilandan: { name: '急兰丹', alt: 'Kelantan', modern: '马来西亚吉兰丹州', at: [6.20, 102.30], tier: 3,
+      desc: '马来半岛东北岸小国，永乐年间曾遣使入贡。' },
+    sumendala: { name: '苏门答剌', alt: '须文达那 · Samudera Pasai', modern: '印度尼西亚亚齐省洛克肖马韦附近', at: [5.30, 97.18], tier: 1,
+      desc: '苏门答腊岛北端的伊斯兰王国，是船队驶入印度洋前的最后大站，马欢称"其处乃西洋之总路头"。船队常在此候风、分䑸。1415 年郑和在此击败并生擒作乱的苏干剌。' },
+    nanwuli: { name: '南巫里', alt: '南渤利 · Lambri', modern: '印度尼西亚班达亚齐一带', at: [5.60, 95.30], tier: 2,
+      desc: '苏门答腊岛西北角的小国。其西北海中有"帽山"（今韦岛一带），船队在此取齐后横渡孟加拉湾驶往锡兰。' },
+    cuilanyu: { name: '翠蓝屿', alt: 'Nicobar', modern: '印度尼科巴群岛', at: [7.00, 94.00], tier: 3,
+      desc: '横渡孟加拉湾途中的岛屿地标。马欢记岛上居民巢居穴处、男女赤体，又称"裸形国"。' },
+    xilanshan: { name: '锡兰山', alt: '别罗里 · Ceylon', modern: '斯里兰卡', at: [6.45, 79.97], tier: 1,
+      desc: '印度洋航运枢纽与佛教圣地，以佛牙和宝石闻名。船队多在西南岸的别罗里（今贝鲁沃勒）停泊。船队在加勒立有《布施锡兰山佛寺碑》；1411 年在此发生锡兰山之战。' },
+    jiayile: { name: '加异勒', alt: 'Kayal', modern: '印度泰米尔纳德邦卡亚尔帕特南', at: [8.57, 78.18], tier: 3,
+      desc: '印度东南沿海港口，与锡兰隔马纳尔湾相望，以采珠闻名。' },
+    xiaogelan: { name: '小葛兰', alt: 'Quilon', modern: '印度喀拉拉邦奎隆（科拉姆）', at: [8.88, 76.55], tier: 3,
+      desc: '马拉巴尔海岸南部港口，盛产胡椒。' },
+    kezhi: { name: '柯枝', alt: 'Cochin', modern: '印度喀拉拉邦科钦', at: [9.96, 76.24], tier: 2,
+      desc: '马拉巴尔海岸的胡椒港。永乐十四年（1416）明廷封其国王，封其国中之山为"镇国之山"，明成祖亲撰碑文赐之。' },
+    guli: { name: '古里', alt: 'Calicut', modern: '印度喀拉拉邦卡利卡特（科泽科德）', at: [11.25, 75.77], tier: 1,
+      desc: '马欢称"古里国乃西洋大国"。这里是印度洋贸易的中心，前三次下西洋的终点，后几次的转运枢纽。永乐年间明廷封其国王并"起建碑亭"。1433 年郑和在归途中病逝于古里一带。1498 年达·伽马的船队也抵达此港。' },
+    liushan: { name: '溜山', alt: 'Maldives', modern: '马尔代夫', at: [4.18, 73.51], tier: 2,
+      desc: '印度洋中的珊瑚岛群，马欢记有"八大溜"。盛产龙涎香、海贝（贝币）和椰索。分䑸船队由此横渡印度洋前往东非。' },
+    banggela: { name: '榜葛剌', alt: 'Bengal', modern: '孟加拉国（吉大港—索纳尔冈）', at: [22.33, 91.81], tier: 2,
+      desc: '恒河三角洲的苏丹国。船队先到浙地港（今吉大港），再换小船到锁纳儿港（今索纳尔冈）入王城。1414 年榜葛剌使臣进献的长颈鹿被视为祥瑞"麒麟"，轰动京师。' },
+    huluomosi: { name: '忽鲁谟斯', alt: 'Hormuz', modern: '伊朗霍尔木兹岛', at: [27.06, 56.46], tier: 1,
+      desc: '扼波斯湾口的商业城邦，第四次起成为下西洋的主要目的地之一。马欢记："各处番船并旱番客商都到此地赶集买卖，所以国民皆富。"' },
+    zufaer: { name: '祖法儿', alt: 'Dhofar', modern: '阿曼佐法尔省（塞拉莱）', at: [16.92, 54.05], tier: 2,
+      desc: '阿拉伯半岛南岸的乳香产地。中国使者到达后，当地以乳香、血竭、芦荟、没药等换取中国的纻丝、瓷器。' },
+    lasa: { name: '剌撒', alt: "La'sa", modern: '也门穆卡拉一带（一说）', at: [14.50, 49.15], tier: 3,
+      desc: '阿拉伯半岛南岸小国，具体位置学界尚有争议。' },
+    adan: { name: '阿丹', alt: 'Aden', modern: '也门亚丁', at: [12.79, 45.02], tier: 1,
+      desc: '红海口的富庶港口。第五次下西洋时，阿丹国进献麒麟（长颈鹿，番名"祖剌法"）等珍兽。中国使者到达时，国王亲率大小头目至海滨迎接诏敕。' },
+    tianfang: { name: '天方', alt: '默伽 · 秩达', modern: '沙特阿拉伯麦加（港口吉达）', at: [21.42, 39.83], tier: 2,
+      desc: '伊斯兰教圣城。马欢记：自古里开船，船行三个月到其国码头，番名"秩达"（今吉达）。第七次下西洋时，太监洪保在古里派通事等七人附当地船只前往，往回一年。' },
+    mugudushu: { name: '木骨都束', alt: 'Mogadishu', modern: '索马里摩加迪沙', at: [2.04, 45.34], tier: 1,
+      desc: '东非沿岸的城邦。费信《星槎胜览》记其地"垒石为屋，四五层高"，土地贫瘠，常年少雨。第五次下西洋起，分䑸船队数次抵达。' },
+    bulawa: { name: '卜剌哇', alt: 'Barawa', modern: '索马里布拉瓦', at: [1.11, 44.03], tier: 2,
+      desc: '木骨都束以南的港市，曾进献"千里骆驼"与驼鸡（鸵鸟）。' },
+    zhubu: { name: '竹步', alt: 'Jubba', modern: '索马里朱巴河口一带', at: [-0.36, 42.54], tier: 3,
+      desc: '东非朱巴河口一带，见于费信《星槎胜览》。' },
+    malin: { name: '麻林', alt: 'Malindi', modern: '肯尼亚马林迪（一般认为）', at: [-3.22, 40.12], tier: 2,
+      desc: '一般认为即今肯尼亚马林迪，是郑和船队所到最南的地区之一。1415 年麻林国遣使进献麒麟，明成祖亲临奉天门接受，百官称贺。' }
+  };
+
+  /* 不在航线上、只用于标注史事的地点 */
+  var places = {
+    kunyang: { name: '昆阳', modern: '云南晋宁', at: [24.67, 102.60] },
+    beijing: { name: '北京', modern: '北京', at: [39.90, 116.40] },
+    galle: { name: '加勒', modern: '斯里兰卡加勒', at: [6.03, 80.22] },
+    kotte: { name: '锡兰王城', modern: '斯里兰卡科特一带', at: [6.89, 79.92] },
+    duban: { name: '杜板', modern: '印度尼西亚图班', at: [-6.90, 112.05] }
+  };
+
+  /* ---------------- 海道（航路网） ---------------- */
+  // 离岸转折点：仅用于让航线沿海道绕行，不在图上显示
+  var waypoints = {
+    w_zj: [32.20, 119.45], w_jy: [31.95, 120.28], w_yz: [31.20, 122.10], w_zs: [29.80, 122.80],
+    w_wz: [27.90, 121.45], w_fj: [26.70, 120.50], w_mj: [26.08, 119.78], w_pt: [25.60, 120.10], w_tn: [25.15, 119.75],
+    w_qz: [24.70, 118.85], w_ts: [23.30, 117.95], w_gd: [21.90, 115.50], w_hn: [19.30, 112.00],
+    w_xs: [17.20, 110.70], w_wl: [15.40, 109.45], w_lg: [12.85, 109.55], w_bl: [11.20, 109.20],
+    w_kl: [8.30, 106.95], w_cm: [8.15, 104.55], w_g1: [9.80, 102.40], w_g2: [12.30, 100.60],
+    w_sm: [13.45, 100.58], w_ke: [6.45, 102.65], w_tr: [5.30, 103.55], w_ph: [3.60, 103.85], w_au: [2.50, 104.75],
+    w_sge: [1.38, 104.50], w_sg: [1.18, 103.90], w_sgw: [1.28, 103.40],
+    w_n1: [4.00, 107.00], w_n2: [0.50, 107.60], w_kr: [-2.00, 109.40], w_js: [-4.50, 110.00],
+    w_tb: [-6.70, 112.05], w_md: [-6.92, 112.66],
+    w_bk1: [-3.50, 106.50], w_bk2a: [-2.95, 106.10], w_bk2: [-2.70, 105.85], w_bk2b: [-2.45, 105.65],
+    w_bk3: [-2.25, 105.20], w_mu: [-2.30, 104.85], w_bkn: [-1.65, 105.00],
+    w_li: [-0.20, 105.50], w_bt: [1.05, 105.00],
+    w_m1: [2.85, 100.90], w_m2: [3.95, 99.95], w_m3: [5.30, 98.20], w_ac: [5.95, 95.65],
+    w_ni: [6.50, 93.85], w_bb: [5.80, 88.00], w_dd: [5.55, 80.80], w_gl: [5.95, 80.15],
+    w_mn: [7.90, 79.15], w_ty: [8.30, 78.25], w_cn: [7.70, 77.55],
+    w_ql: [8.60, 76.35], w_ck: [9.90, 75.95], w_cl: [11.10, 75.55],
+    w_b1: [9.50, 94.20], w_b2: [14.50, 94.10], w_b3: [18.00, 92.90], w_b4: [20.60, 91.55],
+    w_a1: [15.00, 69.50], w_a2: [20.50, 62.50], w_hd: [22.90, 60.30], w_om: [24.90, 57.50],
+    w_hz: [26.40, 56.75], w_ms: [20.00, 59.60], w_de: [17.60, 56.80], w_dh: [16.60, 55.00],
+    w_z1: [16.50, 53.70], w_z2: [15.40, 52.20], w_z3: [14.50, 50.40], w_z4: [14.00, 48.90], w_a3: [12.50, 62.00],
+    w_sq: [13.20, 54.00], w_ae: [12.90, 47.50], w_bm: [12.55, 43.30], w_r1: [14.60, 42.00],
+    w_r2: [17.80, 40.30], w_r3: [20.20, 38.95], w_jd: [21.48, 39.10],
+    w_gf: [12.00, 51.75], w_s1: [9.00, 51.30], w_s2: [6.00, 49.90], w_s3: [3.50, 47.60],
+    w_i1: [2.60, 60.00], w_i2: [2.40, 50.00], w_lm: [-2.05, 41.45]
+  };
+
+  // 航段；第三项 'r' 表示内河，'l' 表示陆路
+  var edges = [
+    ['nanjing', 'w_zj', 'r'], ['w_zj', 'w_jy', 'r'], ['w_jy', 'liujiagang', 'r'], ['liujiagang', 'w_yz', 'r'],
+    ['w_yz', 'w_zs'], ['w_zs', 'w_wz'], ['w_wz', 'w_fj'], ['w_fj', 'w_mj'], ['w_mj', 'changle', 'r'],
+    ['w_mj', 'w_pt'], ['w_pt', 'w_tn'], ['w_tn', 'w_qz'], ['w_qz', 'quanzhou'], ['w_tn', 'w_ts'], ['w_qz', 'w_ts'],
+    ['w_ts', 'w_gd'], ['w_gd', 'w_hn'], ['w_hn', 'w_xs'], ['w_xs', 'w_wl'], ['w_wl', 'zhancheng'],
+    ['zhancheng', 'w_lg'], ['w_lg', 'w_bl'], ['w_bl', 'w_kl'], ['w_kl', 'kunlun'], ['kunlun', 'w_cm'],
+    ['w_kl', 'w_cm'], ['w_cm', 'w_g1'], ['w_g1', 'w_g2'], ['w_g2', 'w_sm'], ['w_sm', 'xianluo', 'r'],
+    ['w_g1', 'w_ke'], ['w_ke', 'jilandan'], ['w_ke', 'w_tr'], ['w_tr', 'w_ph'], ['w_ph', 'pengheng'], ['w_ph', 'w_au'],
+    ['w_kl', 'w_au'], ['kunlun', 'w_au'], ['w_au', 'w_sge'], ['w_sge', 'w_sg'], ['w_sg', 'w_sgw'], ['w_sgw', 'manlajia'],
+    ['w_kl', 'w_n1'], ['w_n1', 'w_n2'], ['w_n2', 'w_kr'], ['w_kr', 'w_js'], ['w_js', 'w_tb'],
+    ['w_tb', 'w_md'], ['w_md', 'zhaowa'],
+    ['w_js', 'w_bk1'], ['w_bk1', 'w_bk2a'], ['w_bk2a', 'w_bk2'], ['w_bk2', 'w_bk2b'], ['w_bk2b', 'w_bk3'],
+    ['w_bk3', 'w_mu'], ['w_mu', 'jiugang', 'r'], ['w_bk3', 'w_bkn'], ['w_bkn', 'w_li'], ['w_li', 'w_bt'], ['w_bt', 'w_sge'],
+    ['manlajia', 'w_m1'], ['w_m1', 'w_m2'], ['w_m2', 'w_m3'], ['w_m3', 'sumendala'], ['sumendala', 'w_ac'],
+    ['nanwuli', 'w_ac'], ['w_ac', 'cuilanyu'], ['cuilanyu', 'w_ni'], ['w_ni', 'w_bb'], ['w_bb', 'w_dd'],
+    ['w_dd', 'w_gl'], ['w_gl', 'xilanshan'],
+    ['w_ac', 'w_b1'], ['w_b1', 'w_b2'], ['w_b2', 'w_b3'], ['w_b3', 'w_b4'], ['w_b4', 'banggela'],
+    ['xilanshan', 'w_mn'], ['w_mn', 'jiayile'], ['jiayile', 'w_ty'], ['w_ty', 'w_cn'], ['xilanshan', 'w_cn'],
+    ['w_cn', 'w_ql'], ['w_ql', 'w_ck'], ['w_ck', 'w_cl'], ['w_cl', 'guli'],
+    ['w_ql', 'xiaogelan'], ['w_ck', 'kezhi'],
+    ['guli', 'w_a1'], ['w_a1', 'w_a2'], ['w_a2', 'w_hd'], ['w_hd', 'w_om'], ['w_om', 'w_hz'], ['w_hz', 'huluomosi'],
+    ['w_hd', 'w_ms'], ['w_ms', 'w_de'], ['w_de', 'w_dh'], ['w_dh', 'zufaer'], ['zufaer', 'w_z1'], ['w_z1', 'w_z2'],
+    ['w_z2', 'w_z3'], ['w_z3', 'lasa'], ['lasa', 'w_z4'], ['w_z4', 'w_ae'], ['w_ae', 'adan'],
+    ['guli', 'w_a3'], ['w_a3', 'w_sq'], ['w_sq', 'w_ae'], ['w_a3', 'w_dh'],
+    ['adan', 'w_bm'], ['w_bm', 'w_r1'], ['w_r1', 'w_r2'], ['w_r2', 'w_r3'], ['w_r3', 'w_jd'], ['w_jd', 'tianfang', 'l'],
+    ['guli', 'liushan'], ['kezhi', 'liushan'], ['liushan', 'w_i1'], ['w_i1', 'w_i2'], ['w_i2', 'mugudushu'],
+    ['w_ae', 'w_gf'], ['w_gf', 'w_s1'], ['w_s1', 'w_s2'], ['w_s2', 'w_s3'], ['w_s3', 'mugudushu'],
+    ['mugudushu', 'bulawa'], ['bulawa', 'zhubu'], ['zhubu', 'w_lm'], ['w_lm', 'malin']
+  ];
+
+  /* ---------------- 七次航程 ---------------- */
+  // stops：回放顺序；ret 表示归程。branches：分䑸（分船队）航线。
+  var voyages = [
+    {
+      n: 1, title: '第一次下西洋', reign: '永乐三年—五年', years: '1405—1407', t0: 1405.53, t1: 1407.76,
+      farthest: '古里（印度卡利卡特）',
+      fleet: '"将士卒二万七千八百余人"；"造大舶，修四十四丈、广十八丈者六十二"（《明史·郑和传》）',
+      people: '正使太监郑和、王景弘',
+      summary: [
+        '永乐三年六月十五日（1405 年 7 月 11 日），明成祖朱棣命内官监太监郑和、王景弘等率舟师出使西洋。《明史·郑和传》说，成祖"疑惠帝亡海外，欲踪迹之，且欲耀兵异域，示中国富强"。2005 年起，7 月 11 日被定为中国航海日。',
+        '船队"自苏州刘家河泛海至福建，复自福建五虎门扬帆，首达占城，以次遍历诸番国，宣天子诏，因给赐其君长，不服则以武慑之"。本次经爪哇、旧港、苏门答剌、锡兰山，最远到达印度西南海岸的古里。',
+        '归途中，郑和在旧港剿灭了长期劫掠商旅的海盗陈祖义，永乐五年九月初二（1407 年 10 月 2 日）回到南京。各国使臣随船来朝，此后近三十年的下西洋由此开端。'
+      ],
+      quote: { t: '自苏州刘家河泛海至福建，复自福建五虎门扬帆，首达占城，以次遍历诸番国，宣天子诏，因给赐其君长，不服则以武慑之。', s: '《明史·郑和传》' },
+      stops: [
+        { p: 'nanjing', d: '1405 年 7 月 11 日', cd: '永乐三年六月十五日', t: '明成祖颁敕，命郑和率舟师出使西洋。宝船在南京龙江宝船厂等处建造、改装，船上装载金银、丝绸、瓷器等赏赐之物。' },
+        { p: 'liujiagang', d: '1405 年秋', cd: '永乐三年', t: '船队沿长江东下，在刘家港集结。来自各卫所的官兵、水手、工匠、通事在此登船。' },
+        { p: 'changle', d: '1405 年冬', cd: '永乐三年冬', t: '船队南下至福建长乐太平港，补充淡水给养，等候东北季风。季风既起，自闽江口五虎门扬帆出海。' },
+        { p: 'zhancheng', d: '1405 年底', cd: '永乐三年', t: '顺风约十昼夜抵达占城新州港。船队在此宣读诏书、颁赐礼物，补充淡水和柴薪。占城是历次下西洋的首站。' },
+        { p: 'zhaowa', d: '1406 年', cd: '永乐四年', t: '时值爪哇东、西二王交战。明军部分官兵在东王辖地登岸贸易，被西王军队误杀一百七十人。郑和没有兴兵报复，而是奏报朝廷，由朝廷敕责西王。' },
+        { p: 'jiugang', d: '1406 年', cd: '永乐四年', t: '途经旧港。海盗陈祖义盘踞此地，劫掠往来商船。' },
+        { p: 'manlajia', d: '1406 年', cd: '永乐四年', t: '经满剌加驶入马六甲海峡。此时满剌加尚受暹罗控制。' },
+        { p: 'sumendala', d: '1406 年', cd: '永乐四年', t: '抵苏门答剌，候风准备横渡印度洋。' },
+        { p: 'nanwuli', d: '1406 年', cd: '永乐四年', t: '自南巫里附近的帽山出发，西渡孟加拉湾。' },
+        { p: 'xilanshan', d: '1406 年', cd: '永乐四年', t: '抵锡兰山。据《明史》，其王亚烈苦奈儿"侮慢不敬，欲害和"，郑和察觉后离去，为日后的冲突埋下伏笔。' },
+        { p: 'guli', d: '1406 年底', cd: '永乐四年', t: '抵达古里，本次航程的终点。古里是印度洋西岸最繁盛的港口，船队在此以丝绸、瓷器交易胡椒、宝石等物，次年乘季风东返。' },
+        { p: 'sumendala', ret: true, d: '1407 年', cd: '永乐五年', t: '回到苏门答剌，取道马六甲海峡东返。' },
+        { p: 'jiugang', ret: true, d: '1407 年', cd: '永乐五年', t: '陈祖义诈降，暗谋劫夺船队。当地华人首领施进卿报知郑和，郑和整兵迎战，"杀贼党五千余人，烧贼船十艘，获其七艘"，生擒陈祖义。' },
+        { p: 'zhancheng', ret: true, d: '1407 年', cd: '永乐五年', t: '经占城北返。' },
+        { p: 'nanjing', ret: true, d: '1407 年 10 月 2 日', cd: '永乐五年九月初二', t: '船队回到南京，献俘于朝，陈祖义等被斩首。古里、苏门答剌、满剌加等国使臣随船来朝。' }
+      ],
+      branches: []
+    },
+    {
+      n: 2, title: '第二次下西洋', reign: '永乐五年—七年', years: '1407—1409', t0: 1407.9, t1: 1409.6,
+      farthest: '古里（印度卡利卡特）',
+      fleet: '永乐五年九月命都指挥汪浩改造海运船二百四十九艘，以备出使西洋诸国（《明太宗实录》）',
+      people: '郑和、王景弘等（郑和本人是否亲往，学界有不同看法）',
+      summary: [
+        '第一次船队回国不久，明成祖即命再使西洋，主要任务是护送来朝的各国使臣回国，并册封古里国王。',
+        '船队于永乐五年冬至六年初出发，经占城、爪哇、满剌加、苏门答剌、锡兰山、加异勒、柯枝到达古里，另有船队前往暹罗。在古里，使团颁赐诰命银印，册封国王，"起建碑亭，立石"。在爪哇，西王献黄金万两为前次误杀明军谢罪。永乐七年夏（1409 年）回国。',
+        '关于郑和本人是否亲率此行，学界意见不一。长乐《天妃灵应之记》碑将本次列为郑和亲统的第二次："永乐五年，统领舟师，往爪哇、古里、柯枝、暹罗等国，王各以珍宝、珍禽异兽贡献，至七年回还。"'
+      ],
+      quote: { t: '其国去中国十万余里，民物咸若，熙皞同风，刻石于兹，永示万世。', s: '古里碑文，见马欢《瀛涯胜览·古里国》' },
+      stops: [
+        { p: 'nanjing', d: '1407 年冬', cd: '永乐五年冬', t: '船队再度受命，护送随首航来华的各国使臣回国。' },
+        { p: 'liujiagang', d: '1407 年冬', cd: '永乐五年', t: '刘家港集结出海。' },
+        { p: 'changle', d: '1408 年初', cd: '永乐六年', t: '自五虎门开洋。' },
+        { p: 'zhancheng', d: '1408 年', cd: '永乐六年', t: '抵占城。另有船队由此西行前往暹罗。' },
+        { p: 'zhaowa', d: '1408 年', cd: '永乐六年', t: '抵爪哇。西王献黄金万两谢罪，礼官认为数额不足，明成祖说"朕于远人，欲其畏罪而已，宁利其金耶？"，免除其余。' },
+        { p: 'manlajia', d: '1408 年', cd: '永乐六年', t: '过满剌加，驶入海峡。' },
+        { p: 'sumendala', d: '1408 年', cd: '永乐六年', t: '在苏门答剌候风，准备西渡。' },
+        { p: 'nanwuli', d: '1408 年', cd: '永乐六年', t: '自南巫里帽山开洋，横渡孟加拉湾。' },
+        { p: 'xilanshan', d: '1408 年', cd: '永乐六年', t: '经锡兰山，沿马纳尔湾北上。' },
+        { p: 'jiayile', d: '1408 年', cd: '永乐六年', t: '到印度东南的加异勒，此地以采珠著称。' },
+        { p: 'kezhi', d: '1408 年', cd: '永乐六年', t: '绕过印度南端，到柯枝。' },
+        { p: 'guli', d: '1408 年', cd: '永乐六年', t: '到古里，颁赐国王诰命银印，给赐大小头目品级冠带，建碑亭立石。' },
+        { p: 'sumendala', ret: true, d: '1409 年春', cd: '永乐七年', t: '东返至苏门答剌。' },
+        { p: 'manlajia', ret: true, d: '1409 年', cd: '永乐七年', t: '经满剌加。' },
+        { p: 'zhancheng', ret: true, d: '1409 年', cd: '永乐七年', t: '经占城北返。' },
+        { p: 'nanjing', ret: true, d: '1409 年夏', cd: '永乐七年夏', t: '船队回国。' }
+      ],
+      branches: [
+        { name: '分䑸往暹罗', stops: ['zhancheng', 'xianluo'] }
+      ]
+    },
+    {
+      n: 3, title: '第三次下西洋', reign: '永乐七年—九年', years: '1409—1411', t0: 1409.77, t1: 1411.53,
+      farthest: '古里（印度卡利卡特）',
+      fleet: '"统领官兵二万七千余人，驾驶海舶四十八号"（费信《星槎胜览》）',
+      people: '郑和、王景弘；通事费信首次随行',
+      summary: [
+        '永乐七年（1409）九月，郑和、王景弘等第三次奉命出使，自太仓刘家港开船，十月到长乐太平港，十二月从五虎门开洋，"张十二帆，顺风十昼夜到占城"（费信语）。',
+        '船队经爪哇到满剌加，宣读诏敕，赐其首领拜里迷苏剌双台银印、冠带袍服，"建碑封城"，满剌加从此摆脱暹罗控制，并成为船队的中转基地。随后经苏门答剌到锡兰山，在佛寺布施并立三语石碑，再至小葛兰、柯枝、古里。',
+        '归途经锡兰山时，国王亚烈苦奈儿诱郑和入国中，索要金币，暗发兵劫夺船只。郑和趁其兵力尽出、都城空虚，率两千余人奇袭王城，生擒国王及其家属。永乐九年六月（1411 年 7 月）船队回国献俘，明成祖赦免亚烈苦奈儿，另立新王。'
+      ],
+      quote: { t: '永乐七年，统领舟师，往前各国，道经锡兰山国，其王亚烈苦奈儿负固不恭，谋害舟师……遂生擒其王，至九年归献。寻蒙恩宥，俾归本国。', s: '长乐《天妃灵应之记》碑' },
+      stops: [
+        { p: 'nanjing', d: '1409 年秋', cd: '永乐七年九月', t: '船队第三次受命出发。' },
+        { p: 'liujiagang', d: '1409 年 10 月', cd: '永乐七年九月', t: '自太仓刘家港开船。' },
+        { p: 'changle', d: '1409 年 11 月—1410 年 1 月', cd: '永乐七年十月—十二月', t: '十月到长乐太平港泊驻，十二月自五虎门开洋，张十二帆南下。' },
+        { p: 'zhancheng', d: '1410 年初', cd: '永乐七年十二月', t: '顺风十昼夜到占城。' },
+        { p: 'zhaowa', d: '1410 年', cd: '永乐八年', t: '抵爪哇。' },
+        { p: 'manlajia', d: '1410 年', cd: '永乐八年', t: '宣读诏敕，封拜里迷苏剌为满剌加国王，建碑封城。此后船队在此设立官厂，作为分䑸汇合、存储货物的基地。' },
+        { p: 'sumendala', d: '1410 年', cd: '永乐八年', t: '抵苏门答剌。' },
+        { p: 'xilanshan', d: '1410 年', cd: '永乐八年', t: '至锡兰山，向佛寺布施金银、丝绸、香油等物，立汉文、泰米尔文、波斯文三语石碑。' },
+        { p: 'xiaogelan', d: '1410 年', cd: '永乐八年', t: '到小葛兰。' },
+        { p: 'kezhi', d: '1410 年', cd: '永乐八年', t: '到柯枝。' },
+        { p: 'guli', d: '1410 年', cd: '永乐八年', t: '到古里，开读赏赐，交易货物。' },
+        { p: 'xilanshan', ret: true, d: '1411 年', cd: '永乐九年', t: '归途再经锡兰山，国王亚烈苦奈儿发兵五万余人劫船、断归路。郑和率两千余人奇袭王城，生擒国王及其家属，回师又大破来援之敌。' },
+        { p: 'sumendala', ret: true, d: '1411 年', cd: '永乐九年', t: '东返至苏门答剌。' },
+        { p: 'manlajia', ret: true, d: '1411 年', cd: '永乐九年', t: '满剌加国王拜里迷苏剌率妻子陪臣五百四十余人随船队赴华。' },
+        { p: 'zhancheng', ret: true, d: '1411 年', cd: '永乐九年', t: '经占城北返。' },
+        { p: 'nanjing', ret: true, d: '1411 年 7 月', cd: '永乐九年六月', t: '回京献俘。明成祖赦免亚烈苦奈儿，命礼部另择贤者立为锡兰山国王。' }
+      ],
+      branches: []
+    },
+    {
+      n: 4, title: '第四次下西洋', reign: '永乐十年—十三年', years: '1413—1415', t0: 1412.96, t1: 1415.6,
+      farthest: '忽鲁谟斯（波斯湾口）',
+      fleet: '规模与前几次相当；船队在苏门答剌等地分䑸，前往榜葛剌、溜山等地',
+      people: '郑和、王景弘；通事马欢首次随行',
+      summary: [
+        '永乐十年十一月十五日（1412 年 12 月 18 日），明成祖命郑和等再使西洋，船队于永乐十一年（1413）冬出发。精通阿拉伯语的通事马欢首次随行，他后来写成的《瀛涯胜览》是了解下西洋最重要的亲历记录。',
+        '本次航行首次越过印度西海岸，横渡阿拉伯海，到达波斯湾口的忽鲁谟斯，分䑸船队则前往榜葛剌、溜山和马来半岛诸国。1414 年榜葛剌使臣进献"麒麟"（长颈鹿），1415 年麻林国也遣使进献麒麟，朝野视为祥瑞。',
+        '归途经苏门答剌时，不满未获赏赐的苏干剌领兵数万截击船队，郑和率官兵与当地国王的军队合力将其击败，追至南渤利生擒。永乐十三年七月（1415 年 8 月）船队回国。'
+      ],
+      quote: { t: '永乐十一年，统领舟师，往忽鲁谟斯等国。其苏门答剌国有伪王苏干剌寇侵本国，其王宰奴里阿比丁遣使赴阙陈诉，就率官兵剿捕……生擒伪王，至十三年归献。', s: '长乐《天妃灵应之记》碑' },
+      stops: [
+        { p: 'nanjing', d: '1412 年 12 月 18 日', cd: '永乐十年十一月十五日', t: '明成祖颁敕，命郑和等往忽鲁谟斯等国。' },
+        { p: 'liujiagang', d: '1413 年', cd: '永乐十一年', t: '刘家港集结。' },
+        { p: 'changle', d: '1413 年冬', cd: '永乐十一年冬', t: '在长乐候风，自五虎门开洋。' },
+        { p: 'zhancheng', d: '1414 年初', cd: '永乐十二年', t: '抵占城。' },
+        { p: 'zhaowa', d: '1414 年', cd: '永乐十二年', t: '抵爪哇。' },
+        { p: 'jiugang', d: '1414 年', cd: '永乐十二年', t: '至旧港，宣慰使施进卿迎接。' },
+        { p: 'manlajia', d: '1414 年', cd: '永乐十二年', t: '在满剌加官厂整顿船只、货物，分出船队前往彭亨、急兰丹。' },
+        { p: 'sumendala', d: '1414 年', cd: '永乐十二年', t: '抵苏门答剌，分出一支船队北上榜葛剌。' },
+        { p: 'nanwuli', d: '1414 年', cd: '永乐十二年', t: '自南巫里开洋西渡。' },
+        { p: 'xilanshan', d: '1414 年', cd: '永乐十二年', t: '抵锡兰山。' },
+        { p: 'kezhi', d: '1414 年', cd: '永乐十二年', t: '抵柯枝。' },
+        { p: 'guli', d: '1414 年', cd: '永乐十二年', t: '抵古里，分出船队前往溜山。主船队由此横渡阿拉伯海。' },
+        { p: 'huluomosi', d: '1414 年', cd: '永乐十二年', t: '到达波斯湾口的忽鲁谟斯，这是下西洋船队首次抵达这里。马欢记此地商旅云集，"国民皆富"。' },
+        { p: 'guli', ret: true, d: '1415 年', cd: '永乐十三年', t: '东返至古里。' },
+        { p: 'sumendala', ret: true, d: '1415 年', cd: '永乐十三年', t: '苏干剌率数万人截击船队。郑和与苏门答剌国王合兵迎战，大破其众，追至南渤利，生擒苏干剌及其妻子。' },
+        { p: 'manlajia', ret: true, d: '1415 年', cd: '永乐十三年', t: '回到满剌加官厂，汇合各路船队。' },
+        { p: 'zhancheng', ret: true, d: '1415 年', cd: '永乐十三年', t: '经占城北返。' },
+        { p: 'nanjing', ret: true, d: '1415 年 8 月', cd: '永乐十三年七月', t: '回京献俘，苏干剌被处斩。' }
+      ],
+      branches: [
+        { name: '分䑸往榜葛剌', stops: ['sumendala', 'banggela'] },
+        { name: '分䑸往溜山', stops: ['guli', 'liushan'] },
+        { name: '分䑸访彭亨、急兰丹', stops: ['manlajia', 'pengheng', 'jilandan'] }
+      ]
+    },
+    {
+      n: 5, title: '第五次下西洋', reign: '永乐十四年—十七年', years: '1417—1419', t0: 1416.99, t1: 1419.58,
+      farthest: '麻林（今肯尼亚马林迪）',
+      fleet: '奉命护送古里、爪哇、满剌加、占城、锡兰山、木骨都束、溜山、阿丹、忽鲁谟斯等十九国使臣回国',
+      people: '郑和、王景弘等',
+      summary: [
+        '永乐十四年十二月初十（1416 年 12 月 28 日），十九国使臣朝贺后辞归，明成祖命郑和护送他们回国，并赐各国国王锦绮纱罗。船队于永乐十五年（1417）出发，五月十六日途经泉州时，郑和至灵山圣墓行香。',
+        '本次航行向西大大延伸：主船队到达忽鲁谟斯，分䑸船队前往阿拉伯半岛的阿丹、剌撒、祖法儿，并横渡印度洋抵达东非的木骨都束、卜剌哇、麻林。一般认为这是中国官方船队首次抵达非洲东岸。',
+        '永乐十七年七月（1419 年 8 月）船队回国，各国进献的珍禽异兽轰动京师：忽鲁谟斯的狮子、金钱豹、大西马，阿丹的麒麟与长角马哈兽，木骨都束的花福禄（斑马）与狮子，卜剌哇的千里骆驼与驼鸡（鸵鸟）。'
+      ],
+      quote: { t: '忽鲁谟斯国进狮子、金钱豹、大西马；阿丹国进麒麟，番名祖剌法，并长角马哈兽；木骨都束国进花福禄，并狮子；卜剌哇国进千里骆驼，并驼鸡。', s: '长乐《天妃灵应之记》碑' },
+      stops: [
+        { p: 'nanjing', d: '1416 年 12 月 28 日', cd: '永乐十四年十二月初十', t: '明成祖命郑和护送十九国使臣回国。' },
+        { p: 'liujiagang', d: '1417 年', cd: '永乐十五年', t: '刘家港集结。' },
+        { p: 'changle', d: '1417 年', cd: '永乐十五年', t: '船队南下福建。' },
+        { p: 'quanzhou', d: '1417 年 5 月 31 日', cd: '永乐十五年五月十六日', t: '郑和至泉州灵山圣墓行香，祈求航行平安。' },
+        { p: 'zhancheng', d: '1417 年', cd: '永乐十五年', t: '抵占城。' },
+        { p: 'zhaowa', d: '1417 年', cd: '永乐十五年', t: '抵爪哇。' },
+        { p: 'manlajia', d: '1417 年', cd: '永乐十五年', t: '在满剌加官厂整备，分出船队往彭亨。' },
+        { p: 'sumendala', d: '1418 年', cd: '永乐十六年', t: '抵苏门答剌。' },
+        { p: 'nanwuli', d: '1418 年', cd: '永乐十六年', t: '自南巫里开洋西渡。' },
+        { p: 'xilanshan', d: '1418 年', cd: '永乐十六年', t: '抵锡兰山。' },
+        { p: 'kezhi', d: '1418 年', cd: '永乐十六年', t: '抵柯枝。' },
+        { p: 'guli', d: '1418 年', cd: '永乐十六年', t: '抵古里。分䑸船队由此分赴东非与阿拉伯半岛。' },
+        { p: 'huluomosi', d: '1418 年', cd: '永乐十六年', t: '主船队到达忽鲁谟斯，其国进献狮子、金钱豹、大西马。' },
+        { p: 'guli', ret: true, d: '1419 年', cd: '永乐十七年', t: '东返至古里，与各分䑸汇合。' },
+        { p: 'sumendala', ret: true, d: '1419 年', cd: '永乐十七年', t: '经苏门答剌。' },
+        { p: 'manlajia', ret: true, d: '1419 年', cd: '永乐十七年', t: '经满剌加。' },
+        { p: 'zhancheng', ret: true, d: '1419 年', cd: '永乐十七年', t: '经占城北返。' },
+        { p: 'nanjing', ret: true, d: '1419 年 8 月', cd: '永乐十七年七月', t: '船队回国，各国使臣与珍禽异兽随船而至。' }
+      ],
+      branches: [
+        { name: '分䑸横渡印度洋赴东非', stops: ['guli', 'liushan', 'mugudushu', 'bulawa', 'malin'] },
+        { name: '分䑸赴阿拉伯半岛', stops: ['guli', 'zufaer', 'lasa', 'adan'] },
+        { name: '分䑸往彭亨', stops: ['manlajia', 'pengheng'] }
+      ]
+    },
+    {
+      n: 6, title: '第六次下西洋', reign: '永乐十九年—二十年', years: '1421—1422', t0: 1421.17, t1: 1422.66,
+      farthest: '木骨都束、卜剌哇、竹步（东非）',
+      fleet: '护送忽鲁谟斯等十六国使臣回国；船队分为多支䑸队',
+      people: '郑和；太监周满、洪保、李兴等分率䑸队；马欢第二次随行',
+      summary: [
+        '永乐十九年正月三十日（1421 年 3 月 3 日），明成祖命郑和等送忽鲁谟斯等十六国使臣回国。同月，北京正式成为京师。',
+        '船队到苏门答剌后分为多支䑸队，由太监周满、洪保、李兴等分别率领，前往榜葛剌、阿拉伯半岛的祖法儿、剌撒、阿丹，以及东非的木骨都束、卜剌哇、竹步等地。郑和本人的具体行程，史料记载不详。',
+        '同年四月初八（1421 年 5 月 9 日），北京紫禁城奉天、华盖、谨身三殿遭雷火焚毁，明成祖下诏暂停下西洋等耗费巨大的事务。永乐二十年八月（1422 年 9 月）船队回国，暹罗、苏门答剌、阿丹等国使臣随船来朝。'
+      ],
+      quote: { t: '永乐十九年，统领舟师，遣忽鲁谟斯等国使臣久侍京师者悉还本国。其各国王贡献方物，视前益加。', s: '长乐《天妃灵应之记》碑' },
+      stops: [
+        { p: 'nanjing', d: '1421 年 3 月 3 日', cd: '永乐十九年正月三十日', t: '明成祖命郑和送十六国使臣回国。' },
+        { p: 'liujiagang', d: '1421 年', cd: '永乐十九年', t: '刘家港集结。' },
+        { p: 'changle', d: '1421 年', cd: '永乐十九年', t: '自五虎门开洋。' },
+        { p: 'zhancheng', d: '1421 年', cd: '永乐十九年', t: '抵占城，分出船队往暹罗。' },
+        { p: 'manlajia', d: '1421 年', cd: '永乐十九年', t: '在满剌加官厂整备。' },
+        { p: 'sumendala', d: '1421 年', cd: '永乐十九年', t: '船队在此分为多支䑸队，分赴榜葛剌、阿拉伯半岛和东非。' },
+        { p: 'xilanshan', d: '1421 年', cd: '永乐十九年', t: '抵锡兰山。' },
+        { p: 'kezhi', d: '1421 年', cd: '永乐十九年', t: '抵柯枝。' },
+        { p: 'guli', d: '1421 年', cd: '永乐十九年', t: '抵古里。' },
+        { p: 'huluomosi', d: '1422 年', cd: '永乐二十年', t: '护送忽鲁谟斯使臣回国。' },
+        { p: 'guli', ret: true, d: '1422 年', cd: '永乐二十年', t: '东返至古里。' },
+        { p: 'sumendala', ret: true, d: '1422 年', cd: '永乐二十年', t: '各䑸陆续回到苏门答剌、满剌加一带汇合。' },
+        { p: 'manlajia', ret: true, d: '1422 年', cd: '永乐二十年', t: '经满剌加。' },
+        { p: 'zhancheng', ret: true, d: '1422 年', cd: '永乐二十年', t: '经占城北返。' },
+        { p: 'nanjing', ret: true, d: '1422 年 9 月', cd: '永乐二十年八月', t: '船队回国，暹罗、苏门答剌、阿丹等国使臣随船来朝。' }
+      ],
+      branches: [
+        { name: '分䑸往榜葛剌', stops: ['sumendala', 'banggela'] },
+        { name: '分䑸赴阿拉伯半岛', stops: ['guli', 'zufaer', 'lasa', 'adan'] },
+        { name: '分䑸赴东非', stops: ['guli', 'liushan', 'mugudushu', 'bulawa', 'zhubu'] },
+        { name: '分䑸往暹罗', stops: ['zhancheng', 'xianluo'] }
+      ]
+    },
+    {
+      n: 7, title: '第七次下西洋', reign: '宣德五年—八年', years: '1431—1433', t0: 1430.49, t1: 1433.56,
+      farthest: '忽鲁谟斯；分䑸至天方（麦加）与东非',
+      fleet: '官校、旗军、火长、舵工、班碇手、通事、办事、书算手、医士、铁锚木艌搭材等匠、水手、民稍人等，"共二万七千五百五十员名"；船名有"清和""惠康""长宁""安济""清远"等（祝允明《前闻记》）',
+      people: '正使太监郑和、王景弘，太监洪保；马欢、费信、巩珍随行',
+      summary: [
+        '宣德五年六月初九（1430 年 6 月 29 日），明宣宗以"践阼岁久，而诸番国远者犹未朝贡"，命郑和、王景弘再使西洋。此时郑和已年近六十。',
+        '船队于宣德五年闰十二月初六（1431 年 1 月 19 日）从南京龙湾启航，先后在刘家港、长乐立碑追记历次航程，宣德六年十二月初九（1432 年 1 月 12 日）出五虎门。祝允明《前闻记》逐日记下了这次航程，下面的日期大多出自该书。',
+        '船队经占城、爪哇、旧港、满剌加、苏门答剌、锡兰山、古里，宣德七年十二月二十六日（1433 年 1 月 17 日）抵达忽鲁谟斯。分䑸船队到达榜葛剌、阿拉伯半岛和东非；太监洪保在古里派通事等七人附当地船只前往天方（麦加）。',
+        '归途中，郑和于宣德八年（1433）春在古里一带病逝。船队于七月初六（1433 年 7 月 22 日）回到南京。此后明朝再未组织如此规模的远洋航行。'
+      ],
+      quote: { t: '自永乐三年奉使西洋，迨今七次，所历番国，由占城国、爪哇国、三佛齐国、暹罗国，直逾南天竺、锡兰山国、古里国、柯枝国，抵于西域忽鲁谟斯国、阿丹国、木骨都束国，大小凡三十余国，涉沧溟十万余里。', s: '长乐《天妃灵应之记》碑' },
+      stops: [
+        { p: 'nanjing', d: '1431 年 1 月 19 日', cd: '宣德五年闰十二月初六', t: '船队自南京龙湾开船，沿长江东下。' },
+        { p: 'liujiagang', d: '1431 年 2 月 3 日', cd: '宣德五年闰十二月二十一日', t: '到刘家港。郑和等在天妃宫立《通番事迹记》碑。' },
+        { p: 'changle', d: '1431 年 4 月 8 日—1432 年 1 月 12 日', cd: '宣德六年二月二十六日—十二月初九', t: '到长乐港，在此驻泊大半年，修船、募集水手、等候北风。冬季立《天妃灵应之记》碑，十二月初九出五虎门。' },
+        { p: 'zhancheng', d: '1432 年 1 月 27 日', cd: '宣德六年十二月二十四日', t: '到占城，停留半月，宣德七年正月十一日开船。' },
+        { p: 'zhaowa', d: '1432 年 3 月 7 日', cd: '宣德七年二月初六', t: '到爪哇苏鲁马益，在此停留四个多月，六月十六日开船。' },
+        { p: 'jiugang', d: '1432 年 7 月 24 日', cd: '宣德七年六月二十七日', t: '到旧港，七月初一开船。' },
+        { p: 'manlajia', d: '1432 年 8 月 3 日', cd: '宣德七年七月初八', t: '到满剌加，在官厂停留一月，八月初八开船。' },
+        { p: 'sumendala', d: '1432 年 9 月 12 日', cd: '宣德七年八月十八日', t: '到苏门答剌，候风近两月，十月初十开船。分䑸船队由此前往榜葛剌。' },
+        { p: 'xilanshan', d: '1432 年 11 月 28 日', cd: '宣德七年十一月初六', t: '到锡兰山别罗里，十一月初十开船。' },
+        { p: 'guli', d: '1432 年 12 月 10 日', cd: '宣德七年十一月十八日', t: '到古里，十一月二十二日开船。洪保所率分䑸在此遣通事等七人随当地船只赴天方。' },
+        { p: 'huluomosi', d: '1433 年 1 月 17 日', cd: '宣德七年十二月二十六日', t: '到忽鲁谟斯，停留近两月，宣德八年二月十八日开船回洋。' },
+        { p: 'guli', ret: true, d: '1433 年 3 月 31 日', cd: '宣德八年三月十一日', t: '回到古里，三月二十日大䑸船回洋。郑和约于此时病逝于古里一带。' },
+        { p: 'sumendala', ret: true, d: '1433 年 4 月 25 日', cd: '宣德八年四月初六', t: '到苏门答剌，四月十二日开船。' },
+        { p: 'manlajia', ret: true, d: '1433 年 5 月 9 日', cd: '宣德八年四月二十日', t: '到满剌加，五月初十回洋。' },
+        { p: 'kunlun', ret: true, d: '1433 年 6 月 10 日', cd: '宣德八年五月二十三日', t: '过昆仑洋。' },
+        { p: 'zhancheng', ret: true, d: '1433 年 6 月 17 日', cd: '宣德八年六月初一', t: '到占城，六月初三开船。' },
+        { p: 'liujiagang', ret: true, d: '1433 年 7 月 7 日', cd: '宣德八年六月二十一日', t: '进太仓。' },
+        { p: 'nanjing', ret: true, d: '1433 年 7 月 22 日', cd: '宣德八年七月初六', t: '到京。七月二十一日，随行官兵各获赏赐衣服、宝钞。' }
+      ],
+      branches: [
+        { name: '分䑸往榜葛剌', stops: ['sumendala', 'banggela'] },
+        { name: '通事七人附古里船赴天方', stops: ['guli', 'adan', 'tianfang'] },
+        { name: '分䑸赴阿拉伯半岛', stops: ['guli', 'zufaer', 'lasa', 'adan'] },
+        { name: '分䑸赴东非', stops: ['guli', 'liushan', 'mugudushu', 'bulawa', 'zhubu'] }
+      ]
+    }
+  ];
+
+  /* ---------------- 大事 ---------------- */
+  // type：战 用兵；碑 碑刻；贡 进贡；使 外交；政 朝廷决策；人 郑和生平；卒 去世
+  // v：所属航次（0 为航次之外）；y：用于时间轴的年份；key：概览时显示
+  var events = [
+    { id: 'birth', v: 0, type: '人', y: 1371, place: 'kunyang', date: '1371 年', cd: '洪武四年', title: '郑和出生',
+      text: '郑和本姓马，名和，小字三保（三宝），出生于云南昆阳州一个回族穆斯林家庭。祖父和父亲都曾赴麦加朝觐，被尊称为"哈只"。' },
+    { id: 'captured', v: 0, type: '人', y: 1381.9, place: 'kunyang', date: '1381 年', cd: '洪武十四年', title: '明军平定云南',
+      text: '傅友德、蓝玉、沐英率明军进入云南，年约十岁的马和被俘，后被阉割，入燕王朱棣府中服役。' },
+    { id: 'jingnan', v: 0, type: '人', y: 1399.6, place: 'beijing', date: '1399—1402 年', cd: '建文元年—四年', title: '靖难之役',
+      text: '燕王朱棣在北平起兵"靖难"，马和随军征战，在郑村坝等战役中立功。1402 年朱棣攻入南京即位，是为明成祖（永乐帝）。' },
+    { id: 'surname', v: 0, type: '人', y: 1404.1, place: 'nanjing', date: '1404 年', cd: '永乐二年正月初一（相传）', title: '赐姓"郑"',
+      text: '明成祖念郑村坝之功，赐马和姓"郑"，从此称郑和，并任内官监太监（正四品）。' },
+    { id: 'mahaji', v: 0, type: '碑', y: 1405.4, place: 'kunyang', date: '1405 年', cd: '永乐三年端阳', title: '《故马公墓志铭》',
+      text: '郑和请礼部尚书李至刚为其父撰写墓志铭，碑立于昆阳月山，至今尚存。碑文记其父马哈只有子二人，"长文铭，次和"，是研究郑和家世最早的可靠史料。',
+      quote: { t: '和自幼有材志，事今天子，赐姓郑，为内官监太监。', s: '李至刚《故马公墓志铭》' } },
+    { id: 'edict1', v: 1, type: '政', y: 1405.53, place: 'nanjing', key: true, date: '1405 年 7 月 11 日', cd: '永乐三年六月十五日', title: '首次下西洋受命',
+      text: '明成祖命郑和、王景弘等率舟师出使西洋。这一天在 2005 年被定为中国航海日。',
+      quote: { t: '成祖疑惠帝亡海外，欲踪迹之，且欲耀兵异域，示中国富强。', s: '《明史·郑和传》' } },
+    { id: 'java', v: 1, type: '战', y: 1406.5, place: 'duban', date: '1406 年', cd: '永乐四年', title: '爪哇误杀事件',
+      text: '爪哇东、西二王交战，东王战败。明使船队官兵在东王辖地登岸贸易，被西王军队杀死一百七十人。郑和未兴兵报复。西王惧而遣使谢罪，明廷命其输黄金六万两赎罪。' },
+    { id: 'chenzuyi', v: 1, type: '战', y: 1407.4, place: 'jiugang', key: true, date: '1407 年', cd: '永乐五年', title: '旧港擒陈祖义',
+      text: '广东人陈祖义逃居旧港，聚众劫掠往来商船。郑和船队归航至此，陈祖义诈降，暗谋劫夺。当地华人首领施进卿事先告知，郑和整兵迎战，大破其众，生擒陈祖义，押回南京斩首。明廷随后设旧港宣慰司，以施进卿为宣慰使。',
+      quote: { t: '杀贼党五千余人，烧贼船十艘，获其七艘。', s: '《明太宗实录》' } },
+    { id: 'javagold', v: 2, type: '使', y: 1408.4, place: 'zhaowa', date: '1408 年', cd: '永乐六年', title: '爪哇西王献金',
+      text: '郑和再至爪哇，西王献黄金一万两。礼官认为不足六万两之数，请将来使下狱，明成祖不许，免除其余。',
+      quote: { t: '朕于远人，欲其畏罪而已，宁利其金耶？', s: '《明史·爪哇传》' } },
+    { id: 'gulistele', v: 2, type: '碑', y: 1408.5, place: 'guli', key: true, date: '1408 年', cd: '永乐五年诏，六年立', title: '古里立碑',
+      text: '使团颁赐古里国王诰命银印，给赐大小头目品级冠带，建碑亭立石。',
+      quote: { t: '其国去中国十万余里，民物咸若，熙皞同风，刻石于兹，永示万世。', s: '马欢《瀛涯胜览·古里国》' } },
+    { id: 'boni', v: 2, type: '使', y: 1408.7, place: 'nanjing', date: '1408 年', cd: '永乐六年', title: '浡泥国王来朝',
+      text: '浡泥（今文莱）国王麻那惹加那乃率妻子、陪臣一百五十余人来华，同年病逝于南京，以王礼葬于城南石子岗（今雨花台区），墓地保存至今。' },
+    { id: 'galle', v: 3, type: '碑', y: 1409.12, place: 'galle', key: true, date: '1409 年 2 月 15 日（碑文落款）', cd: '永乐七年二月初一', title: '布施锡兰山佛寺碑',
+      text: '石碑高约 1.4 米，刻汉文、泰米尔文、波斯文三种文字：汉文向佛陀致敬，泰米尔文献给当地印度教神祇，波斯文赞颂真主，分别记载布施的金银、丝绸、香油等物。碑在南京刻成，一般认为由第三次下西洋船队带到锡兰山竖立。1911 年在斯里兰卡加勒被发现，现藏科伦坡国家博物馆。' },
+    { id: 'malacca', v: 3, type: '使', y: 1410.2, place: 'manlajia', key: true, date: '1409—1410 年', cd: '永乐七年—八年', title: '满剌加建碑封城',
+      text: '郑和宣读诏敕，封拜里迷苏剌为满剌加国王。船队又在此设立官厂，储存钱粮货物，分赴各国的船只回到这里汇齐，再等候南风回国。',
+      quote: { t: '赐头目双台银印、冠带袍服，建碑封城，遂名满剌加国，是后暹罗莫敢侵扰。', s: '马欢《瀛涯胜览·满剌加国》' } },
+    { id: 'ceylon', v: 3, type: '战', y: 1411.25, place: 'kotte', key: true, date: '1411 年', cd: '永乐九年', title: '锡兰山之战',
+      text: '归途中，锡兰山国王亚烈苦奈儿诱郑和入国中，索要金币，同时发兵五万余人劫船、伐木塞断归路。郑和判断敌军尽出、王城空虚，率两千余人走小路奇袭，攻破王城，生擒国王及家属。劫船之敌回救，又被击溃。',
+      quote: { t: '和觇贼大众既出，国内虚，率所统二千余人，出不意攻破其城，生擒亚烈苦奈儿及其妻子官属。', s: '《明史·锡兰山传》' } },
+    { id: 'parameswara', v: 3, type: '使', y: 1411.55, place: 'nanjing', date: '1411 年', cd: '永乐九年七月', title: '满剌加国王访华',
+      text: '满剌加国王拜里迷苏剌率妻子、陪臣五百四十余人随船队来朝，受到隆重接待。' },
+    { id: 'hormuz', v: 4, type: '使', y: 1414.3, place: 'huluomosi', key: true, date: '1414 年', cd: '永乐十二年', title: '初抵忽鲁谟斯',
+      text: '船队首次越过印度，横渡阿拉伯海，到达波斯湾口的商业城邦忽鲁谟斯。此后它成为下西洋的主要目的地之一。',
+      quote: { t: '各处番船并旱番客商都到此地赶集买卖，所以国民皆富。', s: '马欢《瀛涯胜览·忽鲁谟斯国》' } },
+    { id: 'bengalqilin', v: 4, type: '贡', y: 1414.7, place: 'banggela', key: true, date: '1414 年', cd: '永乐十二年九月', title: '榜葛剌进"麒麟"',
+      text: '榜葛剌国王遣使随船队来华，进献一头长颈鹿。长颈鹿在东非索马里语中称 geri，与"麒麟"音近，又合祥瑞之说，朝臣上表称贺。翰林修撰沈度作《瑞应麒麟颂》，并有《瑞应麒麟图》传世。' },
+    { id: 'sekandar', v: 4, type: '战', y: 1415.3, place: 'sumendala', key: true, date: '1415 年', cd: '永乐十三年', title: '苏门答剌擒苏干剌',
+      text: '苏门答剌前王之子宰奴里阿比丁夺回王位，其政敌苏干剌逃入山中。郑和到达后，苏干剌因未获赏赐而怨恨，领兵数万截击船队。郑和与国王合兵迎战，大破其众，追至南渤利，生擒苏干剌及其妻子，押回京城处斩。' },
+    { id: 'malindiqilin', v: 4, type: '贡', y: 1415.85, place: 'malin', date: '1415 年', cd: '永乐十三年十一月', title: '麻林国进麒麟',
+      text: '麻林国遣使进献麒麟，明成祖亲临奉天门接受，百官稽首称贺。这表明船队此时已同东非有所往来。' },
+    { id: 'quanzhou', v: 5, type: '碑', y: 1417.41, place: 'quanzhou', key: true, date: '1417 年 5 月 31 日', cd: '永乐十五年五月十六日', title: '泉州灵山行香',
+      text: '第五次下西洋途经泉州，郑和到城东灵山圣墓行香，祈求航行平安。当地官员蒲和日立碑为记，此碑今存。',
+      quote: { t: '钦差总兵太监郑和前往西洋忽鲁谟斯等国公干，永乐十五年五月十六日于此行香，望灵圣庇佑。', s: '泉州"郑和行香碑"' } },
+    { id: 'africa', v: 5, type: '使', y: 1418.3, place: 'mugudushu', key: true, date: '1418 年', cd: '永乐十六年', title: '船队抵达东非',
+      text: '分䑸船队经溜山横渡印度洋，到达木骨都束、卜剌哇、麻林等东非城邦。一般认为这是中国官方船队首次抵达非洲东岸。费信记木骨都束"垒石为屋，四五层高"。' },
+    { id: 'adenqilin', v: 5, type: '贡', y: 1419.0, place: 'adan', date: '1419 年', cd: '永乐十七年', title: '阿丹进麒麟',
+      text: '阿丹国进献麒麟及长角马哈兽（大角羚羊）。碑文记麒麟"番名祖剌法"，即阿拉伯语称长颈鹿的 zarāfa。' },
+    { id: 'beasts', v: 5, type: '贡', y: 1419.6, place: 'nanjing', date: '1419 年 8 月', cd: '永乐十七年七月', title: '珍兽入京',
+      text: '船队回国，各国使臣带来狮子、金钱豹、西马、麒麟、斑马（花福禄）、鸵鸟（驼鸡）、单峰驼等珍禽异兽，在京城引起轰动。' },
+    { id: 'beijing', v: 6, type: '政', y: 1421.05, place: 'beijing', key: true, date: '1421 年', cd: '永乐十九年', title: '迁都北京与三殿火灾',
+      text: '永乐十九年正月，北京正式成为京师。四月初八（5 月 9 日），紫禁城奉天、华盖、谨身三殿遭雷火焚毁，明成祖下诏求言，并暂停下西洋等耗费巨大的事务。' },
+    { id: 'split', v: 6, type: '使', y: 1421.6, place: 'sumendala', date: '1421 年', cd: '永乐十九年', title: '分䑸远航',
+      text: '船队在苏门答剌等地分为多支䑸队，由太监周满、洪保、李兴等分别率领，前往榜葛剌、阿拉伯半岛和东非。' },
+    { id: 'jiugang1424', v: 0, type: '使', y: 1424.05, place: 'jiugang', date: '1424 年', cd: '永乐二十二年正月', title: '旧港授印',
+      text: '旧港宣慰使施进卿去世，其子施济孙请求承袭职位，郑和奉命赍敕印前往授予。',
+      quote: { t: '二十二年正月，旧港酋长施济孙请袭宣慰使职，和赍敕印往赐之。比还，而成祖已晏驾。', s: '《明史·郑和传》' } },
+    { id: 'halt', v: 0, type: '政', y: 1424.7, place: 'beijing', key: true, date: '1424 年', cd: '永乐二十二年八月', title: '仁宗罢下西洋',
+      text: '明成祖于北征归途中驾崩，明仁宗即位，诏书宣布停止下西洋。',
+      quote: { t: '下西洋诸番国宝船，悉皆停止。', s: '明仁宗即位诏' } },
+    { id: 'shoubei', v: 0, type: '人', y: 1425.1, place: 'nanjing', date: '1425 年', cd: '洪熙元年二月', title: '任南京守备',
+      text: '郑和率下番官军镇守南京，成为第一任南京守备。',
+      quote: { t: '洪熙元年二月，仁宗命和以下番诸军守备南京。南京设守备，自和始。', s: '《明史·郑和传》' } },
+    { id: 'baoen', v: 0, type: '人', y: 1428.2, place: 'nanjing', date: '1428 年', cd: '宣德三年', title: '督修大报恩寺',
+      text: '奉命督工完成南京大报恩寺及琉璃宝塔的营建。' },
+    { id: 'edict7', v: 7, type: '政', y: 1430.49, place: 'nanjing', key: true, date: '1430 年 6 月 29 日', cd: '宣德五年六月初九', title: '宣宗命再下西洋',
+      text: '明宣宗见即位多年而远方诸国未来朝贡，命郑和、王景弘再次出使。',
+      quote: { t: '帝以践阼岁久，而诸番国远者犹未朝贡，于是和、景弘复奉命历忽鲁谟斯等十七国而还。', s: '《明史·郑和传》' } },
+    { id: 'liujiastele', v: 7, type: '碑', y: 1431.1, place: 'liujiagang', date: '1431 年春', cd: '宣德六年', title: '《通番事迹记》碑',
+      text: '郑和等在刘家港天妃宫立碑，记述历次出使经过。原碑已佚，碑文由明人钱谷收入《吴都文粹续集》。' },
+    { id: 'changlestele', v: 7, type: '碑', y: 1431.9, place: 'changle', key: true, date: '1431 年冬', cd: '宣德六年仲冬', title: '《天妃灵应之记》碑',
+      text: '在长乐南山天妃行宫立碑，逐次记述七次下西洋的时间、所到国家和重要事件，是最系统的下西洋石刻史料。碑于 1930 年代重新被发现。',
+      quote: { t: '观夫海洋，洪涛接天，巨浪如山，视诸夷域，迥隔于烟霞缥缈之间。而我之云帆高张，昼夜星驰，涉彼狂澜，若履通衢者，诚荷朝廷威福之致，尤赖天妃之神护佑之德也。', s: '长乐《天妃灵应之记》碑' } },
+    { id: 'mecca', v: 7, type: '使', y: 1432.95, place: 'tianfang', key: true, date: '1432—1433 年', cd: '宣德七年—八年', title: '七人赴天方',
+      text: '太监洪保所率分䑸到古里时，正值天方有使者到此，便选派通事等七人，带着麝香、瓷器等物，附古里船只前往天方。往回一年，换得各色奇货异宝及麒麟、狮子、驼鸡等物，并"画天堂图真本回京"。马欢可能就在这七人之中。' },
+    { id: 'death', v: 7, type: '卒', y: 1433.27, place: 'guli', key: true, date: '1433 年春', cd: '宣德八年', title: '郑和病逝',
+      text: '多数学者认为，郑和在第七次下西洋归途中病逝于古里一带，终年约六十二岁。南京牛首山南麓有其衣冠冢。也有观点认为他回国后于 1435 年前后在南京去世。' },
+    { id: 'return7', v: 7, type: '政', y: 1433.56, place: 'nanjing', date: '1433 年 7 月 22 日', cd: '宣德八年七月初六', title: '船队返京',
+      text: '船队回到南京，多国使臣随船来朝。七下西洋至此结束，此后明朝再未组织同等规模的远洋航行。' }
+  ];
+
+  /* ---------------- 海域注记 ---------------- */
+  var seas = [
+    { t: '东 海', at: [29.0, 125.6] }, { t: '南 海', at: [14.5, 114.5] }, { t: '暹罗湾', at: [10.6, 101.6] },
+    { t: '爪 哇 海', at: [-5.0, 111.5] }, { t: '安达曼海', at: [10.0, 96.4] }, { t: '孟 加 拉 湾', at: [14.5, 88.5] },
+    { t: '阿 拉 伯 海', at: [15.5, 64.5] }, { t: '印 度 洋', at: [-8.0, 76.0] }, { t: '波斯湾', at: [27.4, 51.0] },
+    { t: '红海', at: [19.6, 38.3] }, { t: '亚丁湾', at: [12.2, 48.0] }
+  ];
+
+  /* ---------------- 年表（含身后） ---------------- */
+  var later = [
+    { y: 1434, date: '1434 年', title: '巩珍《西洋番国志》成书', text: '巩珍以幕僚身份随第七次下西洋，书中记二十国见闻，并收录出使敕书。' },
+    { y: 1436, date: '1436 年', title: '费信《星槎胜览》成书', text: '费信先后四次随船出洋，前集记亲历诸国，后集记传闻诸国。' },
+    { y: 1451, date: '1451 年', title: '马欢《瀛涯胜览》定稿', text: '马欢随第四、六、七次下西洋，书中二十国的记载最为翔实，初稿约成于 1416 年。' },
+    { y: 1477, date: '成化年间', title: '刘大夏藏匿下西洋档案（传说）', text: '据严从简《殊域周咨录》，明宪宗欲查郑和出使水程，兵部车驾郎中刘大夏将档案藏匿，并称"三保下西洋费钱粮数十万，军民死且万计"。此说真伪尚有争议。' },
+    { y: 1597, date: '1597 年', title: '罗懋登《三宝太监西洋记通俗演义》', text: '以下西洋为题材的神魔小说，所记宝船尺度常被后人引用，但属小说家言。' },
+    { y: 1621, date: '1621 年', title: '《武备志》收录《郑和航海图》', text: '茅元仪编《武备志》卷二百四十收录此图，原名《自宝船厂开船从龙江关出水直抵外国诸番图》，是现存最早的中国远洋航海图。' },
+    { y: 1911, date: '1911 年', title: '加勒三语碑被发现', text: '英国工程师在斯里兰卡加勒发现《布施锡兰山佛寺碑》，现藏科伦坡国家博物馆。' },
+    { y: 1930, date: '1930 年代', title: '长乐天妃碑重现', text: '《天妃灵应之记》碑在长乐南山寺旧址被发现，现存长乐郑和史迹陈列馆。' },
+    { y: 1957, date: '1957 年', title: '宝船厂舵杆出土', text: '南京中保村宝船厂遗址出土一根长 11.07 米的铁力木舵杆，为推算宝船尺度提供了实物依据。' },
+    { y: 2005, date: '2005 年', title: '设立中国航海日', text: '郑和下西洋 600 周年之际，国务院批准将每年 7 月 11 日定为中国航海日。' },
+    { y: 2010, date: '2010 年', title: '洪保墓寿藏铭出土', text: '南京祖堂山发现副使太监洪保墓，墓志铭记其"乘大福等号五千料巨舶"出使西洋，是关于宝船规模的重要新史料。' }
+  ];
+
+  return { ports: ports, places: places, waypoints: waypoints, edges: edges, voyages: voyages, events: events, seas: seas, later: later };
+})();
+
+</script>
+<script>
+/*
+ * 航路计算：在 data.js 定义的海道网上用 Dijkstra 求港口之间的最短海路，
+ * 再对中途转折点做 Chaikin 平滑，使航线贴近古代帆船沿岸、跨洋的实际走法。
+ */
+(function (root) {
+  var R = 6371;
+  function rad(d) { return d * Math.PI / 180; }
+  function km(a, b) {
+    var dLat = rad(b[0] - a[0]), dLng = rad(b[1] - a[1]);
+    var h = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(rad(a[0])) * Math.cos(rad(b[0])) * Math.sin(dLng / 2) * Math.sin(dLng / 2);
+    return 2 * R * Math.asin(Math.sqrt(h));
+  }
+
+  function build(D) {
+    var nodes = {}, adj = {}, kind = {};
+    Object.keys(D.ports).forEach(function (id) { nodes[id] = D.ports[id].at; });
+    Object.keys(D.waypoints).forEach(function (id) { nodes[id] = D.waypoints[id]; });
+    Object.keys(nodes).forEach(function (id) { adj[id] = []; });
+    D.edges.forEach(function (e) {
+      var a = e[0], b = e[1];
+      if (!nodes[a] || !nodes[b]) throw new Error('未知航点：' + a + ' / ' + b);
+      var w = km(nodes[a], nodes[b]);
+      adj[a].push([b, w]); adj[b].push([a, w]);
+      kind[a + '|' + b] = kind[b + '|' + a] = e[2] || 's';
+    });
+
+    var cache = {};
+    function shortest(from, to) {
+      var key = from + '>' + to;
+      if (cache[key]) return cache[key];
+      var dist = {}, prev = {}, done = {};
+      Object.keys(nodes).forEach(function (id) { dist[id] = Infinity; });
+      dist[from] = 0;
+      for (;;) {
+        var u = null, best = Infinity;
+        for (var id in dist) if (!done[id] && dist[id] < best) { best = dist[id]; u = id; }
+        if (u === null || u === to) break;
+        done[u] = true;
+        adj[u].forEach(function (nb) {
+          var alt = dist[u] + nb[1];
+          if (alt < dist[nb[0]]) { dist[nb[0]] = alt; prev[nb[0]] = u; }
+        });
+      }
+      if (dist[to] === Infinity) throw new Error('无可达海路：' + from + ' → ' + to);
+      var path = [to];
+      while (path[0] !== from) path.unshift(prev[path[0]]);
+      cache[key] = path;
+      return path;
+    }
+
+    // Chaikin 平滑：只平滑连续的海上航段，港口与河道/陆路端点保持不动
+    function smooth(pts, fixed, iterations) {
+      for (var it = 0; it < iterations; it++) {
+        var out = [pts[0]], fx = [true];
+        for (var i = 0; i < pts.length - 1; i++) {
+          var p = pts[i], q = pts[i + 1];
+          if (fixed[i] && fixed[i + 1] && pts.length === 2) { out.push(q); fx.push(true); continue; }
+          var a = [0.75 * p[0] + 0.25 * q[0], 0.75 * p[1] + 0.25 * q[1]];
+          var b = [0.25 * p[0] + 0.75 * q[0], 0.25 * p[1] + 0.75 * q[1]];
+          if (!fixed[i]) { out.push(a); fx.push(false); }
+          if (!fixed[i + 1]) { out.push(b); fx.push(false); }
+          if (fixed[i + 1]) { out.push(q); fx.push(true); }
+        }
+        pts = out; fixed = fx;
+      }
+      return pts;
+    }
+
+    // 一段航程（相邻两个停靠点之间）的坐标串
+    function leg(from, to) {
+      var ids = shortest(from, to);
+      var pts = ids.map(function (id) { return nodes[id].slice(); });
+      // 港口、河道与陆路两端都视为固定点
+      var fixed = ids.map(function (id, i) {
+        if (i === 0 || i === ids.length - 1 || D.ports[id]) return true;
+        var prevK = i > 0 ? kind[ids[i - 1] + '|' + id] : 's';
+        var nextK = i < ids.length - 1 ? kind[id + '|' + ids[i + 1]] : 's';
+        return prevK !== 's' || nextK !== 's';
+      });
+      var overland = [];
+      for (var i = 0; i < ids.length - 1; i++) if (kind[ids[i] + '|' + ids[i + 1]] === 'l') overland.push(i);
+      return { ids: ids, latlngs: smooth(pts, fixed, 2), overland: overland.length > 0, km: pathKm(pts) };
+    }
+
+    function pathKm(pts) {
+      var s = 0;
+      for (var i = 1; i < pts.length; i++) s += km(pts[i - 1], pts[i]);
+      return s;
+    }
+
+    return { nodes: nodes, shortest: shortest, leg: leg, km: km, pathKm: pathKm };
+  }
+
+  root.ZHRoute = { build: build, km: km };
+})(typeof window !== 'undefined' ? window : globalThis);
+
+</script>
+<script>
+/*
+ * 航次档案数据 ZH_DETAIL（docs/SPEC.md §4.1）
+ * 规则：n 只写史料中的数字；原文写"余"的 approx: true；史料未载的 n: null，界面显示"史料未载"。
+ * results[].ev 引用 js/data.js 中 ZH.events 的 id。
+ */
+window.ZH_DETAIL = (function () {
+  var UNKNOWN = { n: null, text: '史料未载', src: null };
+  return {
+    1: {
+      personnel: {
+        total: { n: 27800, approx: true, text: '将士卒二万七千八百余人', src: '《明史·郑和传》' },
+        categories: null
+      },
+      officials: [
+        { name: '郑和', title: '正使太监', role: '统领舟师', src: '《明史·郑和传》' },
+        { name: '王景弘', title: '正使太监', role: '与郑和同领舟师', src: '《明史·郑和传》"和及其侪王景弘等"' }
+      ],
+      fleet: {
+        total: { n: null, text: '总船数史无明载，今人估计在二百艘上下', src: null },
+        large: { n: 62, text: '造大舶，修四十四丈、广十八丈者六十二', src: '《明史·郑和传》' },
+        note: '"修四十四丈"的尺度历来有争议，见舰队复原页。'
+      },
+      results: [
+        { kind: 'battle', text: '归途在旧港剿灭海盗陈祖义集团，生擒陈祖义，押回南京处斩', ev: 'chenzuyi', src: '《明太宗实录》' },
+        { kind: 'conferral', text: '设旧港宣慰司，以当地华人首领施进卿为宣慰使', src: '《明史·三佛齐传》' },
+        { kind: 'envoy', text: '古里等国使臣随船来朝', src: '《明太宗实录》' },
+        { kind: 'other', text: '爪哇东西王内战中，船队官兵一百七十人被西王军队误杀，郑和未兴兵报复', ev: 'java', src: '《明史·爪哇传》' }
+      ],
+      sources: [
+        { t: '永乐三年，统领舟师，往古里等国。时海寇陈祖义聚众三佛齐国，劫掠番商，亦来犯我舟师，即有神兵阴助，一鼓而殄灭之。至五年回。', s: '长乐《天妃灵应之记》碑' },
+        { t: '自苏州刘家河泛海至福建，复自福建五虎门扬帆，首达占城，以次遍历诸番国，宣天子诏，因给赐其君长，不服则以武慑之。', s: '《明史·郑和传》' }
+      ]
+    },
+    2: {
+      personnel: { total: UNKNOWN, categories: null },
+      officials: [
+        { name: '郑和', title: '正使太监', role: '长乐碑列为郑和亲统；是否亲往，学界有不同看法', src: '长乐《天妃灵应之记》碑' },
+        { name: '王景弘', title: '正使太监', role: '同领舟师', src: '长乐《天妃灵应之记》碑' }
+      ],
+      fleet: {
+        total: { n: 249, text: '命都指挥汪浩改造海运船二百四十九艘，备使西洋诸国', src: '《明太宗实录》永乐五年九月', note: '为改造数，未必即出航数' },
+        large: { n: null, text: '史料未载', src: null },
+        note: ''
+      },
+      results: [
+        { kind: 'conferral', text: '颁赐古里国王诰命银印，给赐头目冠带，建碑亭立石', ev: 'gulistele', src: '马欢《瀛涯胜览·古里国》' },
+        { kind: 'tribute', text: '爪哇西王献黄金一万两谢罪，明成祖免除其余五万两', ev: 'javagold', src: '《明史·爪哇传》' },
+        { kind: 'envoy', text: '分䑸赴暹罗，劝谕其与邻国和睦', src: '长乐《天妃灵应之记》碑列暹罗为本次所到之国' },
+        { kind: 'other', text: '同期：1408 年浡泥国王麻那惹加那乃访华，病逝于南京', ev: 'boni', src: '《明史·浡泥传》' }
+      ],
+      sources: [
+        { t: '永乐五年，统领舟师，往爪哇、古里、柯枝、暹罗等国，王各以珍宝、珍禽异兽贡献，至七年回还。', s: '长乐《天妃灵应之记》碑' },
+        { t: '其国去中国十万余里，民物咸若，熙皞同风，刻石于兹，永示万世。', s: '古里碑文，见马欢《瀛涯胜览》' }
+      ]
+    },
+    3: {
+      personnel: {
+        total: { n: 27000, approx: true, text: '统领官兵二万七千余人', src: '费信《星槎胜览》' },
+        categories: null
+      },
+      officials: [
+        { name: '郑和', title: '正使太监', role: '统领舟师', src: '费信《星槎胜览》' },
+        { name: '王景弘', title: '正使太监', role: '同领舟师', src: '费信《星槎胜览》' },
+        { name: '费信', title: '通事', role: '太仓卫军士，首次随行，后著《星槎胜览》', src: '费信《星槎胜览》自序' }
+      ],
+      fleet: {
+        total: { n: 48, text: '驾驶海舶四十八号', src: '费信《星槎胜览》', note: '"号"指编号的大船，不含小型随行船只' },
+        large: { n: 48, text: '海舶四十八号', src: '费信《星槎胜览》' },
+        note: ''
+      },
+      results: [
+        { kind: 'conferral', text: '册封满剌加首领拜里迷苏剌为王，建碑封城，满剌加从此摆脱暹罗控制', ev: 'malacca', src: '马欢《瀛涯胜览·满剌加国》' },
+        { kind: 'stele', text: '在锡兰山佛寺布施，立汉文、泰米尔文、波斯文三语碑', ev: 'galle', src: '加勒《布施锡兰山佛寺碑》' },
+        { kind: 'battle', text: '锡兰山之战：以两千余人奇袭王城，生擒国王亚烈苦奈儿及其家属', ev: 'ceylon', src: '《明史·锡兰山传》' },
+        { kind: 'envoy', text: '满剌加国王拜里迷苏剌率妻子陪臣五百四十余人随船访华', ev: 'parameswara', src: '《明史·满剌加传》' }
+      ],
+      sources: [
+        { t: '永乐七年，统领舟师，往前各国，道经锡兰山国，其王亚烈苦奈儿负固不恭，谋害舟师……遂生擒其王，至九年归献。寻蒙恩宥，俾归本国。', s: '长乐《天妃灵应之记》碑' },
+        { t: '统领官兵二万七千余人，驾驶海舶四十八号，往诸番国开读赏赐。', s: '费信《星槎胜览》' }
+      ]
+    },
+    4: {
+      personnel: { total: UNKNOWN, categories: null },
+      officials: [
+        { name: '郑和', title: '正使太监', role: '统领舟师', src: '长乐《天妃灵应之记》碑' },
+        { name: '王景弘', title: '正使太监', role: '同领舟师', src: '长乐《天妃灵应之记》碑' },
+        { name: '马欢', title: '通事', role: '通晓阿拉伯语，首次随行，后著《瀛涯胜览》', src: '马欢《瀛涯胜览》自序' }
+      ],
+      fleet: { total: UNKNOWN, large: UNKNOWN, note: '' },
+      results: [
+        { kind: 'envoy', text: '首次越过印度，抵达波斯湾口的忽鲁谟斯', ev: 'hormuz', src: '马欢《瀛涯胜览》' },
+        { kind: 'battle', text: '在苏门答剌击败并生擒作乱的苏干剌，押回京城处斩', ev: 'sekandar', src: '《明史·苏门答剌传》' },
+        { kind: 'tribute', text: '榜葛剌使臣进献"麒麟"（长颈鹿）', ev: 'bengalqilin', src: '《明太宗实录》' },
+        { kind: 'tribute', text: '麻林国遣使进献麒麟，明成祖亲临奉天门接受', ev: 'malindiqilin', src: '《明太宗实录》' },
+        { kind: 'envoy', text: '满剌加国王亲率妻子朝贡', src: '长乐《天妃灵应之记》碑' }
+      ],
+      sources: [
+        { t: '永乐十一年，统领舟师，往忽鲁谟斯等国。其苏门答剌国有伪王苏干剌寇侵本国，其王宰奴里阿比丁遣使赴阙陈诉，就率官兵剿捕……生擒伪王，至十三年归献。是年满剌加国王亲率妻子朝贡。', s: '长乐《天妃灵应之记》碑' }
+      ]
+    },
+    5: {
+      personnel: { total: UNKNOWN, categories: null },
+      officials: [
+        { name: '郑和', title: '钦差总兵太监', role: '统领舟师；途经泉州行香', src: '泉州"郑和行香碑"' },
+        { name: '王景弘', title: '正使太监', role: '同领舟师', src: '长乐《天妃灵应之记》碑' }
+      ],
+      fleet: { total: UNKNOWN, large: UNKNOWN, note: '' },
+      results: [
+        { kind: 'envoy', text: '护送古里、爪哇、满剌加、占城、锡兰山、木骨都束、溜山、阿丹、忽鲁谟斯等十九国使臣回国', src: '《明太宗实录》永乐十四年十二月' },
+        { kind: 'envoy', text: '分䑸船队横渡印度洋，抵达木骨都束、卜剌哇、麻林等东非城邦', ev: 'africa', src: '长乐《天妃灵应之记》碑' },
+        { kind: 'conferral', text: '册封柯枝国王，封其国中之山为"镇国之山"，明成祖亲撰碑文', src: '《明史·柯枝传》' },
+        { kind: 'tribute', text: '忽鲁谟斯、阿丹、木骨都束、卜剌哇等国进献狮子、金钱豹、麒麟、花福禄（斑马）、驼鸡（鸵鸟）等', ev: 'beasts', src: '长乐《天妃灵应之记》碑' },
+        { kind: 'stele', text: '途经泉州，至灵山圣墓行香，立碑为记', ev: 'quanzhou', src: '泉州"郑和行香碑"' }
+      ],
+      sources: [
+        { t: '永乐十五年，统领舟师，往西域。其忽鲁谟斯国进狮子、金钱豹、大西马；阿丹国进麒麟，番名祖剌法，并长角马哈兽；木骨都束国进花福禄，并狮子；卜剌哇国进千里骆驼，并驼鸡。', s: '长乐《天妃灵应之记》碑' }
+      ]
+    },
+    6: {
+      personnel: { total: UNKNOWN, categories: null },
+      officials: [
+        { name: '郑和', title: '正使太监', role: '统领舟师；本人具体行程史载不详', src: '长乐《天妃灵应之记》碑' },
+        { name: '周满', title: '太监', role: '率分䑸赴阿丹等国（《明史》称"中官周姓者"）', src: '《明史·阿丹传》' },
+        { name: '马欢', title: '通事', role: '第二次随行', src: '马欢《瀛涯胜览》' }
+      ],
+      fleet: { total: UNKNOWN, large: UNKNOWN, note: '船队在苏门答剌等地分为多支䑸队。' },
+      results: [
+        { kind: 'envoy', text: '护送忽鲁谟斯等十六国使臣回国', src: '《明太宗实录》永乐十九年正月' },
+        { kind: 'trade', text: '分䑸至阿丹，买得猫睛石、珊瑚、珍珠等宝货，以及麒麟、狮子、花福禄、金钱豹、驼鸡等', src: '马欢《瀛涯胜览·阿丹国》' },
+        { kind: 'envoy', text: '暹罗、苏门答剌、阿丹等国使臣随船来朝', src: '《明太宗实录》永乐二十年八月' },
+        { kind: 'other', text: '同期：北京正式成为京师；三殿火灾后明成祖下诏暂停下西洋等事务', ev: 'beijing', src: '《明太宗实录》' }
+      ],
+      sources: [
+        { t: '永乐十九年，统领舟师，遣忽鲁谟斯等国使臣久侍京师者悉还本国。其各国王贡献方物，视前益加。', s: '长乐《天妃灵应之记》碑' }
+      ]
+    },
+    7: {
+      personnel: {
+        total: { n: 27550, approx: false, text: '共二万七千五百五十员名', src: '祝允明《前闻记》' },
+        categories: ['官校', '旗军', '火长', '舵工', '班碇手', '通事', '办事', '书算手', '医士', '铁锚匠', '木艌匠', '搭材匠', '水手', '民稍人']
+      },
+      officials: [
+        { name: '郑和', title: '正使太监', role: '统领舟师；归途病逝于古里一带', src: '长乐《天妃灵应之记》碑落款' },
+        { name: '王景弘', title: '正使太监', role: '郑和去世后率船队返航（一般认为）', src: '长乐《天妃灵应之记》碑落款' },
+        { name: '李兴、朱良、周满、洪保、杨真、张达、吴忠', title: '副使太监', role: '分领䑸队；洪保分䑸至古里，遣通事七人赴天方', src: '长乐《天妃灵应之记》碑落款；马欢《瀛涯胜览·天方国》' },
+        { name: '朱真、王衡', title: '都指挥', role: '统领官军', src: '长乐《天妃灵应之记》碑落款' },
+        { name: '马欢、费信、巩珍', title: '通事、幕僚', role: '随行记录，分别著《瀛涯胜览》《星槎胜览》《西洋番国志》', src: '各书自序' }
+      ],
+      fleet: {
+        total: UNKNOWN,
+        large: { n: null, text: '船名有"清和""惠康""长宁""安济""清远"等，又以一、二等编号', src: '祝允明《前闻记》' },
+        note: ''
+      },
+      results: [
+        { kind: 'stele', text: '在刘家港天妃宫立《通番事迹记》碑，在长乐南山立《天妃灵应之记》碑，追记七次航程', ev: 'changlestele', src: '两碑碑文' },
+        { kind: 'envoy', text: '抵达忽鲁谟斯；分䑸船队到达榜葛剌、阿拉伯半岛和东非', src: '祝允明《前闻记》；《明史·郑和传》' },
+        { kind: 'envoy', text: '太监洪保在古里遣通事等七人附当地船只赴天方（麦加），往回一年', ev: 'mecca', src: '马欢《瀛涯胜览·天方国》' },
+        { kind: 'envoy', text: '古里、苏门答剌、天方等多国使臣随船来朝', src: '《明宣宗实录》宣德八年' },
+        { kind: 'other', text: '郑和于归途中病逝于古里一带', ev: 'death', src: '一般认为；另有回国后去世之说' }
+      ],
+      // 《前闻记》逐日记录：arr 到港，dep 开船（公历，儒略历）
+      log: [
+        { p: 'nanjing', dep: '1431-01-19' },
+        { p: 'liujiagang', arr: '1431-02-03' },
+        { p: 'changle', arr: '1431-04-08', dep: '1432-01-12', note: '在长乐驻泊候风；十二月初九出五虎门' },
+        { p: 'zhancheng', arr: '1432-01-27', dep: '1432-02-12' },
+        { p: 'zhaowa', arr: '1432-03-07', dep: '1432-07-13' },
+        { p: 'jiugang', arr: '1432-07-24', dep: '1432-07-27' },
+        { p: 'manlajia', arr: '1432-08-03', dep: '1432-09-02' },
+        { p: 'sumendala', arr: '1432-09-12', dep: '1432-11-02' },
+        { p: 'xilanshan', arr: '1432-11-28', dep: '1432-12-02' },
+        { p: 'guli', arr: '1432-12-10', dep: '1432-12-14' },
+        { p: 'huluomosi', arr: '1433-01-17', dep: '1433-03-09' },
+        { p: 'guli', arr: '1433-03-31', dep: '1433-04-09' },
+        { p: 'sumendala', arr: '1433-04-25', dep: '1433-05-01' },
+        { p: 'manlajia', arr: '1433-05-09', dep: '1433-05-28' },
+        { p: 'zhancheng', arr: '1433-06-17', dep: '1433-06-19' },
+        { p: 'liujiagang', arr: '1433-07-07' },
+        { p: 'nanjing', arr: '1433-07-22' }
+      ],
+      sources: [
+        { t: '帝以践阼岁久，而诸番国远者犹未朝贡，于是和、景弘复奉命历忽鲁谟斯等十七国而还。', s: '《明史·郑和传》' },
+        { t: '官校、旗军、火长、舵工、班碇手、通事、办事、书算手、医士、铁锚、木艌、搭材等匠，水手、民稍人等，共二万七千五百五十员名。', s: '祝允明《前闻记》' }
+      ]
+    }
+  };
+})();
+
+</script>
+<script>
+/*
+ * 航程统计 ZHStats（docs/SPEC.md §4.2）
+ * 依赖：js/data.js（ZH）、js/route.js（ZHRoute）、js/voyages-detail.js（ZH_DETAIL，可选）
+ * 里程按示意航线（海道网最短路径）计算，只用于比较各次远近，并非实测航迹。
+ */
+(function (root) {
+  'use strict';
+  var D = root.ZH, net = root.ZHRoute.build(D);
+  var LI_KM = 1800 * 0.311 / 1000;          // 1 明里 = 360 步 × 5 尺 = 1800 尺，1 尺约 0.311 米
+  var NM_KM = 1.852;
+  var DOMESTIC = { nanjing: 1, liujiagang: 1, changle: 1, quanzhou: 1 };
+  var LANDMARK = { kunlun: 1, cuilanyu: 1 };  // 航海地标，不计入"国家与地区"
+
+  function units(km) {
+    var r = function (v) { return Math.round(v); };
+    return {
+      km: { out: r(km.out), ret: r(km.ret), branch: r(km.branch), total: r(km.out + km.ret + km.branch) },
+      nm: { out: r(km.out / NM_KM), ret: r(km.ret / NM_KM), branch: r(km.branch / NM_KM), total: r((km.out + km.ret + km.branch) / NM_KM) },
+      li: { out: r(km.out / LI_KM), ret: r(km.ret / LI_KM), branch: r(km.branch / LI_KM), total: r((km.out + km.ret + km.branch) / LI_KM) }
+    };
+  }
+
+  var dayMs = 86400000;
+  function day(s) { var p = s.split('-'); return Date.UTC(+p[0], +p[1] - 1, +p[2]) / dayMs; }
+
+  // 逐日记录（目前只有第七次）：各段在航、在港天数与里程
+  function logLegs(n) {
+    var det = root.ZH_DETAIL && root.ZH_DETAIL[n];
+    if (!det || !det.log) return null;
+    var log = det.log, legs = [], sea = 0, port = 0;
+    for (var i = 0; i < log.length; i++) {
+      var s = log[i];
+      if (s.arr && s.dep) {
+        var d = day(s.dep) - day(s.arr);
+        port += d;
+        legs.push({ kind: 'port', p: s.p, from: s.arr, to: s.dep, days: d, note: s.note || '' });
+      }
+      var nx = log[i + 1];
+      if (nx && s.dep && nx.arr) {
+        var ds = day(nx.arr) - day(s.dep);
+        var km = net.leg(s.p, nx.p).km;
+        sea += ds;
+        legs.push({ kind: 'sea', p: s.p, q: nx.p, from: s.dep, to: nx.arr, days: ds, km: Math.round(km), kmPerDay: Math.round(km / ds) });
+      } else if (nx && s.arr && !s.dep && nx.arr) {
+        // 只知到港、不知开船日期：在港与航行混在一起，单独列出，不计入在航、在港合计
+        legs.push({ kind: 'mixed', p: s.p, q: nx.p, from: s.arr, to: nx.arr, days: day(nx.arr) - day(s.arr), km: Math.round(net.leg(s.p, nx.p).km) });
+      }
+    }
+    return { legs: legs, sea: sea, port: port, start: log[0].dep || log[0].arr, end: log[log.length - 1].arr };
+  }
+
+  function voyage(n) {
+    var v = D.voyages[n - 1];
+    var km = { out: 0, ret: 0, branch: 0 };
+    var visited = {};
+    for (var i = 1; i < v.stops.length; i++) {
+      var L = net.leg(v.stops[i - 1].p, v.stops[i].p);
+      if (v.stops[i].ret) km.ret += L.km; else km.out += L.km;
+    }
+    v.stops.forEach(function (s) { visited[s.p] = true; });
+    v.branches.forEach(function (br) {
+      for (var j = 1; j < br.stops.length; j++) km.branch += net.leg(br.stops[j - 1], br.stops[j]).km;
+      br.stops.forEach(function (p) { visited[p] = true; });
+    });
+    var places = Object.keys(visited).filter(function (p) { return !DOMESTIC[p] && !LANDMARK[p]; });
+    var out = units(km);
+    out.n = n;
+    out.months = Math.round((v.t1 - v.t0) * 12);
+    out.stops = v.stops.length;
+    out.places = places;                         // 所到国家与地区（港口 id）
+    out.countries = places.length;
+    out.log = logLegs(n);
+    out.days = out.log ? { sea: out.log.sea, port: out.log.port } : null;
+    return out;
+  }
+
+  var cache = {};
+  root.ZHStats = {
+    LI_KM: LI_KM,
+    NM_KM: NM_KM,
+    voyage: function (n) { return cache[n] || (cache[n] = voyage(n)); },
+    all: function () { return D.voyages.map(function (v) { return root.ZHStats.voyage(v.n); }); },
+    legKm: function (a, b) { return Math.round(net.leg(a, b).km); }
+  };
+})(typeof window !== 'undefined' ? window : globalThis);
+
+</script>
+<script>
+/*
+ * 航次档案页（voyages.html）
+ * 依赖：ZH（js/data.js）、ZH_DETAIL（js/voyages-detail.js）、ZHStats（js/stats.js）
+ */
+(function () {
+  'use strict';
+  var D = window.ZH, X = window.ZH_DETAIL, S = window.ZHStats;
+  var NUM = ['', '一', '二', '三', '四', '五', '六', '七'];
+  var KIND = {
+    conferral: ['封', '册封'], tribute: ['贡', '进贡'], envoy: ['使', '遣使'], battle: ['战', '用兵'],
+    trade: ['商', '贸易'], stele: ['碑', '立碑'], other: ['记', '其他']
+  };
+  var SEGS = [['out', '去程', 's1'], ['ret', '归程', 's2'], ['branch', '分䑸', 's3']];
+  var NS = 'http://www.w3.org/2000/svg';
+  var state = { n: 1, tab: 'overview' };
+
+  /* ---------- 小工具 ---------- */
+  function $(s, r) { return (r || document).querySelector(s); }
+  function $$(s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); }
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; });
+  }
+  function fmt(n) { return Number(n).toLocaleString('en-US'); }
+  function wan(n) { return n === 0 ? '0' : (n / 10000) + '万'; }
+  function svgEl(tag, attrs, parent) {
+    var e = document.createElementNS(NS, tag);
+    for (var k in attrs) if (attrs[k] != null) e.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(e);
+    return e;
+  }
+  function text(parent, x, y, str, attrs) {
+    var t = svgEl('text', Object.assign({ x: x, y: y }, attrs || {}), parent);
+    t.textContent = str;
+    return t;
+  }
+  function vc(n) { return 'var(--v' + n + ')'; }
+  function shortPlace(id) { return D.ports[id] ? D.ports[id].name : id; }
+  function dateCN(iso) { var p = iso.split('-'); return +p[0] + '.' + (+p[1]) + '.' + (+p[2]); }
+
+  /* ---------- 提示框（只用 textContent 写入） ---------- */
+  var tip = $('#tip');
+  function showTip(evt, title, rows) {
+    tip.textContent = '';
+    var b = document.createElement('b'); b.textContent = title; tip.appendChild(b);
+    (rows || []).forEach(function (r) {
+      var d = document.createElement('div'); d.className = 'row';
+      if (r.color) { var i = document.createElement('i'); i.style.background = r.color; d.appendChild(i); }
+      d.appendChild(document.createTextNode(r.text));
+      tip.appendChild(d);
+    });
+    tip.hidden = false;
+    var pt = evt && evt.clientX != null ? [evt.clientX, evt.clientY] : null;
+    if (!pt) { var bb = evt.target.getBoundingClientRect(); pt = [bb.left + bb.width / 2, bb.top]; }
+    var w = tip.offsetWidth, h = tip.offsetHeight;
+    var x = Math.min(window.innerWidth - w - 8, Math.max(8, pt[0] + 14));
+    var y = pt[1] - h - 12 < 8 ? pt[1] + 18 : pt[1] - h - 12;
+    tip.style.left = x + 'px'; tip.style.top = y + 'px';
+  }
+  function hideTip() { tip.hidden = true; }
+  function bindTip(el, fn) {
+    el.addEventListener('pointermove', function (e) { var c = fn(); showTip(e, c[0], c[1]); });
+    el.addEventListener('pointerleave', hideTip);
+    el.addEventListener('focus', function (e) { var c = fn(); showTip({ target: e.target }, c[0], c[1]); });
+    el.addEventListener('blur', hideTip);
+  }
+  function bindRow(g, n) {
+    g.setAttribute('tabindex', '0');
+    g.setAttribute('role', 'button');
+    g.addEventListener('click', function () { select(n, true); });
+    g.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); select(n, true); } });
+  }
+
+  var ALL = S.all();
+
+  /* ---------- 对比：起止时间 ---------- */
+  function renderGantt() {
+    var box = $('#chart-gantt');
+    var W = Math.max(300, box.clientWidth), rowH = 30, top = 6, labW = 54, right = 64;
+    var H = top + rowH * 7 + 44;
+    var y0 = 1404.5, y1 = 1434;
+    var x = function (y) { return labW + (y - y0) / (y1 - y0) * (W - labW - right); };
+    box.textContent = '';
+    var svg = svgEl('svg', { viewBox: '0 0 ' + W + ' ' + H, role: 'img', 'aria-label': '七次下西洋的起止时间' }, box);
+    var axisY = top + rowH * 7 + 6;
+    for (var yr = 1405; yr <= 1430; yr += 5) {
+      svgEl('line', { class: 'grid', x1: x(yr), x2: x(yr), y1: top, y2: axisY }, svg);
+      text(svg, x(yr), axisY + 13, String(yr), { 'text-anchor': 'middle' });
+    }
+    [['永乐', 1403, 1424.9], ['洪熙', 1425, 1425.9], ['宣德', 1426, 1434]].forEach(function (r) {
+      var a = Math.max(x(r[1]), labW), b = Math.min(x(r[2]), W - right);
+      svgEl('line', { class: 'reign-line', x1: a + 1, x2: b - 1, y1: axisY + 22, y2: axisY + 22 }, svg);
+      if (b - a > 26) text(svg, (a + b) / 2, axisY + 35, r[0], { class: 'reign', 'text-anchor': 'middle' });
+    });
+    D.voyages.forEach(function (v, i) {
+      var cy = top + i * rowH + rowH / 2;
+      var g = svgEl('g', { class: 'row' + (state.n === v.n ? ' on' : ''), 'data-n': v.n, 'aria-label': v.title + '，' + v.years + '，约 ' + ALL[i].months + ' 个月' }, svg);
+      svgEl('rect', { class: 'hl', x: 0, y: cy - rowH / 2, width: W, height: rowH, rx: 4 }, g);
+      text(g, 0, cy + 4, '第' + NUM[v.n] + '次', { class: 'rowlab' });
+      var a = x(v.t0), b = x(v.t1);
+      svgEl('rect', { class: 'gbar', x: a, y: cy - 6, width: Math.max(4, b - a), height: 12, rx: 4 }, g);
+      text(g, b + 6, cy + 4, '约 ' + ALL[i].months + ' 个月', { class: 'val' });
+      bindRow(g, v.n);
+      bindTip(g, function () { return [v.title, [{ text: v.years + ' · ' + v.reign }, { text: '受命至回国约 ' + ALL[i].months + ' 个月' }]]; });
+    });
+  }
+
+  /* ---------- 对比：示意航程 ---------- */
+  function renderKm() {
+    $('#legend-km').innerHTML = SEGS.map(function (s) { return '<span><i class="' + s[2] + '"></i>' + s[1] + '</span>'; }).join('');
+    var box = $('#chart-km');
+    var W = Math.max(300, box.clientWidth), rowH = 30, top = 6, labW = 54, right = 56;
+    var H = top + rowH * 7 + 26;
+    var max = 40000;
+    var x = function (km) { return labW + km / max * (W - labW - right); };
+    box.textContent = '';
+    var svg = svgEl('svg', { viewBox: '0 0 ' + W + ' ' + H, role: 'img', 'aria-label': '七次下西洋的示意航程（公里），分去程、归程、分䑸' }, box);
+    var axisY = top + rowH * 7 + 4;
+    for (var k = 0; k <= max; k += 10000) {
+      svgEl('line', { class: 'grid', x1: x(k), x2: x(k), y1: top, y2: axisY }, svg);
+      text(svg, x(k), axisY + 13, wan(k), { 'text-anchor': 'middle' });
+    }
+    ALL.forEach(function (s, i) {
+      var v = D.voyages[i], cy = top + i * rowH + rowH / 2, bh = 14;
+      var g = svgEl('g', { class: 'row' + (state.n === v.n ? ' on' : ''), 'aria-label': v.title + '，示意航程约 ' + fmt(s.km.total) + ' 公里' }, svg);
+      svgEl('rect', { class: 'hl', x: 0, y: cy - rowH / 2, width: W, height: rowH, rx: 4 }, g);
+      text(g, 0, cy + 4, '第' + NUM[v.n] + '次', { class: 'rowlab' });
+      var acc = 0;
+      var parts = SEGS.filter(function (sg) { return s.km[sg[0]] > 0; });
+      parts.forEach(function (sg, j) {
+        var a = x(acc), b = x(acc + s.km[sg[0]]);
+        acc += s.km[sg[0]];
+        var last = j === parts.length - 1;
+        var w = Math.max(1, b - a - (last ? 0 : 2));            // 2px 纸色间隙
+        var seg;
+        if (last) {
+          var r = Math.min(4, w);
+          seg = svgEl('path', { class: 'seg ' + sg[2], d: 'M' + a + ',' + (cy - bh / 2) + 'h' + (w - r) + 'a' + r + ',' + r + ' 0 0 1 ' + r + ',' + r + 'v' + (bh - 2 * r) + 'a' + r + ',' + r + ' 0 0 1 ' + (-r) + ',' + r + 'h' + (-(w - r)) + 'z' }, g);
+        } else {
+          seg = svgEl('rect', { class: 'seg ' + sg[2], x: a, y: cy - bh / 2, width: w, height: bh }, g);
+        }
+        bindTip(seg, function () {
+          return [fmt(s.km[sg[0]]) + ' 公里', [{ text: v.title + ' · ' + sg[1], color: 'var(--chart-' + sg[2].slice(1) + ')' }]];
+        });
+      });
+      text(g, x(acc) + 6, cy + 4, fmt(s.km.total), { class: 'val' });
+      bindRow(g, v.n);
+    });
+  }
+
+  /* ---------- 对比表（也是两张图的表格版） ---------- */
+  function fleetShort(n) {
+    var f = X[n].fleet;
+    if (f.total && f.total.n) return (n === 2 ? '改造 ' : '') + f.total.n + ' 艘';
+    if (f.large && f.large.n) return '大船 ' + f.large.n + ' 艘';
+    return null;
+  }
+  function renderTable() {
+    var tb = $('#cmp-table tbody');
+    tb.innerHTML = ALL.map(function (s, i) {
+      var v = D.voyages[i], p = X[v.n].personnel.total, f = fleetShort(v.n);
+      return '<tr data-n="' + v.n + '" class="' + (state.n === v.n ? 'on' : '') + '" tabindex="0">' +
+        '<td><span class="vn" style="--vc:' + vc(v.n) + '"><i></i>第' + NUM[v.n] + '次</span></td>' +
+        '<td>' + esc(v.years) + '</td>' +
+        '<td class="num">约 ' + s.months + ' 个月</td>' +
+        '<td class="num">' + (p.n ? (p.approx ? '约 ' : '') + fmt(p.n) : '<span class="na">史料未载</span>') + '</td>' +
+        '<td class="num">' + (f ? esc(f) : '<span class="na">史料未载</span>') + '</td>' +
+        '<td class="num">' + s.stops + ' 站</td>' +
+        '<td class="num">' + s.countries + '</td>' +
+        '<td class="num">' + fmt(s.km.total) + ' 公里</td>' +
+        '<td class="wrap">' + esc(v.farthest) + '</td></tr>';
+    }).join('');
+    $$('tr', tb).forEach(function (tr) {
+      var n = +tr.getAttribute('data-n');
+      tr.addEventListener('click', function () { select(n, true); });
+      tr.addEventListener('keydown', function (e) { if (e.key === 'Enter') select(n, true); });
+    });
+  }
+
+  /* ---------- 详情 ---------- */
+  var TABS = [['overview', '概况'], ['people', '人员'], ['fleet', '船队'], ['route', '航程'], ['results', '成果'], ['sources', '史料']];
+
+  function renderPick() {
+    $('#vpick').innerHTML = D.voyages.map(function (v) {
+      return '<button type="button" role="tab" data-n="' + v.n + '" style="--vc:' + vc(v.n) + '" aria-selected="' + (state.n === v.n) + '"><i></i>第' + NUM[v.n] + '次</button>';
+    }).join('');
+    $$('#vpick button').forEach(function (b) { b.addEventListener('click', function () { select(+b.getAttribute('data-n'), false); }); });
+  }
+
+  function tile(lab, value, sub, na) {
+    return '<div class="tile"><span class="lab">' + lab + '</span><span class="v' + (na ? ' na' : '') + '">' + value + '</span>' + (sub ? '<span class="sub">' + sub + '</span>' : '') + '</div>';
+  }
+
+  function renderDetail() {
+    var n = state.n, v = D.voyages[n - 1], d = X[n], s = S.voyage(n);
+    var p = d.personnel.total, f = fleetShort(n);
+    var html = '' +
+      '<div class="dhead" style="--vc:' + vc(n) + '"><span class="big">第' + NUM[n] + '次</span>' +
+      '<span class="when"><b>' + esc(v.years) + '</b>' + esc(v.reign) + '</span>' +
+      '<span class="links"><a href="index.html#v' + n + '">在航海图上查看航线 →</a></span></div>' +
+      '<div class="tiles">' +
+      tile('历时', s.months + '<small>个月</small>', '受命至回国') +
+      tile('人数', p.n ? fmt(p.n) + '<small>' + (p.approx ? '余人' : '人') + '</small>' : '史料未载', p.n ? esc(p.src) : '', !p.n) +
+      tile('船只', f ? esc(f) : '史料未载', f ? esc((d.fleet.total && d.fleet.total.n ? d.fleet.total.src : d.fleet.large.src) || '') : '', !f) +
+      tile('示意航程', fmt(s.km.total) + '<small>公里</small>', '约 ' + fmt(s.li.total) + ' 明里 · ' + fmt(s.nm.total) + ' 海里') +
+      tile('所到国家与地区', s.countries + '<small>处</small>', '停靠 ' + s.stops + ' 站（含往返）') +
+      '</div>' +
+      '<div class="dtabs" role="tablist">' + TABS.map(function (t) {
+        return '<button class="dtab" role="tab" type="button" data-tab="' + t[0] + '" aria-selected="' + (state.tab === t[0]) + '">' + t[1] + '</button>';
+      }).join('') + '</div>' +
+      '<div class="dpane" id="dpane"></div>';
+    $('#detail-body').innerHTML = html;
+    $$('.dtab').forEach(function (b) {
+      b.addEventListener('click', function () { state.tab = b.getAttribute('data-tab'); $$('.dtab').forEach(function (x) { x.setAttribute('aria-selected', String(x === b)); }); renderPane(); });
+    });
+    renderPane();
+  }
+
+  function renderPane() {
+    var n = state.n, v = D.voyages[n - 1], d = X[n], s = S.voyage(n), el = $('#dpane');
+    var t = state.tab;
+    if (t === 'overview') {
+      el.innerHTML = v.summary.map(function (p) { return '<p>' + esc(p) + '</p>'; }).join('') +
+        '<dl class="kv"><dt>最远</dt><dd>' + esc(v.farthest) + '</dd><dt>所到</dt><dd>' + s.places.map(shortPlace).join('、') + '</dd></dl>' +
+        '<blockquote class="source">' + esc(v.quote.t) + '<cite>' + esc(v.quote.s) + '</cite></blockquote>';
+    } else if (t === 'people') {
+      var p = d.personnel.total;
+      el.innerHTML = '<div class="facts2"><div class="fact"><span class="k">随行人数</span>' +
+        (p.n ? '<span class="n">' + fmt(p.n) + (p.approx ? ' 余人' : ' 人') + '</span><span class="t">"' + esc(p.text) + '"</span><span class="s">' + esc(p.src) + '</span>'
+          : '<span class="n na">史料未载</span><span class="s">各次人数只有第一、三、七次见于记载，通常认为每次都在两万七千人上下。</span>') +
+        '</div></div>' +
+        (d.personnel.categories ? '<h4 class="pane-h">人员构成</h4><p class="note">《前闻记》只列名目，未分项计数。</p><div class="chips">' +
+          d.personnel.categories.map(function (c) { return '<span>' + esc(c) + '</span>'; }).join('') + '</div>' : '') +
+        '<h4 class="pane-h">主要官员与随员</h4><div class="table-wrap"><table class="data"><thead><tr><th>姓名</th><th>职衔</th><th>职责与事迹</th><th>出处</th></tr></thead><tbody>' +
+        d.officials.map(function (o) { return '<tr><td><b>' + esc(o.name) + '</b></td><td>' + esc(o.title) + '</td><td>' + esc(o.role) + '</td><td class="note">' + esc(o.src) + '</td></tr>'; }).join('') +
+        '</tbody></table></div>';
+    } else if (t === 'fleet') {
+      var fc = function (lab, x, textOnly) {
+        var head = textOnly ? '' : x.n ? '<span class="n">' + fmt(x.n) + ' 艘</span>'
+          : '<span class="n na">' + (x.text && x.text !== '史料未载' ? '无确切数字' : '史料未载') + '</span>';
+        return '<div class="fact"><span class="k">' + lab + '</span>' + head +
+          (x.text && x.text !== '史料未载' ? '<span class="t">"' + esc(x.text) + '"</span>' : '') +
+          (x.src ? '<span class="s">' + esc(x.src) + '</span>' : '') + (x.note ? '<span class="s">' + esc(x.note) + '</span>' : '') + '</div>';
+      };
+      el.innerHTML = '<div class="facts2">' + fc('总船数', d.fleet.total) + (n === 7 ? fc('船名', d.fleet.large, true) : fc('大船', d.fleet.large)) + '</div>' +
+        (d.fleet.note ? '<p>' + esc(d.fleet.note) + '</p>' : '') +
+        '<p class="note">各次船只的型号构成史无明载。宝船、马船、粮船、坐船、战船等船型及其 3D 复原，可在舰队复原页查看。</p><p><a href="fleet.html#mode=fleet&v=' + n + '">查看本次舰队复原 →</a></p>';
+    } else if (t === 'route') {
+      renderRoute(el, n, v, s);
+    } else if (t === 'results') {
+      el.innerHTML = '<ul class="results">' + d.results.map(function (r) {
+        var k = KIND[r.kind] || KIND.other;
+        return '<li><i class="glyph g-' + k[0] + '">' + k[0] + '</i><span class="t">' + esc(r.text) + '</span>' +
+          '<span class="m"><span>' + k[1] + '</span><span>' + esc(r.src) + '</span>' + (r.ev ? '<a href="index.html#v' + n + '">在航海图上查看</a>' : '') + '</span></li>';
+      }).join('') + '</ul>';
+    } else if (t === 'sources') {
+      el.innerHTML = d.sources.map(function (q) { return '<blockquote class="source">' + esc(q.t) + '<cite>' + esc(q.s) + '</cite></blockquote>'; }).join('');
+    }
+  }
+
+  function renderRoute(el, n, v, s) {
+    var legsHtml = '';
+    for (var i = 1; i < v.stops.length; i++) {
+      var a = v.stops[i - 1], b = v.stops[i];
+      legsHtml += '<tr><td>' + i + '</td><td>' + esc(shortPlace(a.p)) + ' → ' + esc(shortPlace(b.p)) + (b.ret ? ' <span class="note">归程</span>' : '') + '</td><td>' + esc(b.d) + '</td><td class="num">' + fmt(S.legKm(a.p, b.p)) + '</td></tr>';
+    }
+    var br = v.branches.map(function (bb) {
+      var km = 0;
+      for (var j = 1; j < bb.stops.length; j++) km += S.legKm(bb.stops[j - 1], bb.stops[j]);
+      return '<tr><td>' + esc(bb.name) + '</td><td>' + bb.stops.map(shortPlace).join(' → ') + '</td><td class="num">' + fmt(km) + '</td></tr>';
+    }).join('');
+    el.innerHTML = '<h4 class="pane-h">里程构成</h4><div class="legend-row" id="legend-split"></div><div class="chart" id="chart-split"></div>' +
+      '<p class="note">按示意航线计算：约 ' + fmt(s.km.total) + ' 公里，合 ' + fmt(s.li.total) + ' 明里（1 明里按 1800 尺、1 尺 0.311 米折算），' + fmt(s.nm.total) + ' 海里。</p>' +
+      (s.log ? '<div class="strip-wrap"><h4 class="pane-h">逐日行程（据祝允明《前闻记》）</h4><div class="legend-row" id="legend-strip"></div><div class="chart" id="chart-strip"></div>' +
+        '<p class="note">从南京启航到回京共 ' + fmt(days(s.log.start, s.log.end)) + ' 天，其中有记载的在航 ' + s.days.sea + ' 天、在港 ' + s.days.port + ' 天；在长乐候风就用了 279 天。</p></div>' +
+        '<div class="table-wrap"><table class="data legs"><thead><tr><th>行程</th><th>起止</th><th class="num">天数</th><th class="num">公里</th><th class="num">日均公里</th></tr></thead><tbody>' +
+        s.log.legs.map(function (g) {
+          var lab = g.kind === 'port' ? '驻泊' + shortPlace(g.p) + (g.note ? '（' + g.note + '）' : '') : shortPlace(g.p) + ' → ' + shortPlace(g.q) + (g.kind === 'mixed' ? '（开船日期不详）' : '');
+          return '<tr class="' + g.kind + '"><td>' + esc(lab) + '</td><td>' + dateCN(g.from) + '—' + dateCN(g.to) + '</td><td class="num">' + g.days + '</td><td class="num">' + (g.km ? fmt(g.km) : '') + '</td><td class="num">' + (g.kmPerDay ? g.kmPerDay : '') + '</td></tr>';
+        }).join('') + '</tbody></table></div>' : '') +
+      '<h4 class="pane-h">停靠顺序</h4><div class="table-wrap"><table class="data legs"><thead><tr><th>#</th><th>航段</th><th>到达</th><th class="num">公里</th></tr></thead><tbody>' + legsHtml + '</tbody></table></div>' +
+      (br ? '<h4 class="pane-h">分䑸</h4><div class="table-wrap"><table class="data legs"><thead><tr><th>船队</th><th>航线</th><th class="num">公里</th></tr></thead><tbody>' + br + '</tbody></table></div>' : '');
+    renderSplit(s);
+    if (s.log) renderStrip(s.log);
+  }
+
+  function days(a, b) { var p = a.split('-'), q = b.split('-'); return Math.round((Date.UTC(+q[0], +q[1] - 1, +q[2]) - Date.UTC(+p[0], +p[1] - 1, +p[2])) / 864e5); }
+
+  // 单次里程：高分段条，块内能放下才写数字
+  function renderSplit(s) {
+    var parts = SEGS.filter(function (sg) { return s.km[sg[0]] > 0; });
+    $('#legend-split').innerHTML = parts.map(function (sg) { return '<span><i class="' + sg[2] + '"></i>' + sg[1] + '</span>'; }).join('');
+    var box = $('#chart-split'), W = Math.max(280, box.clientWidth), H = 28;
+    var svg = svgEl('svg', { viewBox: '0 0 ' + W + ' ' + H, role: 'img', 'aria-label': '里程构成：' + parts.map(function (sg) { return sg[1] + ' ' + fmt(s.km[sg[0]]) + ' 公里'; }).join('，') }, box);
+    var acc = 0, tot = s.km.total;
+    parts.forEach(function (sg, j) {
+      var a = acc / tot * W, w = s.km[sg[0]] / tot * W - (j < parts.length - 1 ? 2 : 0);
+      acc += s.km[sg[0]];
+      var r = svgEl('rect', { class: 'seg ' + sg[2], x: a, y: 0, width: Math.max(1, w), height: H, rx: 4 }, svg);
+      var label = fmt(s.km[sg[0]]) + ' 公里 · ' + Math.round(s.km[sg[0]] / tot * 100) + '%';
+      if (w > label.length * 6.6 + 16) text(svg, a + 8, H / 2 + 4, label, { style: 'fill:#fff;font-weight:600' });
+      bindTip(r, function () { return [fmt(s.km[sg[0]]) + ' 公里', [{ text: sg[1] + ' · 占 ' + Math.round(s.km[sg[0]] / tot * 100) + '%', color: 'var(--chart-' + sg[2].slice(1) + ')' }]]; });
+    });
+  }
+
+  // 第七次逐日行程：时间轴上的在航、在港、不详三类区间
+  function renderStrip(log) {
+    $('#legend-strip').innerHTML = '<span><i class="s1"></i>在航</span><span><i class="s2"></i>在港</span><span><i class="mixed"></i>日期不详</span>';
+    var box = $('#chart-strip'), W = Math.max(300, box.clientWidth), H = 66, bh = 28;
+    var t0 = days('1431-01-01', log.start), total = days(log.start, log.end);
+    var x = function (iso) { return days(log.start, iso) / total * W; };
+    var svg = svgEl('svg', { viewBox: '0 0 ' + W + ' ' + H, role: 'img', 'aria-label': '第七次下西洋逐日行程：在航与在港的时间分布' }, box);
+    var defs = svgEl('defs', {}, svg);
+    var pat = svgEl('pattern', { id: 'hatch-mixed', patternUnits: 'userSpaceOnUse', width: 6, height: 6, patternTransform: 'rotate(45)' }, defs);
+    svgEl('line', { x1: 0, y1: 0, x2: 0, y2: 6, style: 'stroke:var(--chart-muted);stroke-width:3' }, pat);
+    log.legs.forEach(function (g) {
+      var a = x(g.from), b = x(g.to), w = Math.max(1, b - a - 1);
+      var cls = g.kind === 'sea' ? 'seg s1' : g.kind === 'port' ? 'seg s2' : 'seg';
+      var r = svgEl('rect', { class: cls, x: a, y: 0, width: w, height: bh, rx: Math.min(3, w / 2), fill: g.kind === 'mixed' ? 'url(#hatch-mixed)' : null }, svg);
+      var name = g.kind === 'port' ? shortPlace(g.p) : shortPlace(g.p) + '→' + shortPlace(g.q);
+      if (g.kind === 'port' && w > name.length * 13 + 30) text(svg, a + 6, bh / 2 + 4, name + ' ' + g.days + '天', { style: 'fill:#fff;font-weight:600' });
+      bindTip(r, function () {
+        return [g.days + ' 天', [{ text: (g.kind === 'sea' ? '在航 · ' : g.kind === 'port' ? '在港 · ' : '日期不详 · ') + name }, { text: dateCN(g.from) + '—' + dateCN(g.to) + (g.km ? ' · ' + fmt(g.km) + ' 公里' : '') }]];
+      });
+      r.setAttribute('tabindex', '0');
+    });
+    ['1431-07-01', '1432-01-01', '1432-07-01', '1433-01-01', '1433-07-01'].forEach(function (iso) {
+      var xx = x(iso);
+      svgEl('line', { class: 'grid', x1: xx, x2: xx, y1: bh + 2, y2: bh + 8 }, svg);
+      var p = iso.split('-');
+      text(svg, xx, bh + 22, p[1] === '01' ? p[0] + '年' : '7月', { 'text-anchor': 'middle' });
+    });
+    void t0;
+  }
+
+  /* ---------- 选择与地址 ---------- */
+  function select(n, scroll) {
+    if (n < 1 || n > 7) return;
+    state.n = n;
+    renderGantt(); renderKm(); renderTable(); renderPick(); renderDetail();
+    try { history.replaceState(null, '', '#v' + n); } catch (e) { /* 查看器可能禁止 */ }
+    if (scroll) $('#detail').scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+  }
+
+  function fromHash() {
+    var m = /^#v([1-7])$/.exec(location.hash);
+    return m ? +m[1] : 0;
+  }
+  window.addEventListener('hashchange', function () { var n = fromHash(); if (n && n !== state.n) select(n, true); });
+  var rt;
+  window.addEventListener('resize', function () {
+    clearTimeout(rt);
+    rt = setTimeout(function () { renderGantt(); renderKm(); if (state.tab === 'route') renderPane(); }, 150);
+  });
+
+  var first = fromHash();
+  select(first || 1, false);
+  if (first) setTimeout(function () { $('#detail').scrollIntoView({ block: 'start' }); }, 50);
+})();
+
+</script>
+</body>
+</html>

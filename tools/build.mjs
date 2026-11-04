@@ -1,44 +1,32 @@
-// 生成单文件版本：node tools/build.mjs [--artifact 输出路径]
-//   默认：dist/zheng-he-voyages-standalone.html —— 所有脚本、样式、数据都内联，可离线双击打开
-//   --artifact：Leaflet 改从 cdnjs 加载，并去掉 <html>/<head>/<body> 外壳（用于 claude.ai Artifact 发布）
+// Reproducible offline pages and multi-file static bundle. npm ci && npm run build
 import fs from 'node:fs';
 import path from 'node:path';
-
-const root = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
-const read = (p) => fs.readFileSync(path.join(root, p), 'utf8');
-const args = process.argv.slice(2);
-const artifactOut = args[0] === '--artifact' ? args[1] : null;
-
-let html = read('index.html');
-const safeJs = (s) => s.replace(/<\/script/gi, '<\\/script');
-
-html = html.replace(/<link rel="stylesheet" href="((?:vendor|css)\/[^"]+)">/g, (_, href) => `<style>\n${read(href)}\n</style>`);
-html = html.replace(/<script src="([^"]+)"><\/script>/g, (_, src) => {
-  if (src === 'vendor/leaflet/leaflet.js' && artifactOut) {
-    return '<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>';
+import {build} from 'esbuild';
+const root=path.resolve(import.meta.dirname,'..'),dist=path.join(root,'dist');
+const read=p=>fs.readFileSync(path.join(root,p),'utf8');
+const safeJs=s=>s.replace(/<\/script/gi,'<\\/script');
+const aliases={three:path.join(root,'vendor/three/three.module.min.js'),'three/addons':path.join(root,'vendor/three/addons')};
+fs.mkdirSync(dist,{recursive:true});
+const artifactOut=process.argv[2]==='--artifact'?process.argv[3]:null;
+for(const page of ['index','voyages','fleet']) {
+  if(artifactOut&&page!=='index')continue;
+  let html=read(page+'.html');
+  html=html.replace(/<link rel="stylesheet" href="((?:vendor|css)\/[^"]+)">/g,(_,href)=>'<style>\n'+read(href)+'\n</style>');
+  html=html.replace(/<script src="([^"]+)"><\/script>/g,(_,src)=>'<script>\n'+safeJs(read(src))+'\n</script>');
+  for(const match of [...html.matchAll(/<script type="module" src="([^"]+)"><\/script>/g)]) {
+    const result=await build({entryPoints:[path.join(root,match[1])],bundle:true,format:'iife',minify:true,write:false,alias:aliases,legalComments:'inline'});
+    html=html.replace(match[0],()=>'<script>\n'+safeJs(result.outputFiles[0].text)+'\n</script>');
   }
-  return `<script>\n${safeJs(read(src))}\n</script>`;
-});
-
-if (artifactOut) {
-  html = html
-    .replace(/<!doctype html>\s*/i, '')
-    .replace(/<html[^>]*>\s*/i, '')
-    .replace(/<\/html>\s*$/i, '')
-    .replace(/<head>\s*/i, '')
-    .replace(/<\/head>\s*/i, '')
-    .replace(/<meta charset="utf-8">\s*/i, '')
-    .replace(/<meta name="viewport"[^>]*>\s*/i, '')
-    .replace(/<body>\s*/i, '')
-    .replace(/<\/body>\s*/i, '');
-  // <title> 必须出现在文件开头 8KB 以内
-  const title = html.match(/<title>[^<]*<\/title>/)[0];
-  html = title + '\n' + html.replace(title, '');
-  fs.writeFileSync(artifactOut, html);
-  console.log('artifact:', artifactOut, (html.length / 1024).toFixed(0) + ' KB');
-} else {
-  fs.mkdirSync(path.join(root, 'dist'), { recursive: true });
-  const out = path.join(root, 'dist', 'zheng-he-voyages-standalone.html');
-  fs.writeFileSync(out, html);
-  console.log('standalone:', out, (html.length / 1024).toFixed(0) + ' KB');
+  html=html.replace(/<script type="importmap">[\s\S]*?<\/script>/g,'');
+  // Font fallback is local; no network is required to render the offline pages.
+  html=html.replace(/<link[^>]+href="https:\/\/fonts\.[^"]+"[^>]*>/g,'');
+  if(artifactOut)html=html.replace(/<!doctype html>/i,'').replace(/<\/?(?:html|head|body)\b[^>]*>/gi,'');
+  const out=artifactOut||path.join(dist,page+'.html');fs.writeFileSync(out,html);
+  console.log(path.relative(root,out),(Buffer.byteLength(html)/1024).toFixed(0)+' KB');
+  if(page==='index'&&!artifactOut)fs.writeFileSync(path.join(dist,'zheng-he-voyages-standalone.html'),html);
+}
+if(!artifactOut) {
+  const target=path.join(dist,'artifact');fs.mkdirSync(target,{recursive:true});
+  for(const name of ['index.html','voyages.html','fleet.html','css','js','three','vendor','data'])fs.cpSync(path.join(root,name),path.join(target,name),{recursive:true});
+  console.log('dist/artifact: multi-file static site');
 }
