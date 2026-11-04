@@ -1,0 +1,405 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>郑和七下西洋</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="交互地图：郑和船队 1405—1433 年七次下西洋的航线、停靠港口、重要事件与史料原文。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="vendor/leaflet/leaflet.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="masthead">
+  <div class="seal" aria-hidden="true">郑和</div>
+  <div class="title-block">
+    <h1>七下西洋</h1>
+    <p class="sub">郑和船队航海图 · 永乐三年至宣德八年（1405—1433）</p>
+  </div>
+  <div class="mast-actions">
+    <button class="btn-quiet" id="theme-toggle" type="button" aria-label="切换昼夜配色">夜航</button>
+  </div>
+</header>
+
+<main class="app">
+  <aside class="panel" id="panel" aria-label="史事面板">
+    <nav class="tabs" role="tablist" aria-label="内容分类">
+      <button class="tab" role="tab" id="tab-voyages" aria-controls="pane-voyages" aria-selected="true" data-tab="voyages">航次</button>
+      <button class="tab" role="tab" id="tab-people" aria-controls="pane-people" aria-selected="false" data-tab="people">人物</button>
+      <button class="tab" role="tab" id="tab-ships" aria-controls="pane-ships" aria-selected="false" data-tab="ships">宝船</button>
+      <button class="tab" role="tab" id="tab-nav" aria-controls="pane-nav" aria-selected="false" data-tab="nav">航海术</button>
+      <button class="tab" role="tab" id="tab-chron" aria-controls="pane-chron" aria-selected="false" data-tab="chron">年表</button>
+      <button class="tab" role="tab" id="tab-review" aria-controls="pane-review" aria-selected="false" data-tab="review">评说</button>
+      <button class="tab" role="tab" id="tab-sources" aria-controls="pane-sources" aria-selected="false" data-tab="sources">史料</button>
+    </nav>
+
+    <!-- 航次：由 js/app.js 生成 -->
+    <section class="pane" id="pane-voyages" role="tabpanel" aria-labelledby="tab-voyages">
+      <div class="vchips" id="vchips" role="group" aria-label="选择航次"></div>
+      <div id="voyage-body" class="pane-body" style="display:flex;flex-direction:column;gap:18px"></div>
+    </section>
+
+    <!-- 人物 -->
+    <section class="pane" id="pane-people" role="tabpanel" aria-labelledby="tab-people" hidden>
+      <h2>郑和</h2>
+      <dl class="kv">
+        <dt>本名</dt><dd>马和，小字三保（亦作三宝），后人称"三保太监"</dd>
+        <dt>生卒</dt><dd>1371 年（洪武四年）— 1433 年（宣德八年）</dd>
+        <dt>籍贯</dt><dd>云南昆阳州（今昆明市晋宁区），回族</dd>
+        <dt>官职</dt><dd>内官监太监（正四品）；洪熙元年起任南京守备</dd>
+        <dt>纪念地</dt><dd>南京牛首山郑和墓（衣冠冢）、晋宁郑和公园、太仓与长乐郑和纪念馆</dd>
+      </dl>
+      <div class="prose">
+        <p>郑和出生在一个穆斯林家庭，祖父和父亲都曾远赴麦加朝觐，被尊称为"哈只"。洪武十四年（1381）明军进入云南，年约十岁的马和被俘，后被阉割，送入北平燕王府。</p>
+        <p>他在燕王朱棣身边长大，有勇有谋。建文元年（1399）朱棣起兵"靖难"，马和随军征战，在郑村坝之战中立功。朱棣即位后，于永乐二年（1404）赐他姓"郑"，并任为内官监太监。</p>
+        <p>从永乐三年（1405）到宣德八年（1433），郑和七次率领船队远航，最远到达波斯湾、阿拉伯半岛和东非。永乐帝去世后下西洋一度停止，郑和以下番官军镇守南京，成为第一任南京守备。年近六十时他再次奉命出海，在第七次航行的归途中去世。</p>
+        <p>父亲马哈只的墓碑《故马公墓志铭》至今仍立在晋宁，碑文称郑和"自幼有材志""公勤明敏，谦恭谨密，不避劳勤"。</p>
+      </div>
+
+      <h3>同行者</h3>
+      <div class="cards">
+        <article class="person">
+          <div class="name"><strong>王景弘</strong><span>正使太监</span></div>
+          <p>与郑和同为正使，多次一同出航，长乐碑、刘家港碑均将两人并列。一般认为郑和去世后，由他率领第七次船队返航。</p>
+        </article>
+        <article class="person">
+          <div class="name"><strong>洪保</strong><span>内官监太监 · 副使</span></div>
+          <p>多次以副使身份出洋，第七次下西洋时率分䑸到古里，派通事七人前往天方。2010 年南京祖堂山出土其《寿藏铭》，记他"乘大福等号五千料巨舶"出使西洋，是关于宝船规模的珍贵实物史料。</p>
+        </article>
+        <article class="person">
+          <div class="name"><strong>侯显</strong><span>太监</span></div>
+          <p>以出使西域、西藏闻名，永乐年间两度率舟师出使榜葛剌，与郑和船队互为呼应。</p>
+        </article>
+        <article class="person">
+          <div class="name"><strong>马欢</strong><span>通事 · 《瀛涯胜览》作者</span></div>
+          <p>浙江会稽人，回族穆斯林，通晓阿拉伯语，以通事（翻译）身份随第四、六、七次下西洋。《瀛涯胜览》记二十国的地理、物产、风俗，是关于下西洋最翔实的亲历记录。</p>
+        </article>
+        <article class="person">
+          <div class="name"><strong>费信</strong><span>通事 · 《星槎胜览》作者</span></div>
+          <p>江苏昆山人，太仓卫军士，先后四次随使出洋，晚年写成《星槎胜览》，前集记亲历诸国，后集记传闻诸国。</p>
+        </article>
+        <article class="person">
+          <div class="name"><strong>巩珍</strong><span>幕僚 · 《西洋番国志》作者</span></div>
+          <p>应天府（南京）人，第七次下西洋时在郑和幕府中任职。《西洋番国志》记二十国见闻，并收录了出使时的敕书原文。</p>
+        </article>
+      </div>
+
+      <h3>海外人物</h3>
+      <div class="cards">
+        <article class="person">
+          <div class="name"><strong>拜里迷苏剌</strong><span>Parameswara · 满剌加开国君主</span></div>
+          <p>1409 年受明廷册封，满剌加由此摆脱暹罗控制。1411 年率妻子陪臣五百四十余人随船队访华。</p>
+        </article>
+        <article class="person">
+          <div class="name"><strong>施进卿</strong><span>旧港华人首领</span></div>
+          <p>1407 年向郑和报告海盗陈祖义的阴谋，此后被任为旧港宣慰使。1424 年其子施济孙承袭此职，由郑和赍送敕印。</p>
+        </article>
+        <article class="person">
+          <div class="name"><strong>陈祖义</strong><span>旧港海盗首领</span></div>
+          <p>广东人，聚众盘踞旧港，劫掠往来商船。1407 年被郑和擒获，押至南京处斩。</p>
+        </article>
+        <article class="person">
+          <div class="name"><strong>亚烈苦奈儿</strong><span>Alakeshvara · 锡兰山国王</span></div>
+          <p>1411 年发兵劫夺船队，被郑和奇袭王城生擒，押到南京后获赦，明廷另立新王。</p>
+        </article>
+        <article class="person">
+          <div class="name"><strong>苏干剌</strong><span>Sekandar · 苏门答剌叛乱者</span></div>
+          <p>与苏门答剌国王争位，1415 年领兵数万截击船队，兵败被擒，押回京城处斩。</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- 宝船 -->
+    <section class="pane" id="pane-ships" role="tabpanel" aria-labelledby="tab-ships" hidden>
+      <h2>宝船与船队</h2>
+      <div class="prose">
+        <p>下西洋船队的主体是被称为"宝船"的大型海船，主要在南京龙江宝船厂建造，另有大量船只由福建、浙江、江苏等地建造或改装。每次出航官兵、水手等约两万七千余人，是十五世纪世界上规模最大的远洋船队。</p>
+        <p>《明史·郑和传》记宝船"修四十四丈、广十八丈者六十二"。按一明尺约 0.311 米折算，长约 138 米、宽约 56 米。不少造船史学者认为，木质帆船很难达到这一尺度，实际最大的宝船可能在 60—70 米上下；也有学者认为史书记载可信。这一争论至今没有定论。</p>
+      </div>
+      <figure>
+        <svg class="scale-svg" viewBox="0 0 412 214" role="img" aria-labelledby="scale-title">
+          <title id="scale-title">船长比较（按比例绘制）</title>
+          <!-- 比例：0–150 米 对应 x=118–388，1 米 = 1.8 像素 -->
+          <g>
+            <line class="axis" x1="118" y1="184" x2="388" y2="184"/>
+            <line class="axis" x1="118" y1="180" x2="118" y2="188"/><text class="tick" x="118" y="200" text-anchor="middle">0</text>
+            <line class="axis" x1="163" y1="180" x2="163" y2="188"/><text class="tick" x="163" y="200" text-anchor="middle">25</text>
+            <line class="axis" x1="208" y1="180" x2="208" y2="188"/><text class="tick" x="208" y="200" text-anchor="middle">50</text>
+            <line class="axis" x1="253" y1="180" x2="253" y2="188"/><text class="tick" x="253" y="200" text-anchor="middle">75</text>
+            <line class="axis" x1="298" y1="180" x2="298" y2="188"/><text class="tick" x="298" y="200" text-anchor="middle">100</text>
+            <line class="axis" x1="343" y1="180" x2="343" y2="188"/><text class="tick" x="343" y="200" text-anchor="middle">125</text>
+            <line class="axis" x1="388" y1="180" x2="388" y2="188"/><text class="tick" x="388" y="200" text-anchor="middle">150 米</text>
+          </g>
+          <line class="ref" x1="307" y1="8" x2="307" y2="180"/>
+          <text class="ref-t" x="303" y="16" text-anchor="end">标准足球场 105 米</text>
+          <text class="lbl" x="0" y="44">《明史》宝船</text>
+          <rect class="bar-ming" x="118" y="32" width="248" height="16"/>
+          <text x="370" y="45">138</text>
+          <text class="lbl" x="0" y="82">学界另一估计</text>
+          <rect class="bar-est" x="118" y="70" width="108" height="16"/>
+          <rect class="bar-est-r" x="226" y="70" width="18" height="16"/>
+          <text x="248" y="83">60—70</text>
+          <text class="lbl" x="0" y="120">达·伽马旗舰</text>
+          <rect class="bar-eu" x="118" y="108" width="49" height="16"/>
+          <text x="171" y="121">约 27</text>
+          <text class="lbl" x="0" y="158">哥伦布旗舰</text>
+          <rect class="bar-eu" x="118" y="146" width="32" height="16"/>
+          <text x="154" y="159">约 18</text>
+        </svg>
+        <figcaption>按比例绘制的船长比较（米）。《明史》数值按 1 明尺 ≈ 0.311 米折算；欧洲船只为后人估算的近似值。</figcaption>
+      </figure>
+
+      <h3>船型</h3>
+      <div class="table-wrap">
+        <table class="data">
+          <thead><tr><th>船型</th><th>长</th><th>宽</th><th>桅</th><th>用途</th></tr></thead>
+          <tbody>
+            <tr><td>宝船</td><td>四十四丈四尺</td><td>一十八丈</td><td>九</td><td>正使、使团座船，载赏赐与货物</td></tr>
+            <tr><td>马船</td><td>三十七丈</td><td>一十五丈</td><td>八</td><td>运载马匹、物资</td></tr>
+            <tr><td>粮船</td><td>二十八丈</td><td>一十二丈</td><td>七</td><td>运载粮食给养</td></tr>
+            <tr><td>坐船</td><td>二十四丈</td><td>九丈四尺</td><td>六</td><td>官兵乘坐</td></tr>
+            <tr><td>战船</td><td>一十八丈</td><td>六丈八尺</td><td>五</td><td>护航作战</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="note">船型尺度见于明末罗懋登的小说《三宝太监西洋记通俗演义》，常被引用但可靠性有限。洪保《寿藏铭》"五千料巨舶"、祝允明《前闻记》中"清和""惠康""长宁""安济""清远"等船名，是更直接的史料。</p>
+
+      <h3>人员</h3>
+      <div class="prose">
+        <p>据祝允明《前闻记》，第七次下西洋的人员包括"官校、旗军、火长、舵工、班碇手、通事、办事、书算手、医士、铁锚、木艌、搭材等匠，水手、民稍人等，共二万七千五百五十员名"。</p>
+      </div>
+      <dl class="kv">
+        <dt>指挥</dt><dd>正使太监、副使太监、少监、内官内使</dd>
+        <dt>航海</dt><dd>火长（领航）、舵工、班碇手（起落锚）、水手</dd>
+        <dt>外交</dt><dd>通事（翻译）、办事、书算手、买办</dd>
+        <dt>军事</dt><dd>都指挥、指挥、千户、百户统领的旗军</dd>
+        <dt>后勤</dt><dd>医官医士（一说一百八十余人）、阴阳官（观天象、择吉日）、各类工匠</dd>
+      </dl>
+
+      <h3>遗址与实物</h3>
+      <div class="prose">
+        <p>南京宝船厂遗址位于今鼓楼区中保村一带，原有多条"作塘"（造船船坞），今存部分作塘。1957 年在此出土一根长 11.07 米的铁力木舵杆；2003—2004 年对六号作塘的考古发掘又出土了大量船用构件和工具。</p>
+      </div>
+    </section>
+
+    <!-- 航海术 -->
+    <section class="pane" id="pane-nav" role="tabpanel" aria-labelledby="tab-nav" hidden>
+      <h2>船队如何找到方向</h2>
+      <p class="lede">郑和船队综合运用季风、罗盘、天文和测深，在没有经纬仪的年代往返于两大洋之间。</p>
+
+      <h3>季风：冬去夏回</h3>
+      <div class="prose">
+        <p>船队几乎都在冬季乘东北季风从福建出发，到第二年夏季乘西南季风回国，因此每次航程大约两年。长乐太平港就是冬季"候风"之地，第七次下西洋在此停留了十个多月。</p>
+        <p>满剌加、苏门答剌的"官厂"是候风中转的基地。马欢记各路船只在满剌加汇齐后，"等候南风正顺，于五月中旬开洋回还"。</p>
+      </div>
+
+      <h3>罗盘与针路</h3>
+      <figure class="compass-figure">
+        <div id="compass-big"></div>
+        <figcaption>二十四向罗盘：以十二地支、八天干和四卦名分周天为二十四向，每向 15°。</figcaption>
+      </figure>
+      <div class="prose">
+        <p>船上用水罗盘指向。航向称"针"，如"丹午针"即正南（180°）。航向介于两向之间时称"缝针"，如"丁未针"约为 202.5°，这样就把罗盘细分为四十八向。</p>
+        <p>一条航线上逐段记下的针位和航程叫"针路"，由火长掌握。《郑和航海图》上的针路如"用丹坤针……取某山"，指出了每段该用的航向和应见到的山岛。</p>
+      </div>
+
+      <h3>更：计时与计程</h3>
+      <div class="prose">
+        <p>一昼夜分为十更，一更约合今 2.4 小时，用燃香计时。"更"同时也是距离单位，指顺风时一更的航程，一般认为约合六十里，各家考证不一。</p>
+      </div>
+
+      <h3>过洋牵星</h3>
+      <div class="prose">
+        <p>在远离陆地的大洋上，船队用"牵星板"测量星辰离海平面的高度来判断南北位置。牵星板由十二块大小不同的方形乌木板组成，手持木板，使下缘对齐海平线、上缘对齐星辰，用的是哪一块板，星高就是几"指"。一指约合 1.5°—1.9°，诸家考证不一。</p>
+        <p>北方以北辰星（北极星）为准；越往南北辰星越低，接近赤道时就改看华盖星（小熊座 β、γ）和南方的灯笼骨星（南十字座）。《郑和航海图》后附《过洋牵星图》四幅，记录了印度洋航线上的星高数据。</p>
+      </div>
+
+      <h3>打水：测量水深</h3>
+      <div class="prose">
+        <p>船员用系着铅锤的长绳测量水深，以"托"为单位，一托约为两臂伸展之长。航海图上常有"打水几托"的注记，配合海底泥沙的颜色、质地来判断船位。</p>
+      </div>
+
+      <h3>《郑和航海图》</h3>
+      <div class="prose">
+        <p>原名《自宝船厂开船从龙江关出水直抵外国诸番图》，收入明末茅元仪编的《武备志》卷二百四十。原为一字展开的长卷，从南京宝船厂画起，一直画到东非海岸，收录地名五百余个，标注针路、更数、山岛、礁石和港口，是现存最早的中国远洋航海图。</p>
+      </div>
+
+      <h3>祈风与天妃</h3>
+      <div class="prose">
+        <p>天妃（妈祖）是船员信奉的海上保护神。船队出发前在刘家港、长乐的天妃宫祭祀，归来后奏请修建庙宇。第七次出发前立的两块碑，都把航行平安归功于"天妃之神护佑之德"。</p>
+      </div>
+    </section>
+
+    <!-- 年表：由 js/app.js 生成 -->
+    <section class="pane" id="pane-chron" role="tabpanel" aria-labelledby="tab-chron" hidden>
+      <h2>年表</h2>
+      <p class="note">带"在图上查看"的条目可以定位到地图。</p>
+      <ol class="chron" id="chron-list"></ol>
+    </section>
+
+    <!-- 评说 -->
+    <section class="pane" id="pane-review" role="tabpanel" aria-labelledby="tab-review" hidden>
+      <h2>评说</h2>
+
+      <h3>为什么远航</h3>
+      <div class="prose">
+        <p>《明史》给出两个理由："成祖疑惠帝亡海外，欲踪迹之，且欲耀兵异域，示中国富强。"即寻找下落不明的建文帝，并向海外展示国力。今天的研究者更多强调：通过册封与赏赐建立朝贡关系、垄断官方海外贸易、取得胡椒苏木等物资，以及巩固永乐帝以"靖难"取得的皇位的合法性。也有学者认为，这与当时帖木儿帝国的东征威胁有关。</p>
+      </div>
+
+      <h3>和平与武力</h3>
+      <div class="prose">
+        <p>船队以颁赏、册封、贸易为主，但也是一支两万多人的武装力量。二十八年间有三次较大的用兵：1407 年旧港擒海盗陈祖义，1411 年锡兰山生擒国王亚烈苦奈儿，1415 年苏门答剌擒苏干剌。这三次都由对方先发动攻击，船队并未占领土地。</p>
+      </div>
+
+      <h3>物货往来</h3>
+      <dl class="kv">
+        <dt>带出</dt><dd>丝绸、纻丝纱罗、青花瓷器、铜钱、麝香、铁器、樟脑</dd>
+        <dt>带回</dt><dd>胡椒、苏木、乳香、没药、龙涎香、宝石、珍珠、象牙，以及长颈鹿、狮子、斑马、鸵鸟等珍禽异兽</dd>
+      </dl>
+
+      <h3>为什么停止</h3>
+      <div class="prose">
+        <p>下西洋耗费巨大，主要靠国家财政支撑。永乐后期北征蒙古、营建北京同样耗资巨大，1421 年三大殿火灾后朝廷已暂停下西洋。1424 年明仁宗即位，下诏"下西洋诸番国宝船，悉皆停止"。宣德年间的第七次航行之后，明朝再未组织同等规模的远洋船队，海禁政策也逐渐收紧。</p>
+        <p>据严从简《殊域周咨录》，成化年间明宪宗曾想再下西洋，兵部官员刘大夏把旧档藏起，说"三保下西洋费钱粮数十万，军民死且万计，纵得奇宝而回，于国家何益"。这则故事流传甚广，但真伪尚有争议。下西洋的原始档案后来确实散失了。</p>
+      </div>
+
+      <h3>争议与误读</h3>
+      <dl class="kv">
+        <dt>宝船尺度</dt><dd>《明史》记载约 138 米，许多造船史学者认为实际可能只有一半左右，至今未有定论。</dd>
+        <dt>郑和卒地</dt><dd>多数学者认为他卒于第七次归途的古里一带，也有观点认为他回国后去世。</dd>
+        <dt>"1421"说</dt><dd>英国作家孟席斯在《1421：中国发现世界》中称郑和船队曾环球航行、先于哥伦布到达美洲。此说缺乏史料与实物证据，不为学界接受。</dd>
+      </dl>
+
+      <h3>与欧洲远航比较</h3>
+      <div class="table-wrap">
+        <table class="data">
+          <thead><tr><th></th><th>郑和首航</th><th>哥伦布首航</th><th>达·伽马首航</th></tr></thead>
+          <tbody>
+            <tr><th>年份</th><td>1405</td><td>1492</td><td>1497</td></tr>
+            <tr><th>船只</th><td>大船 62 艘</td><td>3 艘</td><td>4 艘</td></tr>
+            <tr><th>人数</th><td>约 27,800</td><td>约 90</td><td>约 170</td></tr>
+            <tr><th>目的地</th><td>古里</td><td>巴哈马、古巴等地</td><td>古里</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="note">达·伽马在郑和首航到达古里约九十年后，也来到了这座港口。</p>
+
+      <h3>海外的记忆</h3>
+      <div class="prose">
+        <p>东南亚许多地方至今保留着与郑和有关的地名和庙宇：印度尼西亚三宝垄的三保洞、马来西亚马六甲的三宝山与三宝井、泰国大城的三宝公庙等。斯里兰卡的加勒三语碑则是船队留在海外最重要的实物之一。</p>
+        <p>2005 年，郑和下西洋 600 周年之际，中国将每年 7 月 11 日定为"中国航海日"。</p>
+      </div>
+    </section>
+
+    <!-- 史料 -->
+    <section class="pane" id="pane-sources" role="tabpanel" aria-labelledby="tab-sources" hidden>
+      <h2>史料与参考文献</h2>
+      <h3>亲历者著述</h3>
+      <ol class="refs">
+        <li><b>马欢《瀛涯胜览》</b>：随第四、六、七次出航，初稿约成于 1416 年，1451 年定稿，记二十国。</li>
+        <li><b>费信《星槎胜览》</b>：1436 年成书，四次随使出洋。</li>
+        <li><b>巩珍《西洋番国志》</b>：1434 年成书，随第七次出航，录有敕书原文。</li>
+        <li><b>祝允明《前闻记·下西洋》</b>：逐日记录第七次航程的时间、人员和船号。</li>
+      </ol>
+      <h3>碑刻与图籍</h3>
+      <ol class="refs">
+        <li><b>《天妃灵应之记》碑</b>（1431，福建长乐）：逐次记载七下西洋。</li>
+        <li><b>《娄东刘家港天妃宫石刻通番事迹记》</b>（1431，江苏太仓）：原碑已佚，碑文存于钱谷《吴都文粹续集》。</li>
+        <li><b>《布施锡兰山佛寺碑》</b>（1409，斯里兰卡加勒）：汉文、泰米尔文、波斯文三语碑。</li>
+        <li><b>《故马公墓志铭》</b>（1405，云南晋宁）：郑和家世的最早记载。</li>
+        <li><b>泉州郑和行香碑</b>（1417）。</li>
+        <li><b>洪保《寿藏铭》</b>（2010 年南京出土）。</li>
+        <li><b>《郑和航海图》</b>：收入茅元仪《武备志》（1621）。</li>
+      </ol>
+      <h3>正史与实录</h3>
+      <ol class="refs">
+        <li><b>《明太宗实录》《明宣宗实录》</b>：出使敕令、往返时间、各国朝贡。</li>
+        <li><b>《明史》</b>：卷三〇四《郑和传》及卷三二四—三二六外国诸传。</li>
+      </ol>
+      <h3>今人研究</h3>
+      <ol class="refs">
+        <li>郑鹤声、郑一钧编：《郑和下西洋资料汇编》，齐鲁书社。</li>
+        <li>向达整理：《郑和航海图》，中华书局，1961。</li>
+        <li>冯承钧：《瀛涯胜览校注》《星槎胜览校注》，商务印书馆。</li>
+        <li>万明：《明钞本〈瀛涯胜览〉校注》，海洋出版社，2005。</li>
+        <li>Edward L. Dreyer, <i>Zheng He: China and the Oceans in the Early Ming Dynasty, 1405–1433</i>, Pearson Longman, 2007.</li>
+        <li>Louise Levathes, <i>When China Ruled the Seas</i>, Simon &amp; Schuster, 1994.</li>
+        <li>J. V. G. Mills (trans.), <i>Ma Huan: Ying-yai Sheng-lan, The Overall Survey of the Ocean's Shores</i>, Hakluyt Society, 1970.</li>
+      </ol>
+      <h3>说明</h3>
+      <div class="prose">
+        <p class="note">本图航线依据上述史料所记停靠顺序，在主要海道上绘出示意路线，并非精确航迹。第一至六次各港停靠的具体日期大多失载，图中仅标年份；第七次日期出自《前闻记》。公历日期按史学惯例折算为儒略历。古今地名对应以通行说法为准，有争议者注明"一说"。</p>
+      </div>
+      <p class="credits">海岸线：Natural Earth（公有领域）。地图引擎：Leaflet（BSD-2）。可选在线底图：Esri。</p>
+    </section>
+  </aside>
+
+  <section class="stage" aria-label="航海地图">
+    <div id="map"></div>
+
+    <div class="float map-tools" role="group" aria-label="地图选项">
+      <div class="seg" role="group" aria-label="底图">
+        <button type="button" data-base="scroll" aria-pressed="true">古卷</button>
+        <button type="button" data-base="ocean" aria-pressed="false">海图</button>
+        <button type="button" data-base="sat" aria-pressed="false">卫星</button>
+      </div>
+      <div class="toggles">
+        <label><input type="checkbox" id="opt-labels" checked> 地名</label>
+        <label><input type="checkbox" id="opt-events" checked> 大事</label>
+        <label><input type="checkbox" id="opt-branches" checked> 分䑸</label>
+      </div>
+    </div>
+
+    <div class="float legend" id="legend">
+      <button class="legend-toggle" type="button" id="legend-toggle" aria-expanded="true">图例</button>
+      <div class="vrow" id="legend-voyages"></div>
+      <div class="lines">
+        <span class="row"><i class="ln"></i>去程</span>
+        <span class="row"><i class="ln ret"></i>归程</span>
+        <span class="row"><i class="ln br"></i>分䑸（分船队）</span>
+      </div>
+      <div class="glyphs">
+        <span><i class="glyph g-战">战</i>用兵</span>
+        <span><i class="glyph g-碑">碑</i>碑刻</span>
+        <span><i class="glyph g-贡">贡</i>进贡</span>
+        <span><i class="glyph">使</i>外交</span>
+        <span><i class="glyph">政</i>朝政</span>
+        <span><i class="glyph">人</i>生平</span>
+        <span><i class="glyph g-卒">卒</i>去世</span>
+      </div>
+    </div>
+
+    <button class="float compass-float" type="button" id="compass-float" aria-label="二十四向罗盘：查看航海术"></button>
+
+    <div class="float player" id="player" hidden aria-live="polite">
+      <div class="p-top">
+        <span class="p-v" id="p-v"></span>
+        <span class="p-count" id="p-count"></span>
+        <div class="p-ctl">
+          <button type="button" id="p-prev" aria-label="上一站"><svg viewBox="0 0 16 16"><path d="M3 2h2v12H3zM14 2v12L6 8z"/></svg></button>
+          <button type="button" id="p-play" class="primary" aria-label="播放"><svg viewBox="0 0 16 16"><path d="M4 2l10 6-10 6z"/></svg></button>
+          <button type="button" id="p-next" aria-label="下一站"><svg viewBox="0 0 16 16"><path d="M11 2h2v12h-2zM2 2l8 6-8 6z"/></svg></button>
+          <button type="button" id="p-speed" class="speed" aria-label="切换回放速度">1×</button>
+          <button type="button" id="p-close" aria-label="结束回放"><svg viewBox="0 0 16 16"><path d="M3.5 2.1L8 6.6l4.5-4.5 1.4 1.4L9.4 8l4.5 4.5-1.4 1.4L8 9.4l-4.5 4.5-1.4-1.4L6.6 8 2.1 3.5z"/></svg></button>
+        </div>
+      </div>
+      <div class="p-where"><strong id="p-port"></strong><span id="p-date"></span></div>
+      <div class="p-txt" id="p-txt"></div>
+      <div class="p-bar"><i id="p-bar"></i></div>
+    </div>
+
+    <div class="float timeline" id="timeline" aria-label="时间轴"></div>
+    <div class="float toast" id="toast" role="status" hidden></div>
+  </section>
+</main>
+
+<script src="vendor/leaflet/leaflet.js"></script>
+<script src="data/land.js"></script>
+<script src="js/data.js"></script>
+<script src="js/route.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
