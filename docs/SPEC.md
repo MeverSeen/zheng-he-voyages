@@ -322,33 +322,13 @@ ZHStats.all() → [ voyage(1) … voyage(7) ]
 
 ## 6 人物 `ZH_PEOPLE`
 
-```js
-window.ZH_PEOPLE = {
-  roles: [
-    {
-      id: 'eunuch-envoy', name: '正使太监', example: '郑和、王景弘',
-      rank: '内官监太监（正四品）',
-      duty: '统领全军，宣读诏敕，主持册封与赏赐',
-      costume: [
-        { part: 'hat',  name: '乌纱帽 / 三山帽', note: '……', src: '刘若愚《酌中志》' },
-        { part: 'robe', name: '曳撒',           note: '……', src: '……' },
-        { part: 'belt', name: '革带',           note: '……', src: '……' },
-        { part: 'boots', name: '皂靴',          note: '……', src: '……' }
-      ],
-      items: [ { name: '诏敕', note: '……' } ],
-      palette: { robe: '#7d1f1a', trim: '#c9a54a', hat: '#1f1d1a' },   // 插画与 3D 共用
-      svg: 'art/people/eunuch-envoy.svg',
-      caution: '郑和无同时代画像传世，此为职官典型服饰示意'
-    }
-  ]
-};
-```
+完整格式、各角色要求和史料核查表见 [`PEOPLE-PLAN.md`](PEOPLE-PLAN.md) §5；这里只列接口。
 
-角色 `id`：`eunuch-envoy` 正使太监 · `eunuch-deputy` 副使太监 · `commander` 都指挥 · `soldier` 旗军 · `pilot` 火长 · `interpreter` 通事 · `physician` 医官 · `sailor` 水手或舵工。
-
-`part` 取值：`hat` 冠帽 · `robe` 袍服 · `badge` 补子 · `belt` 腰带 · `boots` 靴鞋 · `armor` 甲胄 · `weapon` 兵器 · `item` 器物。
-
-`buildFigure(roleId, { lod })` 读 `palette`，返回高约 1.7 米的 `THREE.Group`，脚底在 y = 0。
+- `js/people-data.js` 挂 `ZH_PEOPLE = { sources, note, roles }`。每个角色含 `id name example rank duty figure palette costume caution`；`figure` 是 2D 与 3D 共用的部件参数（hat robe sleeve badge belt feet legs beard items），`palette` 是两者共用的颜色。
+- 角色 `id`：`eunuch-envoy` 正使太监 · `eunuch-deputy` 副使太监 · `commander` 都指挥 · `soldier` 旗军 · `pilot` 火长 · `interpreter` 通事 · `physician` 医官 · `sailor` 水手。
+- `costume[].part` 取值：`hat` 冠帽 · `robe` 袍服 · `badge` 补子 · `belt` 腰带 · `boots` 靴鞋 · `armor` 甲胄 · `weapon` 兵器 · `item` 器物。
+- `js/figure2d.js`：`ZHFigure.svg(roleOrId, { annotate: false | 'labels' | 'numbers' })` 返回 SVG 字符串；`ZHFigure.anchors(role)` 返回标注起点。
+- `three/figures.js`：`buildFigure(roleId, { lod })` 返回高约 1.7 米的 `THREE.Group`，脚底在 y = 0，面向 +Z；网格 `userData.part` 同上，另加 `body`。`disposeFigure(group)` 释放资源。
 
 ---
 
