@@ -9,3 +9,6 @@ tools/blender/baochuan-base.json
 
 # 世界底图原始下载数据（worldmap/scripts/fetch_world.py 生成）
 worldmap/data/raw/
+
+# 页面检查截图（tools/check-pages.mjs 生成）
+.screens/

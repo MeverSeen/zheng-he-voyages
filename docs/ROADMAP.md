@@ -76,8 +76,8 @@
 |---|---|---|---|---|---|
 | E1 | 拆出 `css/base.css`（设计令牌、页眉、导航、按钮、引文等共用样式），五个页面共用一个页眉导航 | — | 现有航海图外观不变 | 完成 | `js/nav.js` 生成导航并接管昼夜切换（派发 `zh:theme` 事件）；页面完成后把 `PAGES` 中对应项的 `ready: false` 删去 |
 | E2 | 引入 three.js：从 npm 获取 `three@0.160.0`，放进 `vendor/three/`（`three.module.min.js` 与 `OrbitControls.js`），附许可证 | — | 页面通过 import map 加载，见 SPEC §1.3 | 完成 | 另带 `addons/utils/BufferGeometryUtils.js`（合并几何体用）；离线单文件版需用 esbuild 打包（file:// 下浏览器不加载 ES 模块），在 E3 处理 |
-| E3 | `tools/build.mjs` 改为多页面：为每个页面生成离线单文件；为 Artifact 生成多文件发布包 | 各页面 | `dist/` 下每个页面都能双击打开 | 进行中 | 已支持现有航海图、航次档案、舰队三页的离线构建和多文件包；世界、人物页待实现后接入。 |
-| E4 | 检查与文档：每个页面截图检查（桌面、手机、昼夜）；更新 README | 全部 | 无控制台报错，无横向滚动 | 进行中 | 舰队页验收与README已更新；全站其余页面留待后续。 |
+| E3 | `tools/build.mjs` 改为多页面：为每个页面生成离线单文件；为 Artifact 生成多文件发布包 | 各页面 | `dist/` 下每个页面都能双击打开 | 完成 | 航海图、天下全图、航次档案、舰队四页均已接入；天下全图内嵌地形底图，舰队页内嵌宝船 GLB。人物页上线时按 PEOPLE-PLAN P11 接入 |
+| E4 | 检查与文档：每个页面截图检查（桌面、手机、昼夜）；更新 README | 全部 | 无控制台报错，无横向滚动 | 完成 | 新增 `tools/check-pages.mjs`（`npm run check:pages`）：四页 × 桌面/手机 × 昼夜，另含典型操作，源码与 `dist/` 各一遍，全部通过；窄屏统一隐藏页眉副标题；README 按四个页面重写 |
 
 ## 建议顺序
 

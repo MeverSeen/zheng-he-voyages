@@ -406,4 +406,5 @@ ZHStats.all() → [ voyage(1) … voyage(7) ]
 - `node worldmap/scripts/build_polities.mjs 1415 --center ming --ports js/data.js`：生成政局数据（取代已删除的 tools/build-polities.mjs）。
 - `npm run build`：为现有每个页面生成 `dist/<page>.html`（离线单文件），并生成 Artifact 多文件发布包 `dist/artifact/`。
 - 世界底图：`python3 -I worldmap/scripts/fetch_world.py`，然后 `python3 -I worldmap/scripts/build_world.py`（需要 numpy、scipy、matplotlib、Pillow）。
-- 提交前：对改过的页面截图检查（桌面 1440×900、手机 390×844，昼夜各一张），确认控制台没有报错、页面没有横向滚动。
+- `npm run check:pages`（需另装 Playwright 与 Chromium）：每个页面在桌面 1440×900、手机 390×844、昼夜两种配色下打开并执行典型操作，检查控制台报错、请求失败和横向滚动，截图存入 `.screens/`；源码页面与 `dist/` 各查一遍。新页面上线时，在 `tools/check-pages.mjs` 的 `STEPS` 中加上该页的典型操作。
+- 提交前：运行上面的检查，并亲自看一遍改过页面的截图。

@@ -5,7 +5,8 @@
   "scripts": {
     "build": "node tools/build.mjs && node tools/check-build.mjs",
     "check": "node tools/check-fleet.mjs && node tools/check-blender-ships.mjs && node tools/check-routes.mjs",
-    "model:baseline": "node tools/export-ship-base.mjs"
+    "model:baseline": "node tools/export-ship-base.mjs",
+    "check:pages": "node tools/check-pages.mjs && node tools/check-pages.mjs --dist"
   },
   "devDependencies": {
     "esbuild": "0.25.12",
