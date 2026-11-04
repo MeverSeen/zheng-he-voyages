@@ -8,10 +8,12 @@ const safeJs=s=>s.replace(/<\/script/gi,'<\\/script');
 const aliases={three:path.join(root,'vendor/three/three.module.min.js'),'three/addons':path.join(root,'vendor/three/addons')};
 fs.mkdirSync(dist,{recursive:true});
 const artifactOut=process.argv[2]==='--artifact'?process.argv[3]:null;
-for(const page of ['index','voyages','fleet']) {
+for(const page of ['index','voyages','fleet','world']) {
   if(artifactOut&&page!=='index')continue;
   let html=read(page+'.html');
-  html=html.replace(/<link rel="stylesheet" href="((?:vendor|css)\/[^"]+)">/g,(_,href)=>'<style>\n'+read(href)+'\n</style>');
+  // 天下全图的地形底图由脚本加载，离线版改为内嵌（worldmap.js 优先读取 WM_RASTER_DATA）
+  if(page==='world')html=html.replace('<script src="worldmap/worldmap.js"></script>',()=>'<script>window.WM_RASTER_DATA='+JSON.stringify(Object.fromEntries(['world','io'].map(k=>['assets/terrain_'+k+'.jpg','data:image/jpeg;base64,'+fs.readFileSync(path.join(root,'worldmap/assets/terrain_'+k+'.jpg')).toString('base64')])))+';</script>\n<script src="worldmap/worldmap.js"></script>');
+  html=html.replace(/<link rel="stylesheet" href="((?:vendor|css|worldmap)\/[^"]+)">/g,(_,href)=>'<style>\n'+read(href)+'\n</style>');
   html=html.replace(/<script src="([^"]+)"><\/script>/g,(_,src)=>'<script>\n'+safeJs(read(src))+'\n</script>');
   for(const match of [...html.matchAll(/<script type="module" src="([^"]+)"><\/script>/g)]) {
     const result=await build({entryPoints:[path.join(root,match[1])],bundle:true,format:'iife',minify:true,write:false,alias:aliases,legalComments:'inline',define:{__SHIP_ASSETS__:JSON.stringify(Object.fromEntries(['full','section'].map(k=>[k,'data:model/gltf-binary;base64,'+fs.readFileSync(path.join(root,'assets/ships/baochuan-'+k+'.glb')).toString('base64')])))}});
@@ -27,6 +29,6 @@ for(const page of ['index','voyages','fleet']) {
 }
 if(!artifactOut) {
   const target=path.join(dist,'artifact');fs.mkdirSync(target,{recursive:true});
-  for(const name of ['index.html','voyages.html','fleet.html','css','js','three','vendor','data','assets'])fs.cpSync(path.join(root,name),path.join(target,name),{recursive:true,filter:src=>!src.endsWith('.blend')&&!src.endsWith('.blend1')&&!(/baochuan-(preview|deckhouse|rig)\.png$/.test(src))});
+  for(const name of ['index.html','voyages.html','fleet.html','world.html','css','js','three','vendor','data','assets','worldmap'])fs.cpSync(path.join(root,name),path.join(target,name),{recursive:true,filter:src=>!src.endsWith('.blend')&&!src.endsWith('.blend1')&&!(/baochuan-(preview|deckhouse|rig)\.png$/.test(src))&&!/worldmap[\\/](data|scripts)/.test(src)&&!src.endsWith('.mjs')});
   console.log('dist/artifact: multi-file static site');
 }

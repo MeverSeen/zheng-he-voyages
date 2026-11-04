@@ -28,14 +28,14 @@
 
 | 编号 | 任务 | 依赖 | 验收标准 | 状态 | 记录 |
 |---|---|---|---|---|---|
-| A1 | `worldmap/scripts/fetch_world.py`：下载 Terrarium 高程瓦片（全球 z4，印度洋—东亚 z5）、Natural Earth 1:50m 海岸与湖泊、1:10m 河流 | — | 重复运行不重复下载；输出在 `worldmap/data/raw/`（git 忽略） | 待办 | |
-| A2 | `worldmap/scripts/build_world.py`：按统一投影渲染晕渲加分层设色底图，包括全球图和印度洋—东亚细图；配色沿用 `songjin-zhizhan` 的 `LAND` 色阶 | A1 | `worldmap/assets/terrain_world.jpg`（约 3100×1800）与 `terrain_io.jpg`（约 2800×1900），每张不超过 2.5 MB | 待办 | |
-| A3 | 同一脚本生成矢量：陆地轮廓、海岸线、湖泊、主要河流（带中文名），输出 `worldmap/geo/world.geo.js` | A1 | 与底图严格对齐（误差 < 1 个底图像素）；文件不超过 1.5 MB | 待办 | |
-| A4 | `worldmap/worldmap.js` 渲染引擎：投影换算、平移缩放、按缩放切换高清底图、"不随缩放变大"的符号层、注记避让 | A2 A3 | 按 SPEC §2 的接口实现；桌面和手机都能拖动、双指缩放 | 待办 | |
-| A5 | 1415 年世界政局数据：把 `tools/polities-src.mjs` 迁到 `worldmap/polities/1415.mjs`，补全欧洲、非洲、美洲、大洋洲、北亚；增加宗主关系、附属样式等字段 | — | 按 SPEC §3；核心区（亚非沿岸）保持现有精度，其他地区为"粗略"级并在界面注明 | 待办 | |
-| A6 | `worldmap/scripts/build_polities.mjs`：裁剪、去重、配色，输出 `worldmap/polities/1415.js` | A3 A5 | 相邻政权颜色不同；藩属用斜线或点纹 | 待办 | |
-| A7 | `world.html` 天下全图：政局（诸国、与明关系两种模式）、郑和七次航线、都城、同期大事注记（如 1405 帖木儿去世、1415 葡萄牙占领休达、1428 阿兹特克三国同盟等） | A4 A6 | 点击政权弹出简介；可直接跳到某一航次的视野 | 待办 | |
-| A8 | 航海图（Leaflet）改读统一政局数据（`worldmap/polities/1415.js`），删除旧的 `data/polities.js`；可选：把 A2 底图切成瓦片，作为 Leaflet 的"地形"底图 | A6 | 航海图功能不退化；`tools/check-routes.mjs` 仍通过 | 待办 | |
+| A1 | `worldmap/scripts/fetch_world.py`：下载 Terrarium 高程瓦片（全球 z4，印度洋—东亚 z5）、Natural Earth 1:50m 海岸与湖泊、1:10m 河流 | — | 重复运行不重复下载；输出在 `worldmap/data/raw/`（git 忽略） | 完成 | 下载 256 张 z4 与 104 张 z5 高程瓦片及三份 Natural Earth 数据，共约 36 MB，不入库 |
+| A2 | `worldmap/scripts/build_world.py`：按统一投影渲染晕渲加分层设色底图，包括全球图和印度洋—东亚细图；配色沿用 `songjin-zhizhan` 的 `LAND` 色阶 | A1 | `worldmap/assets/terrain_world.jpg`（约 3100×1800）与 `terrain_io.jpg`（约 2800×1900），每张不超过 2.5 MB | 完成 | terrain_world.jpg 3118×1800（648 KB）、terrain_io.jpg 2815×1875（723 KB）；两极按纬度横向平滑以消除拉伸条纹 |
+| A3 | 同一脚本生成矢量：陆地轮廓、海岸线、湖泊、主要河流（带中文名），输出 `worldmap/geo/world.geo.js` | A1 | 与底图严格对齐（误差 < 1 个底图像素）；文件不超过 1.5 MB | 完成 | world.geo.js 615 KB：1349 个陆地环、373 个湖泊、88 条带中文名的河流，另有山脉与海洋注记；陆地轮廓与底图同源，严格对齐 |
+| A4 | `worldmap/worldmap.js` 渲染引擎：投影换算、平移缩放、按缩放切换高清底图、"不随缩放变大"的符号层、注记避让 | A2 A3 | 按 SPEC §2 的接口实现；桌面和手机都能拖动、双指缩放 | 完成 | worldmap/worldmap.js + worldmap.css；注记分级与细图切换按绝对比例尺，手机与桌面一致；离线版可读内嵌的 WM_RASTER_DATA |
+| A5 | 1415 年世界政局数据：把 `tools/polities-src.mjs` 迁到 `worldmap/polities/1415.mjs`，补全欧洲、非洲、美洲、大洋洲、北亚；增加宗主关系、附属样式等字段 | — | 按 SPEC §3；核心区（亚非沿岸）保持现有精度，其他地区为"粗略"级并在界面注明 | 完成 | worldmap/polities/1415.mjs：120 个政权（核心区 73，粗略区 47：欧洲、北非、西非、中南非、美洲）；新增 kind、suzerain、style、detail 字段 |
+| A6 | `worldmap/scripts/build_polities.mjs`：裁剪、去重、配色，输出 `worldmap/polities/1415.js` | A3 A5 | 相邻政权颜色不同；藩属用斜线或点纹 | 完成 | worldmap/scripts/build_polities.mjs：155 KB，邻国不同色，藩属斜线、部族联盟点纹；可选 --ports 统计境内港口 |
+| A7 | `world.html` 天下全图：政局（诸国、与明关系两种模式）、郑和七次航线、都城、同期大事注记（如 1405 帖木儿去世、1415 葡萄牙占领休达、1428 阿兹特克三国同盟等） | A4 A6 | 点击政权弹出简介；可直接跳到某一航次的视野 | 完成 | world.html：诸国／与明关系两种着色、七次航线、28 座都城、13 条同期世界大事、黄河夺淮故道；五个快速视野 |
+| A8 | 航海图（Leaflet）改读统一政局数据（`worldmap/polities/1415.js`），删除旧的 `data/polities.js`；可选：把 A2 底图切成瓦片，作为 Leaflet 的"地形"底图 | A6 | 航海图功能不退化；`tools/check-routes.mjs` 仍通过 | 完成 | 航海图改读 WM_POLITIES[1415]，删除 data/polities.js、tools/polities-src.mjs、tools/build-polities.mjs；check-routes 通过。Leaflet 地形瓦片暂未做（可选项） |
 
 ## B 航次档案
 

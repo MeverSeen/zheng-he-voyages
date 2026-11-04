@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>天下全图</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="约 1415 年的世界政局：地形底图上的各国疆域、郑和七次航线与同期世界大事。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="worldmap/worldmap.css">
+<link rel="stylesheet" href="css/world.css">
+<script src="js/nav.js"></script>
+</head>
+<body data-page="world">
+<header class="masthead">
+  <div class="seal" aria-hidden="true">郑和</div>
+  <div class="title-block">
+    <h1>七下西洋</h1>
+    <p class="sub">天下全图 · 约 1415 年的世界政局</p>
+  </div>
+  <div class="mast-actions">
+    <button class="btn-quiet" id="theme-toggle" type="button" aria-label="切换昼夜配色">夜航</button>
+  </div>
+</header>
+
+<main class="world-app">
+  <section class="world-stage" aria-label="世界地图">
+    <div id="worldmap" aria-label="可拖动、缩放的世界地图"></div>
+    <div class="wfloat wtools" role="group" aria-label="地图选项">
+      <div class="seg" role="group" aria-label="疆域着色">
+        <button type="button" data-pol="states" aria-pressed="true">诸国</button>
+        <button type="button" data-pol="rel" aria-pressed="false">与明关系</button>
+        <button type="button" data-pol="off" aria-pressed="false">无疆域</button>
+      </div>
+      <div class="toggles">
+        <label><input type="checkbox" id="opt-routes" checked> 郑和航线</label>
+        <label><input type="checkbox" id="opt-events" checked> 同期大事</label>
+        <label><input type="checkbox" id="opt-rivers" checked> 河流</label>
+      </div>
+    </div>
+    <div class="wfloat wzoom" role="group" aria-label="缩放">
+      <button type="button" id="zoom-in" aria-label="放大">+</button>
+      <button type="button" id="zoom-out" aria-label="缩小">−</button>
+      <button type="button" id="zoom-home" aria-label="回到全图">全</button>
+    </div>
+    <div class="wfloat wlegend" id="wlegend"></div>
+  </section>
+
+  <aside class="world-panel" aria-label="说明">
+    <h2 class="wtitle">天下全图</h2>
+    <p class="lede">郑和船队往来于亚非之间的时候，世界是什么样子？这张图以约 1415 年（第四、五次下西洋之间）为准，画出当时各政权的大致疆域。</p>
+    <div class="jump" role="group" aria-label="快速定位">
+      <button type="button" data-view="world">全世界</button>
+      <button type="button" data-view="voyage">下西洋海域</button>
+      <button type="button" data-view="east">东亚</button>
+      <button type="button" data-view="europe">欧洲与地中海</button>
+      <button type="button" data-view="americas">美洲</button>
+    </div>
+    <div class="wlegend-panel" id="wlegend-panel"></div>
+    <section class="card" id="polity-card" aria-live="polite">
+      <p class="note">点击地图上的色块，查看该政权的简介。</p>
+    </section>
+    <h3 class="wh3">同期世界大事</h3>
+    <ol class="wevents" id="wevents"></ol>
+    <p class="note">疆域依据通行历史地图集手绘，只表示约 1415 年的大致范围；亚非沿岸（船队所到之处）较细，欧洲、非洲内陆和美洲为粗略示意；未着色地区为部族地区或资料不详。黄河在这一时期由淮河入海，图中另以虚线标出。</p>
+    <p class="credits">地形：AWS Terrain Tiles（SRTM 等）；海岸、湖泊、河流：Natural Earth（公有领域）。</p>
+  </aside>
+</main>
+
+<script src="worldmap/geo/world.geo.js"></script>
+<script src="worldmap/polities/1415.js"></script>
+<script src="worldmap/worldmap.js"></script>
+<script src="js/data.js"></script>
+<script src="js/route.js"></script>
+<script src="js/world-page.js"></script>
+</body>
+</html>

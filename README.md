@@ -10,7 +10,8 @@
 - **大事**：以印章形标记（战、碑、贡、使、政、人、卒）标出旧港擒陈祖义、锡兰山之战、苏门答剌擒苏干剌、麒麟入贡、泉州行香、长乐立碑、郑和病逝等事件，附史料原文。
 - **时间轴**：1398—1436 年的航次与大事，并标出建文、永乐、洪熙、宣德年号。
 - **专题**：人物、宝船（按比例的船长比较）、航海术（二十四向罗盘、针路、更、牵星、打水）、年表、评说、史料与参考文献。
-- **政治疆域**：以约 1415 年（第四、五次下西洋之间）为准，为明朝、交趾、帖木儿帝国、马穆鲁克苏丹国、阿瑜陀耶、满者伯夷、孟加拉苏丹国、毗奢耶那伽罗等 73 个政权着色。可切换"诸国"（一色一国）与"与明关系"（明朝直辖 / 郑和船队到访 / 明朝羁縻 / 遣使往来 / 其他）两种着色，点击色块可查看各国简介与境内港口。
+- **天下全图**：仿照 `songjin-zhizhan` 全景图的形式，在真实地形晕渲底图上画出约 1415 年（第四、五次下西洋之间）全世界 120 个政权的大致疆域（亚非沿岸较细，欧洲、非洲内陆、美洲为粗略示意），可切换"诸国"与"与明关系"两种着色，并叠加郑和七次航线、都城、黄河夺淮故道和同期世界大事。航海图使用同一份政局数据。
+- **航次档案**：七次对比（起止时间、示意航程、人数、船只、所到国家），以及逐次的人员、主要官员、船队、航程统计、成果和史料原文；第七次按《前闻记》列出逐日行程。
 - **底图**：默认"古卷"底图由内置的 Natural Earth 海岸线绘制，无需联网；也可切换 Esri 在线海图或卫星图。支持昼/夜两种配色和手机屏幕。
 
 ## 舰队复原
@@ -63,25 +64,29 @@ Blender 源文件按 `Baochuan_full`、`Baochuan_section` 集合分开保存。�
 ## 目录结构
 
 ```
-index.html            页面结构与专题内容
-css/style.css         样式（昼/夜配色、手机适配）
-js/data.js            港口、海道、七次航程、大事、年表等全部史事数据
+index.html            航海图：航线、港口、大事、回放、专题（Leaflet）
+world.html            天下全图：约 1415 年世界政局、七次航线、同期世界大事
+voyages.html          航次档案：七次对比、人数、官员、船队、航程统计、成果与史料
+fleet.html            舰队复原：船只三维示意复原（three.js）
+css/                  base.css 共用令牌与组件；其余为各页面样式
+js/data.js            港口、海道、七次航程、大事、年表等史事数据
 js/route.js           在海道网上求最短海路并平滑航线
-js/app.js             地图、面板、回放、时间轴等交互
-data/land.js          Natural Earth 1:50m 海岸线（裁剪到相关海域）
-data/polities.js      约 1415 年各政权疆域（由 tools/build-polities.mjs 生成）
-vendor/leaflet/       Leaflet 1.9.4
-tools/build-land.mjs  重新生成 data/land.js
-tools/polities-src.mjs 各政权的手绘大致范围、与明朝的关系和简介
-tools/build-polities.mjs 用海岸线裁剪疆域、去除重叠并自动配色
+js/stats.js           航程统计（里程、历时、在航天数）
+js/voyages-detail.js  航次档案数据
+js/nav.js             共用页眉导航与昼夜切换
+js/app.js             航海图交互；js/world-page.js、js/voyages-page.js 为其他页面脚本
+data/land.js          航海图用的 Natural Earth 1:50m 海岸线（裁剪到相关海域）
+worldmap/             可复用的世界底图模块与 1415 年世界政局，见 worldmap/README.md
+vendor/               Leaflet 1.9.4、three.js 0.160.0
 tools/check-routes.mjs 检查所有航线（含平滑后）均不穿越陆地
-tools/build.mjs       生成单文件版 dist/zheng-he-voyages-standalone.html
+tools/build.mjs       为每个页面生成离线单文件 dist/<页面>.html 与多文件包 dist/artifact/
+docs/                 任务清单 ROADMAP、接口规范 SPEC、舰队方案与评审
 ```
 
-修改 `tools/polities-src.mjs` 后需要重新生成疆域数据（需先安装 `polygon-clipping`）：
+修改政局数据 `worldmap/polities/1415.mjs` 后需要重新生成（依赖见 `worldmap/README.md`）：
 
 ```bash
-npm install --no-save polygon-clipping@0.15.7 && node tools/build-polities.mjs node_modules
+node worldmap/scripts/build_polities.mjs 1415 --center ming --ports js/data.js
 ```
 
 修改 `js/data.js` 后建议运行：
@@ -91,7 +96,11 @@ node tools/check-routes.mjs
 ```
 
 ```bash
-node tools/build.mjs
+npm run check
+```
+
+```bash
+npm run build
 ```
 
 ## 资料与说明

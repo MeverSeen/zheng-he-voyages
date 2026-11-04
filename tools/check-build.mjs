@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import vm from 'node:vm';
 import assert from 'node:assert/strict';
-for(const page of ['index','voyages','fleet']) {
+for(const page of ['index','voyages','fleet','world']) {
   const html=fs.readFileSync(new URL('../dist/'+page+'.html',import.meta.url),'utf8');
   const scripts=[...html.matchAll(/<script>([\s\S]*?)<\/script>/g)];
   assert.ok(scripts.length>0);

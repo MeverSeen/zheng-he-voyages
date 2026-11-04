@@ -1,0 +1,79 @@
+/*
+ * WorldMap 图层样式。优先使用页面的设计令牌（--ink、--paper 等），没有时用这里的默认值，
+ * 因此本模块可以单独用于其他项目。政局配色令牌：--pc0…--pc8、--rel-*、--pol-border。
+ */
+.wm {
+  --wm-ink: var(--ink, #231e19);
+  --wm-ink-2: var(--ink-2, #5c5246);
+  --wm-halo: #f1ead6;
+  --wm-sea-ink: #3d6764;
+  --wm-river: #4f8396;
+  --wm-coast: #4a6c68;
+  --wm-border: var(--pol-border, #7d6f58);
+  position: relative;
+  overflow: hidden;
+  touch-action: none;
+  background: #a7c0bd;
+  outline: none;
+}
+.wm:focus-visible { box-shadow: inset 0 0 0 2px var(--focus, #24506e); }
+.wm-svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; cursor: grab; user-select: none; -webkit-user-select: none; }
+.wm-dragging .wm-svg { cursor: grabbing; }
+
+/* 底图 */
+.wm-lake { fill: none; stroke: var(--wm-coast); stroke-width: 0.6px; vector-effect: non-scaling-stroke; opacity: 0.7; }
+.wm-river { fill: none; stroke: var(--wm-river); stroke-width: 1px; vector-effect: non-scaling-stroke; stroke-linecap: round; stroke-linejoin: round; opacity: 0.85; }
+.wm-river.w2 { stroke-width: 1.7px; }
+.wm-coast { fill: none; stroke: var(--wm-coast); stroke-width: 0.9px; vector-effect: non-scaling-stroke; stroke-linejoin: round; }
+.wm-z1 .wm-river.w1 { display: none; }
+
+/* 注记：都带纸色光晕，压在地形上仍可读 */
+.wm-label text, .wm-river-label {
+  paint-order: stroke; stroke: var(--wm-halo); stroke-width: 3px; stroke-linejoin: round;
+  fill: var(--wm-ink); font-family: var(--f-body, "Songti SC", "SimSun", serif);
+}
+.wm-label text { font-size: 12px; }
+.wm-sea text { fill: var(--wm-sea-ink); stroke: rgba(205, 222, 216, 0.85); font-size: 14px; letter-spacing: 0.45em; font-weight: 600; }
+.wm-sea.r1 text { font-size: 19px; letter-spacing: 0.8em; }
+.wm-range text { fill: #6a5639; font-size: 11px; letter-spacing: 0.3em; font-weight: 600; }
+.wm-range.r1 text { font-size: 13px; }
+.wm-river-label { fill: #2f6375; stroke-width: 2.5px; letter-spacing: 0.15em; }
+.wm-z1 .wm-river-label, .wm-z2 .wm-river-label:not(.w2) { display: none; }
+.wm-z1 .wm-label.r2, .wm-z1 .wm-label.r3, .wm-z2 .wm-label.r3 { display: none; }
+
+/* 政局：一色一国（states）或按关系（rel）着色；附属政权叠斜线或点纹 */
+.wm-pol { stroke: var(--wm-border); stroke-width: 0.9px; stroke-dasharray: 4 3; vector-effect: non-scaling-stroke; fill-opacity: 0.42; fill: transparent; cursor: pointer; transition: fill-opacity 0.15s; }
+.wm-pol:hover { fill-opacity: 0.62; }
+.wm-pol-tex { stroke: none; pointer-events: none; }
+.wm-hatch-line { stroke: var(--wm-border); stroke-width: 1; opacity: 0.55; }
+.wm-dot { fill: var(--wm-border); opacity: 0.6; }
+.wm-pol-states .wm-pol.pc0 { fill: var(--pc0, #f0cf6a); } .wm-pol-states .wm-pol.pc1 { fill: var(--pc1, #e7b8a4); }
+.wm-pol-states .wm-pol.pc2 { fill: var(--pc2, #b9d4a6); } .wm-pol-states .wm-pol.pc3 { fill: var(--pc3, #a9c7dd); }
+.wm-pol-states .wm-pol.pc4 { fill: var(--pc4, #cdb7dc); } .wm-pol-states .wm-pol.pc5 { fill: var(--pc5, #edc8a0); }
+.wm-pol-states .wm-pol.pc6 { fill: var(--pc6, #a6d1c8); } .wm-pol-states .wm-pol.pc7 { fill: var(--pc7, #e4bfcf); }
+.wm-pol-states .wm-pol.pc8 { fill: var(--pc8, #cfd09c); }
+.wm-pol-rel .wm-pol.rel-ming { fill: var(--rel-ming, #f0cf6a); } .wm-pol-rel .wm-pol.rel-visit { fill: var(--rel-visit, #8fc7a3); }
+.wm-pol-rel .wm-pol.rel-loose { fill: var(--rel-loose, #e9bf8e); } .wm-pol-rel .wm-pol.rel-tribute { fill: var(--rel-tribute, #a9c4de); }
+.wm-pol-rel .wm-pol.rel-other { fill: var(--rel-other, #dcd6c8); }
+.wm-pol-rel .wm-pol { fill-opacity: 0.55; }
+.wm-pol-off .wm-polities, .wm-pol-off .wm-pol-labels { display: none; }
+.wm-pol-label text { font-weight: 700; letter-spacing: 0.2em; fill: var(--wm-ink-2); }
+.wm-pol-label.r1 text { font-family: var(--f-display, "Kaiti SC", "KaiTi", serif); font-weight: 400; font-size: 22px; letter-spacing: 0.35em; fill: var(--wm-ink); }
+.wm-pol-label.r2 text { font-size: 13.5px; }
+.wm-z1 .wm-pol-label.r1 text { font-size: 15px; letter-spacing: 0.15em; }
+.wm-z1 .wm-sea.r1 text { font-size: 15px; letter-spacing: 0.5em; }
+.wm-pol-label.r3 text { font-size: 11.5px; font-weight: 600; }
+
+/* 夜间：底图压暗，注记换深色光晕 */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .wm { --wm-halo: #1d2420; --wm-ink: #ece3cd; --wm-ink-2: #c9bfa9; --wm-sea-ink: #9cc3bd; --wm-river: #6fa9bd; --wm-coast: #93b5ae; background: #22302f; }
+  :root:not([data-theme="light"]) .wm-terrain image { filter: brightness(0.5) saturate(0.75) contrast(1.05); }
+  :root:not([data-theme="light"]) .wm-sea text { stroke: rgba(20, 30, 30, 0.85); }
+  :root:not([data-theme="light"]) .wm-range text { fill: #d9c49e; }
+  :root:not([data-theme="light"]) .wm-river-label { fill: #9fd0e0; }
+}
+:root[data-theme="dark"] .wm { --wm-halo: #1d2420; --wm-ink: #ece3cd; --wm-ink-2: #c9bfa9; --wm-sea-ink: #9cc3bd; --wm-river: #6fa9bd; --wm-coast: #93b5ae; background: #22302f; }
+:root[data-theme="dark"] .wm-terrain image { filter: brightness(0.5) saturate(0.75) contrast(1.05); }
+:root[data-theme="dark"] .wm-sea text { stroke: rgba(20, 30, 30, 0.85); }
+:root[data-theme="dark"] .wm-range text { fill: #d9c49e; }
+:root[data-theme="dark"] .wm-river-label { fill: #9fd0e0; }
