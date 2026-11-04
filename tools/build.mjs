@@ -14,7 +14,7 @@ for(const page of ['index','voyages','fleet']) {
   html=html.replace(/<link rel="stylesheet" href="((?:vendor|css)\/[^"]+)">/g,(_,href)=>'<style>\n'+read(href)+'\n</style>');
   html=html.replace(/<script src="([^"]+)"><\/script>/g,(_,src)=>'<script>\n'+safeJs(read(src))+'\n</script>');
   for(const match of [...html.matchAll(/<script type="module" src="([^"]+)"><\/script>/g)]) {
-    const result=await build({entryPoints:[path.join(root,match[1])],bundle:true,format:'iife',minify:true,write:false,alias:aliases,legalComments:'inline'});
+    const result=await build({entryPoints:[path.join(root,match[1])],bundle:true,format:'iife',minify:true,write:false,alias:aliases,legalComments:'inline',define:{__SHIP_ASSETS__:JSON.stringify(Object.fromEntries(['full','section'].map(k=>[k,'data:model/gltf-binary;base64,'+fs.readFileSync(path.join(root,'assets/ships/baochuan-'+k+'.glb')).toString('base64')])))}});
     html=html.replace(match[0],()=>'<script>\n'+safeJs(result.outputFiles[0].text)+'\n</script>');
   }
   html=html.replace(/<script type="importmap">[\s\S]*?<\/script>/g,'');
@@ -27,6 +27,6 @@ for(const page of ['index','voyages','fleet']) {
 }
 if(!artifactOut) {
   const target=path.join(dist,'artifact');fs.mkdirSync(target,{recursive:true});
-  for(const name of ['index.html','voyages.html','fleet.html','css','js','three','vendor','data'])fs.cpSync(path.join(root,name),path.join(target,name),{recursive:true});
+  for(const name of ['index.html','voyages.html','fleet.html','css','js','three','vendor','data','assets'])fs.cpSync(path.join(root,name),path.join(target,name),{recursive:true,filter:src=>!src.endsWith('.blend')&&!src.endsWith('.blend1')&&!src.endsWith('baochuan-preview.png')});
   console.log('dist/artifact: multi-file static site');
 }

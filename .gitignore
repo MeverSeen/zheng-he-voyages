@@ -2,3 +2,7 @@ node_modules/
 .DS_Store
 
 dist/artifact/
+
+# Reproducible Blender interchange and automatic backup
+tools/blender/baochuan-base.json
+*.blend1

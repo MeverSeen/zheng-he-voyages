@@ -27,6 +27,23 @@ npm run build
 
 `dist/index.html`、`dist/voyages.html`、`dist/fleet.html` 均为离线单文件；放在同一目录可互相跳转。`dist/zheng-he-voyages-standalone.html` 为航海图兼容文件名。生成的 `dist/artifact/` 是多文件发布包。
 
+## Blender 宝船样板
+
+二千料尺度宝船默认提供精修样板，可在页面关闭该选项对照参数化模型。完整和剖视 GLB 位于 `assets/ships/`，可编辑源文件为 `assets/ships/baochuan.blend`，渲染图为 `assets/ships/baochuan-preview.png`。原有五类船参数、争议大船方案和低细节舰队继续保留。
+
+从参数基准重新生成（会覆盖样板源文件，手工精修前请另存副本）：
+
+```bash
+npm run model:baseline
+/Applications/Blender.app/Contents/MacOS/Blender --background --factory-startup --threads 4 --python tools/blender/build-baochuan.py
+npm run check
+npm run build
+```
+
+Blender 源文件按 `Baochuan_full`、`Baochuan_section` 集合分开保存。每个集合有六类构件分组；剖视集合初始隐藏，可在大纲视图中启用。手工编辑后应分别选择根对象及子对象，导出 GLB，启用自定义属性（Extras）和 Y Up，保留根对象的 `metadata` 与分组的 `part` 属性；不要直接重新运行生成脚本覆盖手工修改。网页版使用米制、+X 船首、+Y 向上；Blender 源文件为 Z 向上，导出时自动转换。
+
+这一轮重点是船壳、船板与护舷材及模型交付流程。桅帆、船楼和内部布局沿用原有建模假设，未新增历史形制结论。单文件构建会内嵌两个 GLB，不依赖模型网络请求。
+
 ## 开发计划
 
 第二阶段（统一世界底图与 1415 年世界政局、航次档案、舰队 3D 复原、人物复原）的任务清单见 [`docs/ROADMAP.md`](docs/ROADMAP.md)，接口、数据格式与样式规范见 [`docs/SPEC.md`](docs/SPEC.md)。
