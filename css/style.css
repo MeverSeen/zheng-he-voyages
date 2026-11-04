@@ -466,7 +466,7 @@ path.port.on { fill: var(--ink); }
   .tabs { top: env(safe-area-inset-top, 0px); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
   .pane { padding-right: max(16px, env(safe-area-inset-right, 0px)); }
   .title-block h1 { font-size: 1.45rem; }
-  .seal { width: 38px; height: 38px; font-size: 1rem; }
+  .seal { width: 38px; height: 38px; padding: 2px 11px; font-size: 16px; line-height: 17px; }
   .compass-float { display: none; }
   .legend { bottom: 96px; width: auto; max-width: 230px; }
   .legend.collapsed > :not(.legend-toggle) { display: none; }
