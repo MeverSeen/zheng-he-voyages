@@ -1,18 +1,46 @@
 {
+  "schemaVersion": 1,
+  "source": {
+    "master": "models/baochuan/baochuan-master.blend",
+    "sha256": "c29910bfa854885907f65e667405a94244409f885c24d16b5b16b5ffe7c48c85",
+    "baselineSha256": "a2d989ed3457e6907d7eed81214fa790a46d0dcf0a64a95fc9d1c93088191cdc",
+    "pipelineVersion": 1
+  },
+  "testOnly": false,
   "full": {
     "triangles": 29865,
+    "masterTriangles": 78473,
     "dimensions": {
       "L": 61.2,
       "B": 13.8
     },
-    "file": "baochuan-full.glb"
+    "file": "baochuan-full.glb",
+    "sha256": "52f3dff606a4fa9810cd1d9d7a18ca60f53eaf3c92b94a8b061292ccbbd5fcfb",
+    "normalTexture": {
+      "file": "baochuan-full-normal.png",
+      "width": 1024,
+      "height": 1024,
+      "objects": 178,
+      "sha256": "eb7d63d29bfd3d031f5c2bb84466a2c4831ed3dd0d80137be3947fdc0ea50422",
+      "maxRedDeviation": 0.4843
+    }
   },
   "section": {
     "triangles": 22183,
+    "masterTriangles": 60759,
     "dimensions": {
       "L": 61.2,
       "B": 13.8
     },
-    "file": "baochuan-section.glb"
+    "file": "baochuan-section.glb",
+    "sha256": "241426b5818d8f487928ef393af87ac6a770cb6b7de61405f2ef551ff6e61e60",
+    "normalTexture": {
+      "file": "baochuan-section-normal.png",
+      "width": 1024,
+      "height": 1024,
+      "objects": 121,
+      "sha256": "64a2bff0ed9b9b6b6d474296ceab18a26ca16c03b8d338d4b1ded3b4cb73c9a0",
+      "maxRedDeviation": 0.4843
+    }
   }
 }

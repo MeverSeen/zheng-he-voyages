@@ -27,22 +27,31 @@ npm run build
 
 `dist/index.html`、`dist/voyages.html`、`dist/fleet.html` 均为离线单文件；放在同一目录可互相跳转。`dist/zheng-he-voyages-standalone.html` 为航海图兼容文件名。生成的 `dist/artifact/` 是多文件发布包。
 
-## Blender 宝船样板
+## Blender 母版与网页模型
 
-二千料尺度宝船默认提供精修样板，可在页面关闭该选项对照参数化模型。完整和剖视 GLB 位于 `assets/ships/`，可编辑源文件为 `assets/ships/baochuan.blend`，渲染图为 `assets/ships/baochuan-preview.png`。原有五类船参数、争议大船方案和低细节舰队继续保留。
+二千料尺度宝船默认使用 Blender 导出的网页模型，可关闭精修选项对照参数化版本。现在将三类资产分开保存：
 
-从参数基准重新生成（会覆盖样板源文件，手工精修前请另存副本）：
+| 用途 | 文件 | 更新方式 |
+| --- | --- | --- |
+| 可再生成的参数底稿 | `models/baochuan/generated/baochuan-baseline.blend` | `npm run model:baseline`，只更新底稿 |
+| 独立精修母版 | `models/baochuan/baochuan-master.blend` | 在 Blender 中编辑、保存；无三万面限制 |
+| 网页完整/剖视模型 | `assets/ships/baochuan-full.glb`、`baochuan-section.glb` | `npm run model:export` 从已保存母版导出 |
+
+日常精修时，打开母版编辑并保存，然后运行：
 
 ```bash
-npm run model:baseline
-/Applications/Blender.app/Contents/MacOS/Blender --background --factory-startup --threads 4 --python tools/blender/build-baochuan.py
+npm run model:export
 npm run check
 npm run build
 ```
 
-Blender 源文件按 `Baochuan_full`、`Baochuan_section` 集合分开保存。每个集合有六类构件分组；剖视集合初始隐藏，可在大纲视图中启用。手工编辑后应分别选择根对象及子对象，导出 GLB，启用自定义属性（Extras）和 Y Up，保留根对象的 `metadata` 与分组的 `part` 属性；不要直接重新运行生成脚本覆盖手工修改。网页版使用米制、+X 船首、+Y 向上；Blender 源文件为 Z 向上，导出时自动转换。
+`npm run model:init-master` 只用于母版不存在时的首次初始化，已有母版会拒绝覆盖。重新生成参数底稿不会更新母版或网页资产；导出也不改写母版。完整/剖视的船楼木构件倒角已分别烘焙为1024像素法线图并嵌入GLB。网页保留三万面预算；母版的细分和倒角可独立调整。
 
-样板已深化船壳、船板、护舷材、分层船楼、屋面梯口及分幅桅帆和索具。形制核对与来源边界见 `docs/FLEET-PLAN.md`；九桅九主帆、三层艉楼和细部尺寸仍是明确标注的建模假设。细部检查图为 `assets/ships/baochuan-deckhouse.png`、`assets/ships/baochuan-rig.png`。单文件构建会内嵌两个 GLB，不依赖模型网络请求。
+`npm run model:render` 生成母版与实际网页GLB的检查图；`npm run model:check` 验证底稿隔离、禁止覆盖母版、编辑传递和只读导出。需要安装 Blender；非默认安装路径可用 `BLENDER_BIN` 指定。模型资产记录母版指纹，母版修改后未重新导出时，网页构建会提示先导出。
+
+详细的修改器约定、烘焙范围和编辑步骤见 [母版工作说明](models/baochuan/README.md)。原 `assets/ships/baochuan.blend` 已迁移为独立底稿与母版，后续精修应打开上表中的母版文件。
+
+形制核对见 `docs/FLEET-PLAN.md`；九桅九主帆、三层艉楼及细部尺寸仍为建模假设。制作流程调整没有改变这些历史依据的边界。
 
 ## 开发计划
 

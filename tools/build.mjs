@@ -2,6 +2,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import {build} from 'esbuild';
+import {checkShipAssets} from './check-ship-assets.mjs';
+checkShipAssets();
 const root=path.resolve(import.meta.dirname,'..'),dist=path.join(root,'dist');
 const read=p=>fs.readFileSync(path.join(root,p),'utf8');
 const safeJs=s=>s.replace(/<\/script/gi,'<\\/script');

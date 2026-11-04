@@ -1,11 +1,16 @@
 """Blender authoring source. Run export-ship-base.mjs first, then Blender -b -t 2 -P this file.
 Y-up baseline is mapped to Blender Z-up, and glTF converts it back on export.
 """
-import bpy, bmesh, json, math, runpy
+import bpy, bmesh, json, math, runpy, argparse, sys
 from pathlib import Path
 from mathutils import Vector
 ROOT=Path(__file__).resolve().parents[2]
-OUT=ROOT/'assets/ships'
+parser=argparse.ArgumentParser();parser.add_argument('--out',type=Path,default=ROOT/'models/baochuan/generated')
+args=parser.parse_args(sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else [])
+OUT=args.out.resolve()
+OUT.mkdir(parents=True,exist_ok=True)
+if bpy.data.filepath and Path(bpy.data.filepath).name=='baochuan-master.blend':
+    raise RuntimeError('Generate the baseline in a separate background process; the master is never a generator target.')
 refine=runpy.run_path(str(ROOT/'tools/blender/refine-superstructure.py'))['refine']
 BASE=json.loads((ROOT/'tools/blender/baochuan-base.json').read_text())
 bpy.ops.object.select_all(action='SELECT'); bpy.ops.object.delete(use_global=False)
@@ -40,7 +45,7 @@ def strip(name,points,radius,parent,material):
     faces=[(i*4+j,i*4+(j+1)%4,(i+1)*4+(j+1)%4,(i+1)*4+j) for i in range(len(points)-1) for j in range(4)]
     return mesh(name,verts,faces,parent,[material])
 
-roots=[];report={}
+roots=[]
 for mode,base in BASE.items():
     section=mode=='section'; meta=base['metadata']; L,B,D,F=[meta[k] for k in ('L','B','D','F')]
     root=bpy.data.objects.new('Baochuan_'+mode,None); bpy.context.collection.objects.link(root); roots.append(root)
@@ -99,15 +104,6 @@ for mode,base in BASE.items():
         strip('Sheer cap timber',[surface(j/N,1,side) for j in range(N+1)],.09,groups['hull'],wood[4])
     refine(meta,groups,section,mesh,material)
     root['metadata']=json.dumps(meta,separators=(',',':'))
-    bpy.ops.object.select_all(action='DESELECT')
-    root.select_set(True)
-    for o in root.children_recursive:o.select_set(True)
-    bpy.context.view_layer.objects.active=root
-    bpy.ops.export_scene.gltf(filepath=str(OUT/('baochuan-'+mode+'.glb')),use_selection=True,export_format='GLB',export_extras=True,export_yup=True,export_materials='EXPORT')
-    tris=0
-    for o in root.children_recursive:
-        if o.type=='MESH':o.data.calc_loop_triangles();tris+=len(o.data.loop_triangles)
-    report[mode]={'triangles':tris,'dimensions':{'L':L,'B':B},'file':'baochuan-'+mode+'.glb'}
 # Collections make full / section independently editable in the saved source.
 for root in roots:
     c=bpy.data.collections.new(root.name);bpy.context.scene.collection.children.link(c)
@@ -116,7 +112,7 @@ for root in roots:
         c.objects.link(o)
     if root.name.endswith('section'):c.hide_render=True;c.hide_viewport=True
 bpy.context.preferences.filepaths.save_version=0
-scene=bpy.context.scene;scene.unit_settings.system='METRIC';scene.unit_settings.scale_length=1
+scene=bpy.context.scene;scene['artifact_role']='parameter_baseline';scene.unit_settings.system='METRIC';scene.unit_settings.scale_length=1
 scene.render.engine='CYCLES';scene.cycles.samples=24;scene.cycles.device='CPU'
 scene.world.color=(.32,.32,.32)
 cam_data=bpy.data.cameras.new('Review camera');cam=bpy.data.objects.new('Review camera',cam_data);scene.collection.objects.link(cam)
@@ -131,11 +127,5 @@ for screen in bpy.data.screens:
             area.spaces.active.region_3d.view_distance=95
             area.spaces.active.region_3d.view_location=target
             area.spaces.active.region_3d.view_rotation=cam.rotation_euler.to_quaternion()
-bpy.ops.wm.save_as_mainfile(filepath=str(OUT/'baochuan.blend'))
-(OUT/'baochuan-report.json').write_text(json.dumps(report,indent=2)+'\n')
-bpy.ops.render.render(write_still=True)
-cam.location=(-48,-62,32);target=Vector((-20,0,9));cam.rotation_euler=(target-cam.location).to_track_quat('-Z','Y').to_euler();cam.data.ortho_scale=29
-scene.render.filepath=str(OUT/'baochuan-deckhouse.png');bpy.ops.render.render(write_still=True)
-cam.location=(23,-54,29);target=Vector((3,0,15));cam.rotation_euler=(target-cam.location).to_track_quat('-Z','Y').to_euler();cam.data.ortho_scale=38
-scene.render.filepath=str(OUT/'baochuan-rig.png');bpy.ops.render.render(write_still=True)
-print(json.dumps(report))
+bpy.ops.wm.save_as_mainfile(filepath=str(OUT/'baochuan-baseline.blend'))
+print('Saved reproducible baseline only; master and web assets were not modified.')
