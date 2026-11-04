@@ -894,29 +894,10 @@
   });
   if (window.matchMedia('(max-width: 760px)').matches) { legend.classList.add('collapsed'); $('#legend-toggle').setAttribute('aria-expanded', 'false'); }
 
-  // 昼夜
-  var root = document.documentElement;
-  function isDark() {
-    var t = root.getAttribute('data-theme');
-    if (t) return t === 'dark';
-    return !!(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
-  }
-  function syncThemeBtn() { $('#theme-toggle').textContent = isDark() ? '昼航' : '夜航'; }
-  var savedTheme = store('theme');
-  if (savedTheme === 'dark' || savedTheme === 'light') root.setAttribute('data-theme', savedTheme);
-  $('#theme-toggle').addEventListener('click', function () {
-    var next = isDark() ? 'light' : 'dark';
-    root.setAttribute('data-theme', next);
-    store('theme', next);
-    syncThemeBtn();
-    if (player.trail) player.trail.setStyle({ color: getComputedStyle(root).getPropertyValue('--v' + player.n).trim() });
+  // 昼夜切换由 js/nav.js 负责；这里只更新回放轨迹的颜色（它是 Leaflet 属性色，不随 CSS 变量变化）
+  window.addEventListener('zh:theme', function () {
+    if (player.trail) player.trail.setStyle({ color: getComputedStyle(document.documentElement).getPropertyValue('--v' + player.n).trim() });
   });
-  syncThemeBtn();
-  if (window.matchMedia) {
-    var mq = window.matchMedia('(prefers-color-scheme: dark)');
-    if (mq.addEventListener) mq.addEventListener('change', syncThemeBtn);
-  }
-  new MutationObserver(syncThemeBtn).observe(root, { attributes: true, attributeFilter: ['data-theme'] });
 
   /* ---------- 启动 ---------- */
   renderChips();
