@@ -1,11 +1,12 @@
 """Blender authoring source. Run export-ship-base.mjs first, then Blender -b -t 2 -P this file.
 Y-up baseline is mapped to Blender Z-up, and glTF converts it back on export.
 """
-import bpy, bmesh, json, math
+import bpy, bmesh, json, math, runpy
 from pathlib import Path
 from mathutils import Vector
 ROOT=Path(__file__).resolve().parents[2]
 OUT=ROOT/'assets/ships'
+refine=runpy.run_path(str(ROOT/'tools/blender/refine-superstructure.py'))['refine']
 BASE=json.loads((ROOT/'tools/blender/baochuan-base.json').read_text())
 bpy.ops.object.select_all(action='SELECT'); bpy.ops.object.delete(use_global=False)
 for c in list(bpy.data.collections):
@@ -50,6 +51,7 @@ for mode,base in BASE.items():
     for i,item in enumerate(base['meshes']):
         # Replace the shell and old floating decorative wales; keep the keel.
         if item['part']=='hull' and max(item['color'])-min(item['color'])>.06:continue
+        if item.get('detail') in ['deckhouse','rig']:continue
         p=item['positions'];verts=[p[j:j+3] for j in range(0,len(p),3)]
         if item['part']=='bulkheads':verts=[(x,y,z*.96) for x,y,z in verts]
         idx=item['indices'] or list(range(len(verts)));faces=[idx[j:j+3] for j in range(0,len(idx),3)]
@@ -95,6 +97,8 @@ for mode,base in BASE.items():
     # Explicit shell thickness at the sheer, independent of the railing.
     for side in [-1] if section else [-1,1]:
         strip('Sheer cap timber',[surface(j/N,1,side) for j in range(N+1)],.09,groups['hull'],wood[4])
+    refine(meta,groups,section,mesh,material)
+    root['metadata']=json.dumps(meta,separators=(',',':'))
     bpy.ops.object.select_all(action='DESELECT')
     root.select_set(True)
     for o in root.children_recursive:o.select_set(True)
@@ -121,7 +125,17 @@ for name,pos,energy,size in [('Key',(20,-35,65),70000,45),('Fill',(-30,20,35),45
     data=bpy.data.lights.new(name,'AREA');o=bpy.data.objects.new(name,data);scene.collection.objects.link(o);o.location=pos;o.rotation_euler=(Vector((0,0,4))-o.location).to_track_quat('-Z','Y').to_euler();data.energy=energy;data.shape='DISK';data.size=size
 scene.render.resolution_x=1400;scene.render.resolution_y=1000;scene.render.resolution_percentage=100
 scene.render.image_settings.file_format='PNG';scene.render.filepath=str(OUT/'baochuan-preview.png')
+for screen in bpy.data.screens:
+    for area in screen.areas:
+        if area.type=='VIEW_3D':
+            area.spaces.active.region_3d.view_distance=95
+            area.spaces.active.region_3d.view_location=target
+            area.spaces.active.region_3d.view_rotation=cam.rotation_euler.to_quaternion()
 bpy.ops.wm.save_as_mainfile(filepath=str(OUT/'baochuan.blend'))
 (OUT/'baochuan-report.json').write_text(json.dumps(report,indent=2)+'\n')
 bpy.ops.render.render(write_still=True)
+cam.location=(-48,-62,32);target=Vector((-20,0,9));cam.rotation_euler=(target-cam.location).to_track_quat('-Z','Y').to_euler();cam.data.ortho_scale=29
+scene.render.filepath=str(OUT/'baochuan-deckhouse.png');bpy.ops.render.render(write_still=True)
+cam.location=(23,-54,29);target=Vector((3,0,15));cam.rotation_euler=(target-cam.location).to_track_quat('-Z','Y').to_euler();cam.data.ortho_scale=38
+scene.render.filepath=str(OUT/'baochuan-rig.png');bpy.ops.render.render(write_still=True)
 print(json.dumps(report))

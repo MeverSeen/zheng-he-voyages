@@ -6,6 +6,10 @@ window.ZH_FLEET = (function () {
     museum: { title: '中国机械工程数字博物馆·郑和航船', url: 'https://museum.cmes.org/machinery/search/detail/c5eb6f090e9a48cbb5b68221cece11c0', note: '五类船的传统模型体系与尺度争议。五至九桅方案采用这一展示体系，不视为同时代实测。' },
     craft: { title: 'Royal Museums Greenwich · Pechili trading junk', url: 'https://www.rmg.co.uk/collections/objects/rmgc-object-6901', note: '后世中国商船模型的舱口、绞盘与桅座构件比较资料，不能直接证明明代郑和船的布局。' },
     rig: { title: '长荣海事博物馆·郑和宝船', url: 'https://www.evergreenmuseum.org.tw/collection/79', note: '馆藏为现代研究推论模型，采用九桅十二帆；不能据此确认二千料尺度的帆装。本项目目前为九桅九主帆示意，未复制该馆模型。' },
+    fuchuan: {title:'《古今图书集成·戎政典》大福船图说',url:'https://www.shidianguji.com/zh/mid-page/7597182380151406602',note:'清代汇编中的大福船比较材料：艉楼、露台、梯道与栏护。所述为二桅福船，不能直接证明永宣宝船的楼层和帆装。'},
+    tiangong: {title:'宋应星《天工开物·漕舫》',url:'https://zh.wikisource.org/zh-hant/天工開物/漕舫',note:'晚明漕船资料，记带竹条的分片篷、升降与减帆、桅顶穿索及麻索。用于构件原理比较，不照搬漕船桅数、材料和尺寸到宝船。'},
+    shantung: {title:'Science Museum Group · 山东五桅商船模型（1933-670）',url:'https://collection.sciencemuseumgroup.org.uk/objects/co41902/model-of-a-5-masted-shantung-trading-junk',note:'1931—1933年后世船模，记密帆骨、多支控帆索。仅用于索具构件比较，不据此认定郑和宝船的支索方式。'},
+    novel: {title:'《三宝太监西洋记》第十五回（小说）',url:'https://zh.wikisource.org/zh-hant/三寶太監西洋記/015',note:'九桅与华丽殿宇见于小说叙述，不能作为实船测绘依据。本项目九桅九主帆继续作为展示假设。'},
     bulkhead: { title: 'UNESCO·中国水密隔舱福船制造技艺', url: 'https://ich.unesco.org/en/RL/00321', note: '支持隔舱、木板连接及填缝技术；不提供郑和某艘船的隔舱数量与位置。' }
   };
   function variant(L, B, label, evidence, src) { return { L:L, B:B, label:label, evidence:evidence, src:src }; }
@@ -51,6 +55,10 @@ window.ZH_FLEET = (function () {
       model:{baochuan:10,machuan:40,liangchuan:80,zuochuan:80,zhanchuan:40},estimate:true,
       basis:'统一250艘教学编成（10/40/80/80/40），仅便于观察船型分工，不推断各次实际数量。七次共用相同假设，不能据此比较真实规模。'};
   }
-  return {chiToM:.311, sources:sources, types:types, parts:parts, voyages:voyages,
+  var refinedParts={
+    cabins:{text:'精修样板将三层艉楼拆为柱梁、围壁、真实窗洞与局部开启的木窗板，增加屋面露台、栏护、登楼梯及实际开孔的上层梯口。大福船图说只提供类型比较；三层、2.25米层高及窗格布置仍是建模假设，船内四层不等于甲板上四层楼。',src:'fuchuan'},
+    sails:{text:'精修样板显示分幅帆面、帆骨、上下帆杆、桅旁升帆滑轮与引向系缆点的多支控帆索。晚明漕船和后世船模仅提供构件比较；九桅九主帆、每帆八幅、帆材和索路尺寸均为展示选择，未完成航行工程验证。',src:'tiangong'}
+  };
+  return {refinedParts:refinedParts,chiToM:.311, sources:sources, types:types, parts:parts, voyages:voyages,
     caution:'示意复原：尺度方案与船体细节的证据不同。船楼、帆装和内部布局未有完整原船图纸，勿作精确历史模型。'};
 })();

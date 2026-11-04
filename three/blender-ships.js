@@ -1,4 +1,6 @@
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
+import * as THREE from 'three';
+import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js';
 import {disposeObject} from './ships.js';
 // Build embeds both GLBs so the standalone page never fetches model files.
 const urls=typeof __SHIP_ASSETS__!=='undefined'?__SHIP_ASSETS__:{full:'assets/ships/baochuan-full.glb',section:'assets/ships/baochuan-section.glb'};
@@ -19,6 +21,24 @@ export function buildBlenderShip(cutaway=false){
     if(o.userData.part)groups[o.userData.part]=o;
     if(o.isMesh){o.geometry=o.geometry.clone();o.material=Array.isArray(o.material)?o.material.map(m=>m.clone()):o.material.clone();o.castShadow=true;o.receiveShadow=true;}
   });
+  // Keep editable pieces in Blender; batch by material inside each clickable web component.
+  for(const group of Object.values(groups)){
+    group.updateWorldMatrix(true,true);const inverse=group.matrixWorld.clone().invert(),batches=new Map(),old=[];
+    group.traverse(o=>{if(!o.isMesh)return;const materials=Array.isArray(o.material)?o.material:[o.material];
+      // GLTFLoader emits one mesh per primitive for these single-material authoring objects.
+      if(materials.length!==1)return;
+      const mat=materials[0],key=JSON.stringify([mat.color.toArray(),mat.roughness,mat.metalness,mat.side]);
+      if(!batches.has(key))batches.set(key,{mat,geos:[]});
+      const geo=o.geometry.index?o.geometry.toNonIndexed():o.geometry.clone();geo.deleteAttribute('uv');geo.deleteAttribute('uv1');
+      geo.applyMatrix4(inverse.clone().multiply(o.matrixWorld));batches.get(key).geos.push(geo);old.push(o);
+    });
+    for(const o of old){o.removeFromParent();o.geometry.dispose();}
+    for(const {mat,geos} of batches.values()){
+      const geo=mergeGeometries(geos);if(!geo)throw new Error('Incompatible Blender geometry');
+      const m=new THREE.Mesh(geo,mat);m.castShadow=true;m.receiveShadow=true;group.add(m);geos.forEach(g=>g.dispose());
+    }
+    const used=new Set([...batches.values()].map(b=>b.mat));for(const o of old)if(!used.has(o.material))o.material.dispose();
+  }
   root.userData={...metadata,groups,modelSource:'blender'};
   return root;
 }

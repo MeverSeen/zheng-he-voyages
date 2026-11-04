@@ -11,15 +11,18 @@ const bundle=await build({entryPoints:[path.join(root,'three/ships.js')],bundle:
 const {buildShip,disposeObject}=await import('data:text/javascript;base64,'+Buffer.from(bundle.outputFiles[0].text).toString('base64'));
 const output={};
 for(const cutaway of [false,true]) {
- const ship=buildShip('baochuan',{variant:'estimated',cutaway});
+ const ship=buildShip('baochuan',{variant:'estimated',cutaway,merge:false});
  const {groups,...metadata}=ship.userData;
- const meshes=[];ship.updateMatrixWorld(true);
+ const batches=new Map();ship.updateMatrixWorld(true);
  for(const [part,group] of Object.entries(groups))group.traverse(o=>{
   if(!o.isMesh)return;
   const g=o.geometry.clone().applyMatrix4(o.matrixWorld);
-  meshes.push({part,color:o.material.color.toArray(),positions:Array.from(g.attributes.position.array),indices:g.index?Array.from(g.index.array):null,doubleSided:o.material.side===2});g.dispose();
+  const color=o.material.color.toArray(),detail=o.userData.detail||'baseline',key=JSON.stringify([part,detail,color,o.material.side]);
+  if(!batches.has(key))batches.set(key,{part,detail,color,positions:[],indices:null,doubleSided:o.material.side===2});
+  const p=g.attributes.position,a=batches.get(key).positions;
+  for(let j=0;j<(g.index?.count||p.count);j++){const i=g.index?g.index.getX(j):j;a.push(p.getX(i),p.getY(i),p.getZ(i));}g.dispose();
  });
- output[cutaway?'section':'full']={metadata,meshes};disposeObject(ship);
+ output[cutaway?'section':'full']={metadata,meshes:[...batches.values()]};disposeObject(ship);
 }
 fs.writeFileSync(path.join(root,'tools/blender/baochuan-base.json'),JSON.stringify(output));
 console.log('Exported full and section baselines for Blender.');

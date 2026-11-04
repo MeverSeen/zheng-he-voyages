@@ -27,6 +27,6 @@ for(const page of ['index','voyages','fleet']) {
 }
 if(!artifactOut) {
   const target=path.join(dist,'artifact');fs.mkdirSync(target,{recursive:true});
-  for(const name of ['index.html','voyages.html','fleet.html','css','js','three','vendor','data','assets'])fs.cpSync(path.join(root,name),path.join(target,name),{recursive:true,filter:src=>!src.endsWith('.blend')&&!src.endsWith('.blend1')&&!src.endsWith('baochuan-preview.png')});
+  for(const name of ['index.html','voyages.html','fleet.html','css','js','three','vendor','data','assets'])fs.cpSync(path.join(root,name),path.join(target,name),{recursive:true,filter:src=>!src.endsWith('.blend')&&!src.endsWith('.blend1')&&!(/baochuan-(preview|deckhouse|rig)\.png$/.test(src))});
   console.log('dist/artifact: multi-file static site');
 }

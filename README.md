@@ -42,7 +42,7 @@ npm run build
 
 Blender 源文件按 `Baochuan_full`、`Baochuan_section` 集合分开保存。每个集合有六类构件分组；剖视集合初始隐藏，可在大纲视图中启用。手工编辑后应分别选择根对象及子对象，导出 GLB，启用自定义属性（Extras）和 Y Up，保留根对象的 `metadata` 与分组的 `part` 属性；不要直接重新运行生成脚本覆盖手工修改。网页版使用米制、+X 船首、+Y 向上；Blender 源文件为 Z 向上，导出时自动转换。
 
-这一轮重点是船壳、船板与护舷材及模型交付流程。桅帆、船楼和内部布局沿用原有建模假设，未新增历史形制结论。单文件构建会内嵌两个 GLB，不依赖模型网络请求。
+样板已深化船壳、船板、护舷材、分层船楼、屋面梯口及分幅桅帆和索具。形制核对与来源边界见 `docs/FLEET-PLAN.md`；九桅九主帆、三层艉楼和细部尺寸仍是明确标注的建模假设。细部检查图为 `assets/ships/baochuan-deckhouse.png`、`assets/ships/baochuan-rig.png`。单文件构建会内嵌两个 GLB，不依赖模型网络请求。
 
 ## 开发计划
 

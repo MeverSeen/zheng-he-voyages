@@ -1,6 +1,6 @@
 {
   "full": {
-    "triangles": 27391,
+    "triangles": 29865,
     "dimensions": {
       "L": 61.2,
       "B": 13.8
@@ -8,7 +8,7 @@
     "file": "baochuan-full.glb"
   },
   "section": {
-    "triangles": 20321,
+    "triangles": 22183,
     "dimensions": {
       "L": 61.2,
       "B": 13.8

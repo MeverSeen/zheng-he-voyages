@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js';
 
 // All coordinates are metres: bow +X, up +Y, starboard +Z; waterline y=0.
-export function buildShip(typeId, {variant='estimated',lod=0,cutaway=false}={}) {
+export function buildShip(typeId, {variant='estimated',lod=0,cutaway=false,merge=true}={}) {
   const spec=globalThis.ZH_FLEET.types[typeId];
   if(!spec) throw new Error('Unknown ship '+typeId);
   const dims=spec.variants[variant]||spec.variants.estimated;
@@ -17,7 +17,8 @@ export function buildShip(typeId, {variant='estimated',lod=0,cutaway=false}={}) 
   for(const id of ['hull','sails','bulkheads','rudder','anchor','cabins']) {
     groups[id]=new THREE.Group();groups[id].userData.part=id;ship.add(groups[id]);
   }
-  const mesh=(geo,mat,group)=>{const m=new THREE.Mesh(geo,mat);m.castShadow=lod===0;m.receiveShadow=true;group.add(m);return m;};
+  let detail='baseline';
+  const mesh=(geo,mat,group)=>{const m=new THREE.Mesh(geo,mat);m.userData.detail=detail;m.castShadow=lod===0;m.receiveShadow=true;group.add(m);return m;};
   const box=(x,y,z,w,h,d,mat,g)=>{const m=mesh(new THREE.BoxGeometry(w,h,d),mat,g);m.position.set(x,y,z);return m;};
   const rod=(a,b,r,mat,g)=>{const av=new THREE.Vector3(...a),bv=new THREE.Vector3(...b),v=bv.clone().sub(av);
     const m=mesh(new THREE.CylinderGeometry(r*.8,r,v.length(),lod===2?4:6),mat,g);m.position.copy(av).add(bv).multiplyScalar(.5);m.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),v.normalize());return m;};
@@ -106,6 +107,7 @@ export function buildShip(typeId, {variant='estimated',lod=0,cutaway=false}={}) 
       if(i%2===0)rod([r[0][0],holdFloor,-w*.38],[r[0][0],shape(t).y-.35,-w*.38],timber*.45,mats.wood,groups.bulkheads);
     }
   }
+  detail='deckhouse';
   // Hollow deckhouse: separate floors, posts, window openings and forward doorway.
   const houseX=-L*.35,houseBase=shape(.15).y+.10;
   for(let level=0;level<spec.model.decks;level++) {
@@ -140,6 +142,7 @@ export function buildShip(typeId, {variant='estimated',lod=0,cutaway=false}={}) 
       for(const dx of [-.5,.5])rod([x+w*.2+dx,y,-d*.22],[x+w*.2+dx,y+.7,-d*.22],.07,mats.wood,groups.cabins);
     }
   }
+  detail='cargo';
   // Cargo always belongs in the hold; sectioning removes the shell, never moves cargo.
   if(lod===0)for(let i=2;i<n-1;i++) {
     const x=((i+.5)/n-.5)*L,z=-shape((i+.5)/n).w*.38,y=holdFloor;
@@ -155,6 +158,7 @@ export function buildShip(typeId, {variant='estimated',lod=0,cutaway=false}={}) 
       else for(const dx of [-.4,.4])box(x+dx,y+.4,z,.06,.83,.78,mats.dark,groups.cabins);
     }
   }
+  detail='rig';
   // Explicit unequal stations: main sails amidships, smaller end sails.
   // This is a display hypothesis, not a historical rigging survey.
   const stations=spec.model.rig;
@@ -186,6 +190,7 @@ export function buildShip(typeId, {variant='estimated',lod=0,cutaway=false}={}) 
       }
     }
   }
+  detail='baseline';
   // Stern rudder and head-stock.
   rod([-L*.50,F*1.3,0],[-L*.50,-D*1.25,0],L*.006,mats.dark,groups.rudder);
   box(-L*.505,-D*.45,0,L*.043,D*1.5,B*.025,mats.wood,groups.rudder);
@@ -202,7 +207,7 @@ export function buildShip(typeId, {variant='estimated',lod=0,cutaway=false}={}) 
   const wheel=mesh(new THREE.CylinderGeometry(L*.012,L*.012,B*.2,10),mats.dark,groups.anchor);wheel.rotation.x=Math.PI/2;wheel.position.set(L*.3,F+L*.04,0);
   // Batch static meshes within each selectable component. Keep part selection
   // while reducing hundreds of timber/sail draw calls to a few material batches.
-  for(const group of Object.values(groups)) {
+  if(merge)for(const group of Object.values(groups)) {
     group.updateMatrixWorld(true);const batches=new Map();
     for(const child of [...group.children])if(child.isMesh) {
       if(!batches.has(child.material))batches.set(child.material,[]);
