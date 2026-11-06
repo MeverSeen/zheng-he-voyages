@@ -28,6 +28,7 @@
 <div class="view-controls" aria-label="视角"><button data-view="perspective">重置视角</button><button data-view="side">侧视</button><button data-view="bow">船首</button><button data-view="stern">船尾</button><button data-view="top">俯视</button></div>
 <div class="options"><label class="single-control"><input type="checkbox" id="refined" checked>宝船精修样板 · 二千料尺度</label><label class="single-control"><input type="checkbox" id="cutaway">剖开右舷 · 查看隔舱</label><label class="single-control"><input type="checkbox" id="labels" checked>构件标注</label><label class="single-control"><input type="checkbox" id="reference">人物与 105×68 米场地参照</label><label class="fleet-control" hidden>船间距 <input type="range" id="spacing" min="1.1" max="2.5" step=".1" value="1.4"></label></div>
 <p class="interaction-note" id="model-source">参数化示意模型</p>
+<div class="sail-demo" id="sail-demo-controls" hidden><label for="sail-state">前部辅帆示范</label><select id="sail-state"><option value="set">展开</option><option value="half">半收</option><option value="stowed">收拢</option></select><span>仅演示一面辅帆的帆骨叠合与索具位置，不代表受力模拟。</span></div>
 <p class="interaction-note">拖动旋转 · 滚轮或双指缩放 · 点击构件查看说明。键盘可使用视角按钮和下方构件目录。</p>
 </section>
 <aside class="ship-info" aria-label="船只资料"><p class="eyebrow" id="info-kicker">船型档案</p><h3 id="info-title">宝船</h3><div id="ship-facts"></div><div id="fleet-facts" hidden></div><h4>构件目录</h4><div id="part-list"></div><article id="part-detail" aria-live="polite"></article><button id="open-selected" hidden>查看选中船只</button></aside>

@@ -2,7 +2,7 @@
 Never saves the master. Publishing occurs only after both model variants validate.
 DETAIL_ modifiers -> master only; WEB_ modifiers -> web only; all other shape modifiers kept.
 """
-import bpy, json, hashlib, argparse, sys, tempfile, os, struct
+import bpy, json, hashlib, argparse, sys, tempfile, os, struct, math
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[2]
 DEFAULT_OUT=ROOT/'assets/ships'
@@ -33,14 +33,37 @@ def select(objects):
 def bake_normals(candidates,correspondence,collection,mode,stage):
     if not candidates:raise RuntimeError('No marked bake_normal objects found in the master')
     # Shared atlas UVs are assigned to export copies, never to the master control meshes.
+    for o in candidates:
+        for uv in list(o.data.uv_layers):o.data.uv_layers.remove(uv)
+        o.data.uv_layers.new(name='WebAtlas')
     select(candidates);bpy.ops.object.mode_set(mode='EDIT');bpy.ops.mesh.select_all(action='SELECT')
     bpy.ops.uv.smart_project(angle_limit=1.151917,island_margin=.015,correct_aspect=True,scale_to_bounds=False)
     bpy.ops.object.mode_set(mode='OBJECT')
+    # Folded cloth produces subpixel slivers under geometric projection. Keep its
+    # authored, unfolded weave layout, then repack it with the timber islands.
+    for o in candidates:
+        source=correspondence[o]
+        if not source.get('bake_group','').startswith('sail-'):continue
+        target_uv=o.data.uv_layers.active.data;source_uv=source.data.uv_layers['GrainUV'].data
+        def area(uv):
+            total=0
+            for face in o.data.polygons:
+                points=[uv[i].uv for i in face.loop_indices]
+                total+=abs(sum(a.x*b.y-a.y*b.x for a,b in zip(points,points[1:]+points[:1])))/2
+            return total
+        scale=math.sqrt(area(target_uv)/area(source_uv))
+        for target,authored in zip(target_uv,source_uv):target.uv=authored.uv*scale
+    select(candidates);bpy.ops.object.mode_set(mode='EDIT');bpy.ops.mesh.select_all(action='SELECT')
+    bpy.ops.uv.select_all(action='SELECT');bpy.ops.uv.pack_islands(rotate=True,scale=True,margin=.015)
+    bpy.ops.object.mode_set(mode='OBJECT')
     image=bpy.data.images.new('Baochuan '+mode+' detail normals',width=1024,height=1024,alpha=False)
     image.generated_color=(.5,.5,1,1);image.colorspace_settings.name='Non-Color'
+    color=bpy.data.images.new('Baochuan '+mode+' material colors',width=1024,height=1024,alpha=False)
+    color.generated_color=(.15,.10,.06,1);color.colorspace_settings.name='sRGB'
     materials=set()
     for o in candidates:
         for m in o.data.materials:
+            if m in materials:continue
             materials.add(m);nodes=m.node_tree.nodes
             texture=nodes.new('ShaderNodeTexImage');texture.name='Web normal bake target';texture.image=image;nodes.active=texture
     # Isolate component families so rays cannot capture adjacent walls or floor surfaces.
@@ -58,20 +81,38 @@ def bake_normals(candidates,correspondence,collection,mode,stage):
         if len(targets)>1:bpy.ops.object.join()
         target=bpy.context.view_layer.objects.active
         highs=[correspondence[o] for o in parts]
+        cloth=family.startswith('sail-')
+        cage,reach=(.25,.50) if cloth else (.025,.05)
         for o in highs:o.hide_render=False
         select([target]+highs);bpy.context.view_layer.objects.active=target
-        bpy.ops.object.bake(type='NORMAL',use_selected_to_active=True,cage_extrusion=.025,max_ray_distance=.05,normal_space='TANGENT',margin=4,use_clear=False)
+        bpy.ops.object.bake(type='NORMAL',use_selected_to_active=True,cage_extrusion=cage,max_ray_distance=reach,normal_space='TANGENT',margin=4,use_clear=False)
+        for m in materials:m.node_tree.nodes['Web normal bake target'].image=color
+        # Color follows the control surface UVs. Subdivision can shrink large sail bays
+        # beyond a projection ray; it must not punch dark holes in a material-color bake.
+        detail_settings=[]
+        for source in highs:
+            for mod in source.modifiers:
+                if mod.name.startswith('DETAIL_'):
+                    detail_settings.append((mod,mod.show_viewport,mod.show_render));mod.show_viewport=False;mod.show_render=False
+        bpy.context.view_layer.update()
+        bpy.ops.object.bake(type='DIFFUSE',pass_filter={'COLOR'},use_selected_to_active=True,cage_extrusion=cage,max_ray_distance=reach,margin=4,use_clear=False)
+        for mod,viewport,render in detail_settings:mod.show_viewport=viewport;mod.show_render=render
+        bpy.context.view_layer.update()
+        for m in materials:m.node_tree.nodes['Web normal bake target'].image=image
         for o in highs:o.hide_render=True
         mesh=target.data;bpy.data.objects.remove(target,do_unlink=True);bpy.data.meshes.remove(mesh)
     for m in materials:
         nodes=m.node_tree.nodes;normal=nodes.new('ShaderNodeNormalMap');normal.inputs['Strength'].default_value=1
         m.node_tree.links.new(nodes['Web normal bake target'].outputs['Color'],normal.inputs['Color'])
         m.node_tree.links.new(normal.outputs['Normal'],nodes.get('Principled BSDF').inputs['Normal'])
+        texture=nodes.new('ShaderNodeTexImage');texture.name='Web color bake';texture.image=color
+        m.node_tree.links.new(texture.outputs['Color'],nodes.get('Principled BSDF').inputs['Base Color'])
     image.filepath_raw=str(stage/f'baochuan-{mode}-normal.png');image.file_format='PNG';image.save();image.pack()
+    color.filepath_raw=str(stage/f'baochuan-{mode}-color.png');color.file_format='PNG';color.save();color.pack()
     # A non-flat result is evidence that high-detail geometry was actually transferred.
     pixels=image.pixels[:];deviation=max(abs(pixels[i]-.5) for i in range(0,len(pixels),4))
     if deviation<.015:raise RuntimeError('Baked normal atlas is unexpectedly flat')
-    return {'file':Path(image.filepath_raw).name,'width':1024,'height':1024,'objects':len(candidates),'sha256':digest(Path(image.filepath_raw)),'maxRedDeviation':round(deviation,4)}
+    return {'file':Path(image.filepath_raw).name,'width':1024,'height':1024,'objects':len(candidates),'sha256':digest(Path(image.filepath_raw)),'maxRedDeviation':round(deviation,4),'colorTexture':{'file':Path(color.filepath_raw).name,'width':1024,'height':1024,'sha256':digest(Path(color.filepath_raw))}}
 
 out.parent.mkdir(parents=True,exist_ok=True)
 with tempfile.TemporaryDirectory(prefix='baochuan-export-',dir=out.parent) as tmp:
@@ -94,7 +135,15 @@ with tempfile.TemporaryDirectory(prefix='baochuan-export-',dir=out.parent) as tm
                 # Per-source material sharing and explicit bake variants keep draw counts bounded.
                 for index,mat in enumerate(o.data.materials):
                     key=(mat.name,bool(o.get('bake_normal')) and not args.no_bake)
-                    if key not in materials:materials[key]=mat.copy()
+                    if key not in materials:
+                        materials[key]=mat.copy()
+                        if not key[1]:
+                            # glTF cannot serialize procedural wood nodes. Unbaked small
+                            # pieces use their authored base color, never the exporter's white.
+                            shader=materials[key].node_tree.nodes.get('Principled BSDF')
+                            for name in ['Base Color','Normal']:
+                                for link in list(shader.inputs[name].links):materials[key].node_tree.links.remove(link)
+                            shader.inputs['Base Color'].default_value=mat.diffuse_color
                     copy.data.materials[index]=materials[key]
                 if o.get('bake_normal') and not args.no_bake:candidates.append(copy);correspondence[copy]=o
             copies[o]=copy
@@ -105,11 +154,12 @@ with tempfile.TemporaryDirectory(prefix='baochuan-export-',dir=out.parent) as tm
         bpy.context.view_layer.update();web_tris=triangles(copies.values())
         if web_tris>=30000:raise RuntimeError(f'{mode} control mesh exceeds web budget ({web_tris}); simplify it with WEB_ modifiers. Master has not been changed.')
         normal=bake_normals(candidates,correspondence,collection,mode,stage) if not args.no_bake else None
+        color=normal.pop('colorTexture') if normal else None
         select(list(copies.values()))
         file=stage/f'baochuan-{mode}.glb'
         bpy.ops.export_scene.gltf(filepath=str(file),use_selection=True,export_format='GLB',export_extras=True,export_yup=True,export_apply=True,export_materials='EXPORT')
         meta=json.loads(root['metadata'])
-        report[mode]={'triangles':web_tris,'masterTriangles':high_tris,'dimensions':{'L':meta['L'],'B':meta['B']},'file':file.name,'sha256':digest(file),'normalTexture':normal}
+        report[mode]={'triangles':web_tris,'masterTriangles':high_tris,'dimensions':{'L':meta['L'],'B':meta['B']},'file':file.name,'sha256':digest(file),'normalTexture':normal,'colorTexture':color}
     if digest(master)!=source_hash:raise RuntimeError('Source master changed during export; web publication stopped')
     # GLB is self-contained. PNGs are retained as inspectable build artifacts.
     for mode in ['full','section']:

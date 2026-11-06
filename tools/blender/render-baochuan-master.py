@@ -15,6 +15,9 @@ for name in ['Baochuan_full','Baochuan_section']:
     root=bpy.data.objects[name]
     for obj in [root]+list(root.children_recursive):obj.hide_render=True
 bpy.ops.import_scene.gltf(filepath=str(ROOT/'assets/ships/baochuan-full.glb'))
+for obj in list(bpy.data.objects):
+    if obj.get('sail_state') and obj['sail_state']!='set':
+        for child in [obj]+list(obj.children_recursive):child.hide_render=True
 webout=ROOT/'assets/ships'
 for filename,position,look,scale in [('baochuan-preview.png',(85,-105,65),(0,0,10),85),('baochuan-deckhouse.png',(-48,-62,32),(-20,0,9),29),('baochuan-rig.png',(23,-54,29),(3,0,15),38)]:
     cam.location=position;target=Vector(look);cam.rotation_euler=(target-cam.location).to_track_quat('-Z','Y').to_euler();cam.data.ortho_scale=scale

@@ -2,45 +2,57 @@
   "schemaVersion": 1,
   "source": {
     "master": "models/baochuan/baochuan-master.blend",
-    "sha256": "c29910bfa854885907f65e667405a94244409f885c24d16b5b16b5ffe7c48c85",
+    "sha256": "0176a33a5ac4e1685fbb1d0ef386cce7dd9e06c154bc860da9b96580632fb985",
     "baselineSha256": "a2d989ed3457e6907d7eed81214fa790a46d0dcf0a64a95fc9d1c93088191cdc",
     "pipelineVersion": 1
   },
   "testOnly": false,
   "full": {
-    "triangles": 29865,
-    "masterTriangles": 78473,
+    "triangles": 29626,
+    "masterTriangles": 76442,
     "dimensions": {
       "L": 61.2,
       "B": 13.8
     },
     "file": "baochuan-full.glb",
-    "sha256": "52f3dff606a4fa9810cd1d9d7a18ca60f53eaf3c92b94a8b061292ccbbd5fcfb",
+    "sha256": "012f65311fb9af3cfceeeaca7c279ec058943c470b4dde18d830823ff30d259e",
     "normalTexture": {
       "file": "baochuan-full-normal.png",
       "width": 1024,
       "height": 1024,
-      "objects": 178,
-      "sha256": "eb7d63d29bfd3d031f5c2bb84466a2c4831ed3dd0d80137be3947fdc0ea50422",
+      "objects": 260,
+      "sha256": "0e362230108ed21ed7d489985433a7bc7f58a8e7def85bf99638174c14c0744f",
       "maxRedDeviation": 0.4843
+    },
+    "colorTexture": {
+      "file": "baochuan-full-color.png",
+      "width": 1024,
+      "height": 1024,
+      "sha256": "3147d5c00caf36ecbf8b51f7f8f4e3434064ff384113515768c705144b09933e"
     }
   },
   "section": {
-    "triangles": 22183,
-    "masterTriangles": 60759,
+    "triangles": 21898,
+    "masterTriangles": 56042,
     "dimensions": {
       "L": 61.2,
       "B": 13.8
     },
     "file": "baochuan-section.glb",
-    "sha256": "241426b5818d8f487928ef393af87ac6a770cb6b7de61405f2ef551ff6e61e60",
+    "sha256": "4e82f7c73a0a79e14580e8b6e6ed5dc0858d33c62e4954e48ffdd25f7bf47a38",
     "normalTexture": {
       "file": "baochuan-section-normal.png",
       "width": 1024,
       "height": 1024,
-      "objects": 121,
-      "sha256": "64a2bff0ed9b9b6b6d474296ceab18a26ca16c03b8d338d4b1ded3b4cb73c9a0",
-      "maxRedDeviation": 0.4843
+      "objects": 186,
+      "sha256": "1edc4dfb7e19b6499ab1db9777d681d27480545d14f3a892c016457b0d0d462f",
+      "maxRedDeviation": 0.4961
+    },
+    "colorTexture": {
+      "file": "baochuan-section-color.png",
+      "width": 1024,
+      "height": 1024,
+      "sha256": "a4e992b6a3f75d269bd289c4e04e9c653b77fae3e105005f07772236e9d4dd52"
     }
   }
 }

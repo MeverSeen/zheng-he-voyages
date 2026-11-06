@@ -13,9 +13,11 @@ export function checkShipAssets(){
   const r=report[mode];assert.ok(r.triangles<30000);assert.ok(r.masterTriangles>r.triangles);
   assert.equal(sha(path.join(folder,r.file)),r.sha256,`${mode} model differs from export manifest`);
   assert.ok(r.normalTexture?.objects>0);assert.equal(sha(path.join(folder,r.normalTexture.file)),r.normalTexture.sha256);
+  if(r.colorTexture)assert.equal(sha(path.join(folder,r.colorTexture.file)),r.colorTexture.sha256,'baked material color differs from export manifest');
   const bytes=fs.readFileSync(path.join(folder,r.file));assert.equal(bytes.toString('ascii',0,4),'glTF');
   const json=JSON.parse(bytes.toString('utf8',20,20+bytes.readUInt32LE(12)));
   assert.ok(json.materials.some(m=>m.normalTexture),'GLB must carry baked detail normals');
+  if(r.colorTexture)assert.ok(json.materials.some(m=>m.pbrMetallicRoughness?.baseColorTexture),'GLB must carry baked material color');
   assert.ok(json.images?.length>0&&json.images.every(i=>i.bufferView!==undefined&&!i.uri),'textures must be embedded');
   assert.ok(json.buffers.every(b=>!b.uri));
   for(const m of json.meshes)for(const p of m.primitives)if(json.materials[p.material]?.normalTexture)assert.ok(p.attributes.TEXCOORD_0!==undefined,'textured geometry must retain UVs');

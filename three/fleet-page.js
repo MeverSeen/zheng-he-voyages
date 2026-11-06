@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import {buildShip,disposeObject} from './ships.js';
 import {buildFleet,fleetCounts} from './fleet.js';
-import {prepareBlenderShips,buildBlenderShip,disposeBlenderShips} from './blender-ships.js';
+import {prepareBlenderShips,buildBlenderShip,disposeBlenderShips,setBlenderSailState} from './blender-ships.js';
 import {createScene} from './scene.js';
 const $=id=>document.getElementById(id),F=window.ZH_FLEET,info=window.ZHFleetInfo;
 const state={mode:'single',type:'baochuan',variant:'estimated',n:1,countMode:'recorded',filter:'all',spacing:1.4,part:'hull'};
@@ -22,6 +22,8 @@ function rebuild(){sync();if(!scene){if(state.mode==='single')info.ship(state.ty
   if(state.mode==='single') {const refined=state.type==='baochuan'&&state.variant==='estimated'&&$('refined').checked;ship=(refined&&blenderReady?buildBlenderShip($('cutaway').checked):null)||buildShip(state.type,{variant:state.variant,lod:low?1:0,cutaway:$('cutaway').checked});object.add(ship);object.userData.waterline=ship.userData.waterline;if($('reference').checked)reference(object,ship.userData.L,ship.userData.B);info.ship(state.type,state.variant,{refined:ship.userData.modelSource==='blender'});$('model-source').textContent=ship.userData.modelSource==='blender'?'宝船精修样板 · 帆装与楼舱仍为假设':'参数化示意模型';message(refined&&!blenderReady?(blenderFailed?'精修模型未能载入，当前显示参数化模型。':'正在载入宝船精修样板…'):'');}
   else {$('model-source').textContent='舰队采用低细节示意模型';const fleet=buildFleet(state.n,{mode:state.countMode,variant:state.variant,filter:state.countMode==='recorded'?'all':state.filter,spacing:state.spacing});object.add(fleet);info.fleet(state.n,state.countMode,fleet.userData.count);message(fleet.userData.count?'':'该次船数史料未载。可切换“假设编成”观察船型分工。');}
   scene.setObject(object,{section:state.mode==='single'&&$('cutaway').checked});
+  $('sail-demo-controls').hidden=!(ship?.userData.modelSource==='blender'&&ship.userData.refinement?.furlDemo);
+  if(ship?.userData.modelSource==='blender')setBlenderSailState(ship,$('sail-state').value);
   $('hotspots').replaceChildren();if(ship)F.parts.forEach(p=>{const b=document.createElement('button');b.className='hotspot';b.textContent=p.name;b.dataset.anchor=p.id;b.addEventListener('click',()=>highlight(p.id));$('hotspots').appendChild(b);});save();}
 function pick(hits){for(const hit of hits){if(hit.object===outline)continue;if(state.mode==='fleet'&&hit.object.isInstancedMesh){selected=hit.object.userData.typeId;const serial=hit.instanceId+1;$('open-selected').hidden=false;$('open-selected').textContent='查看 '+F.types[selected].name+' · 第 '+serial+' 艘示意船';info.part('hull');return;}let o=hit.object;while(o&&o!==object){if(o.userData.part){highlight(o.userData.part);return;}o=o.parent;}}}
 function labels(){raf=requestAnimationFrame(labels);if(document.hidden||!scene)return;const w=$('viewport').clientWidth,h=$('viewport').clientHeight;const show=state.mode==='single'&&$('labels').checked;
@@ -37,6 +39,7 @@ try {
   $('ship-type').onchange=()=>{state.type=$('ship-type').value;rebuild();};$('variant').onchange=()=>{state.variant=$('variant').value;rebuild();};
   $('voyage').onchange=()=>{state.n=+$('voyage').value;rebuild();};$('count-mode').onchange=()=>{state.countMode=$('count-mode').value;rebuild();};$('ship-filter').onchange=()=>{state.filter=$('ship-filter').value;rebuild();};
   $('spacing').onchange=()=>{state.spacing=+$('spacing').value;rebuild();};for(const id of ['cutaway','reference','refined'])$(id).onchange=rebuild;
+  $('sail-state').onchange=()=>{if(ship?.userData.modelSource==='blender')setBlenderSailState(ship,$('sail-state').value);};
   document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>scene?.view(b.dataset.view));
   $('open-selected').onclick=()=>{if(selected){state.type=selected;state.mode='single';rebuild();}};
   window.addEventListener('fleet:part',e=>highlight(e.detail));window.addEventListener('hashchange',()=>{parse();rebuild();});

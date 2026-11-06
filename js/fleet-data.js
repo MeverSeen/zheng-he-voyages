@@ -5,11 +5,13 @@ window.ZH_FLEET = (function () {
     study: { title: '金国平《缅怀历史，展望未来：纪念郑和下西洋600周年》', url: 'https://www.safp.gov.mo/static/2023/09/16/WCM_003280.pdf', note: '《行政》2005年第68期，第557页（全文549—562页）；文中介绍二千料船61.2×13.8米的尺度解释，不是定论。' },
     museum: { title: '中国机械工程数字博物馆·郑和航船', url: 'https://museum.cmes.org/machinery/search/detail/c5eb6f090e9a48cbb5b68221cece11c0', note: '五类船的传统模型体系与尺度争议。五至九桅方案采用这一展示体系，不视为同时代实测。' },
     craft: { title: 'Royal Museums Greenwich · Pechili trading junk', url: 'https://www.rmg.co.uk/collections/objects/rmgc-object-6901', note: '后世中国商船模型的舱口、绞盘与桅座构件比较资料，不能直接证明明代郑和船的布局。' },
-    rig: { title: '长荣海事博物馆·郑和宝船', url: 'https://www.evergreenmuseum.org.tw/collection/79', note: '馆藏为现代研究推论模型，采用九桅十二帆；不能据此确认二千料尺度的帆装。本项目目前为九桅九主帆示意，未复制该馆模型。' },
+    rig: { title: '长荣海事博物馆·郑和宝船', url: 'https://www.evergreenmuseum.org.tw/collection/79', note: '馆藏为现代研究推论模型，采用九桅十二帆；不能据此确认二千料尺度的帆装。本项目目前为九桅九帆示意，未复制该馆模型。' },
     fuchuan: {title:'《古今图书集成·戎政典》大福船图说',url:'https://www.shidianguji.com/zh/mid-page/7597182380151406602',note:'清代汇编中的大福船比较材料：艉楼、露台、梯道与栏护。所述为二桅福船，不能直接证明永宣宝船的楼层和帆装。'},
     tiangong: {title:'宋应星《天工开物·漕舫》',url:'https://zh.wikisource.org/zh-hant/天工開物/漕舫',note:'晚明漕船资料，记带竹条的分片篷、升降与减帆、桅顶穿索及麻索。用于构件原理比较，不照搬漕船桅数、材料和尺寸到宝船。'},
     shantung: {title:'Science Museum Group · 山东五桅商船模型（1933-670）',url:'https://collection.sciencemuseumgroup.org.uk/objects/co41902/model-of-a-5-masted-shantung-trading-junk',note:'1931—1933年后世船模，记密帆骨、多支控帆索。仅用于索具构件比较，不据此认定郑和宝船的支索方式。'},
-    novel: {title:'《三宝太监西洋记》第十五回（小说）',url:'https://zh.wikisource.org/zh-hant/三寶太監西洋記/015',note:'九桅与华丽殿宇见于小说叙述，不能作为实船测绘依据。本项目九桅九主帆继续作为展示假设。'},
+    foochow: {title:'Science Museum Group · 福州海船模型（1936-347）',url:'https://collection.sciencemuseumgroup.org.uk/objects/co41975/rigged-model-of-a-foochow-junk',note:'1936年制作、表现20世纪初福州海船的模型；主帆、首帆和艉帆分别编目。用于大小帆差异的比较，不作为郑和宝船帆装的直接证据。'},
+    songHull: {title:'泉州市文旅局 · 泉州湾宋代海船残体',url:'https://www.quanzhou.gov.cn/zfb/xxgk/zfxxgkzl/qzdt/qzyw/202402/t20240204_3002556.htm',note:'馆藏遗存的介绍记尖头方尾、尖底与多层船板。只作船体构造类型参照；不能据其残体恢复宝船的船楼和帆装。'},
+    novel: {title:'《三宝太监西洋记》第十五回（小说）',url:'https://zh.wikisource.org/zh-hant/三寶太監西洋記/015',note:'九桅与华丽殿宇见于小说叙述，不能作为实船测绘依据。本项目九桅九帆继续作为展示假设。'},
     bulkhead: { title: 'UNESCO·中国水密隔舱福船制造技艺', url: 'https://ich.unesco.org/en/RL/00321', note: '支持隔舱、木板连接及填缝技术；不提供郑和某艘船的隔舱数量与位置。' }
   };
   function variant(L, B, label, evidence, src) { return { L:L, B:B, label:label, evidence:evidence, src:src }; }
@@ -40,7 +42,7 @@ window.ZH_FLEET = (function () {
   types.baochuan.variants.recorded.sectionNote='吃水8米、干舷4米借用现代展示模型的深度解释，与本页尺制折算并非同一套完整测绘，属于组合示意。';
   var parts = [
     {id:'hull',name:'船体与龙骨',text:'纵向龙骨与弯曲横剖面支承船壳。模型采用尖底、首尾抬升的福船式轮廓；郑和宝船的具体船型仍有不同解释。',src:'museum'},
-    {id:'sails',name:'桅杆与硬帆',text:'主桅帆较高，首尾帆较小，桅座延伸入舱，帆骨接引帆索。五至九桅为展示假设，不随研究尺度自动获得历史依据；宝船目前为九桅九主帆，与长荣馆九桅十二帆复原不同。',src:'museum'},
+    {id:'sails',name:'桅杆与硬帆',text:'主桅帆较高，首尾帆较小，桅座延伸入舱，帆骨接引帆索。五至九桅为展示假设，不随研究尺度自动获得历史依据；宝船目前为九桅九帆，与长荣馆九桅十二帆复原不同。',src:'museum'},
     {id:'bulkheads',name:'水密隔舱',text:'横向舱壁将船内空间分隔，局部进水时可限制水的扩散。剖视显示连续龙骨材、肋骨、横梁、支柱和架高舱底板。货物在完整与剖视模式保持同一位置；舱数与配置是建模假设。',src:'bulkhead'},
     {id:'rudder',name:'艉舵',text:'艉部舵杆连接水下舵叶，改变水流方向以操纵航向。舵的大小、外形和悬挂方式仅作构造示意。',src:'museum'},
     {id:'anchor',name:'锚与绞盘',text:'船首配置锚、锚索与绞盘，便于理解停泊和收放过程。当前造型及数量是示意，不是出土锚的复制品。',src:'museum'},
@@ -56,8 +58,12 @@ window.ZH_FLEET = (function () {
       basis:'统一250艘教学编成（10/40/80/80/40），仅便于观察船型分工，不推断各次实际数量。七次共用相同假设，不能据此比较真实规模。'};
   }
   var refinedParts={
-    cabins:{text:'精修样板将三层艉楼拆为柱梁、围壁、真实窗洞与局部开启的木窗板，增加屋面露台、栏护、登楼梯及实际开孔的上层梯口。大福船图说只提供类型比较；三层、2.25米层高及窗格布置仍是建模假设，船内四层不等于甲板上四层楼。',src:'fuchuan'},
-    sails:{text:'精修样板显示分幅帆面、帆骨、上下帆杆、桅旁升帆滑轮与引向系缆点的多支控帆索。晚明漕船和后世船模仅提供构件比较；九桅九主帆、每帆八幅、帆材和索路尺寸均为展示选择，未完成航行工程验证。',src:'tiangong'}
+    hull:{text:'精修样板拓宽既有方艉封板，衔接船板与护舷材，并补出船壳的实际厚度。宋代遗存仅作类型参照；本模型160毫米船壳厚度、具体线型和艉部尺寸仍是建模假设。',src:'songHull'},
+    cabins:{text:'三层艉楼的前部逐层退让，下层围壁较封闭，上层设较轻的浅拱遮蔽顶，保留两处真实梯口。卧铺、工作室、瞭望位及层高均是布局假设。梁端设斜撑、柱脚设承托；舱口盖分片后靠舷堆放，为通行留出空间。',src:'fuchuan'},
+    sails:{text:'精修样板区分主帆、首帆和艉帆的比例、上帆杆斜度与5—9幅分段，主桅移至中线，每幅帆骨尾端连接控帆索。前部辅帆可查看展开、半收与收拢三种状态。九桅九帆、桅位与帆形仍是假设；收帆示范只表现构件位置，不计算风载、绳长约束或操纵力。',src:'tiangong'},
+    bulkheads:{text:'剖视保留肋骨、梁、纵向承托与货物位置，并为原来的薄片隔舱补出120毫米厚度。厚度是本模型选择；宋代遗存和传统技艺不提供郑和某艘船的确切舱数、板厚或布局。',src:'songHull'},
+    rudder:{text:'舵杆上端延至艉部平台，短舵柄与舵承之间留出操作位置。舵叶比例、悬挂方式和平台均为构造示意；尚未验证转舵所需机械增益、升降机构或受力。',src:'craft'},
+    anchor:{text:'绞盘前移，避开前部舱口，锚缆经舷侧导缆点引向绞盘。操作位与主甲板通路已用人体尺度做局部净空检查；这不替代完整的作业流程或船舶工程验证。',src:'craft'}
   };
   return {refinedParts:refinedParts,chiToM:.311, sources:sources, types:types, parts:parts, voyages:voyages,
     caution:'示意复原：尺度方案与船体细节的证据不同。船楼、帆装和内部布局未有完整原船图纸，勿作精确历史模型。'};
