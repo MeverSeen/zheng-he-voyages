@@ -6,8 +6,9 @@ import bpy, json, hashlib, argparse, sys, tempfile, os, struct, math
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[2]
 DEFAULT_OUT=ROOT/'assets/ships'
-p=argparse.ArgumentParser();p.add_argument('--master',type=Path,default=ROOT/'models/baochuan/baochuan-master.blend');p.add_argument('--out',type=Path,default=DEFAULT_OUT);p.add_argument('--no-bake',action='store_true',help='Geometry smoke tests only, requires a separate --out');args=p.parse_args(sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else [])
-master=args.master.resolve();out=args.out.resolve()
+p=argparse.ArgumentParser();p.add_argument('--ship',default='baochuan',choices=['baochuan','machuan','liangchuan','zuochuan','zhanchuan']);p.add_argument('--master',type=Path);p.add_argument('--out',type=Path,default=DEFAULT_OUT);p.add_argument('--no-bake',action='store_true',help='Geometry smoke tests only, requires a separate --out');args=p.parse_args(sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else [])
+ship_id=args.ship
+master=(args.master or ROOT/'models'/ship_id/f'{ship_id}-master.blend').resolve();out=args.out.resolve()
 if args.no_bake and out==DEFAULT_OUT.resolve():raise RuntimeError('--no-bake is only allowed for isolated test output')
 source_hash=hashlib.sha256(master.read_bytes()).hexdigest()
 bpy.ops.wm.open_mainfile(filepath=str(master))
@@ -56,9 +57,9 @@ def bake_normals(candidates,correspondence,collection,mode,stage):
     select(candidates);bpy.ops.object.mode_set(mode='EDIT');bpy.ops.mesh.select_all(action='SELECT')
     bpy.ops.uv.select_all(action='SELECT');bpy.ops.uv.pack_islands(rotate=True,scale=True,margin=.015)
     bpy.ops.object.mode_set(mode='OBJECT')
-    image=bpy.data.images.new('Baochuan '+mode+' detail normals',width=1024,height=1024,alpha=False)
+    image=bpy.data.images.new(ship_id+' '+mode+' detail normals',width=1024,height=1024,alpha=False)
     image.generated_color=(.5,.5,1,1);image.colorspace_settings.name='Non-Color'
-    color=bpy.data.images.new('Baochuan '+mode+' material colors',width=1024,height=1024,alpha=False)
+    color=bpy.data.images.new(ship_id+' '+mode+' material colors',width=1024,height=1024,alpha=False)
     color.generated_color=(.15,.10,.06,1);color.colorspace_settings.name='sRGB'
     materials=set()
     for o in candidates:
@@ -107,8 +108,8 @@ def bake_normals(candidates,correspondence,collection,mode,stage):
         m.node_tree.links.new(normal.outputs['Normal'],nodes.get('Principled BSDF').inputs['Normal'])
         texture=nodes.new('ShaderNodeTexImage');texture.name='Web color bake';texture.image=color
         m.node_tree.links.new(texture.outputs['Color'],nodes.get('Principled BSDF').inputs['Base Color'])
-    image.filepath_raw=str(stage/f'baochuan-{mode}-normal.png');image.file_format='PNG';image.save();image.pack()
-    color.filepath_raw=str(stage/f'baochuan-{mode}-color.png');color.file_format='PNG';color.save();color.pack()
+    image.filepath_raw=str(stage/f'{ship_id}-{mode}-normal.png');image.file_format='PNG';image.save();image.pack()
+    color.filepath_raw=str(stage/f'{ship_id}-{mode}-color.png');color.file_format='PNG';color.save();color.pack()
     # A non-flat result is evidence that high-detail geometry was actually transferred.
     pixels=image.pixels[:];deviation=max(abs(pixels[i]-.5) for i in range(0,len(pixels),4))
     if deviation<.015:raise RuntimeError('Baked normal atlas is unexpectedly flat')
@@ -117,10 +118,11 @@ def bake_normals(candidates,correspondence,collection,mode,stage):
 out.parent.mkdir(parents=True,exist_ok=True)
 with tempfile.TemporaryDirectory(prefix='baochuan-export-',dir=out.parent) as tmp:
     stage=Path(tmp)
-    report={'schemaVersion':1,'source':{'master':os.path.relpath(master,ROOT),'sha256':source_hash,'baselineSha256':scene.get('baseline_sha256'),'pipelineVersion':scene.get('pipeline_version')},'testOnly':args.no_bake}
+    report={'schemaVersion':1,'typeId':ship_id,'source':{'master':os.path.relpath(master,ROOT),'sha256':source_hash,'baselineSha256':scene.get('baseline_sha256'),'pipelineVersion':scene.get('pipeline_version')},'testOnly':args.no_bake}
     for mode in ['full','section']:
-        original=bpy.data.objects.get('Baochuan_'+mode)
+        original=bpy.data.objects.get(ship_id.title()+'_'+mode)
         if not original:raise RuntimeError(f'Missing source root {mode}')
+        if json.loads(original['metadata'])['typeId']!=ship_id:raise RuntimeError('Master ship type does not match output type')
         source=[original]+list(original.children_recursive);high_tris=triangles(source)
         collection=bpy.data.collections.new('WEB_'+mode);scene.collection.children.link(collection)
         copies={};materials={};correspondence={};candidates=[]
@@ -156,7 +158,7 @@ with tempfile.TemporaryDirectory(prefix='baochuan-export-',dir=out.parent) as tm
         normal=bake_normals(candidates,correspondence,collection,mode,stage) if not args.no_bake else None
         color=normal.pop('colorTexture') if normal else None
         select(list(copies.values()))
-        file=stage/f'baochuan-{mode}.glb'
+        file=stage/f'{ship_id}-{mode}.glb'
         bpy.ops.export_scene.gltf(filepath=str(file),use_selection=True,export_format='GLB',export_extras=True,export_yup=True,export_apply=True,export_materials='EXPORT')
         meta=json.loads(root['metadata'])
         report[mode]={'triangles':web_tris,'masterTriangles':high_tris,'dimensions':{'L':meta['L'],'B':meta['B']},'file':file.name,'sha256':digest(file),'normalTexture':normal,'colorTexture':color}
@@ -165,9 +167,10 @@ with tempfile.TemporaryDirectory(prefix='baochuan-export-',dir=out.parent) as tm
     for mode in ['full','section']:
         data=(stage/report[mode]['file']).read_bytes();length=struct.unpack_from('<I',data,12)[0];gltf=json.loads(data[20:20+length])
         if any('uri' in b for b in gltf.get('buffers',[])+gltf.get('images',[])):raise RuntimeError('Export must not depend on external resources')
-    (stage/'baochuan-report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
+    report_file=f'{ship_id}-report.json'
+    (stage/report_file).write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
     out.mkdir(parents=True,exist_ok=True)
     for f in stage.iterdir():
-        if f.name!='baochuan-report.json':os.replace(f,out/f.name)
-    os.replace(stage/'baochuan-report.json',out/'baochuan-report.json')
+        if f.name!=report_file:os.replace(f,out/f.name)
+    os.replace(stage/report_file,out/report_file)
 print(json.dumps(report,ensure_ascii=False,indent=2))

@@ -2,8 +2,8 @@
 import bpy, bmesh, json, hashlib, sys, argparse
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[2]
-p=argparse.ArgumentParser();p.add_argument('--master',type=Path,default=ROOT/'models/baochuan/baochuan-master.blend');args=p.parse_args(sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else [])
-master=args.master.resolve();baseline=ROOT/'models/baochuan/generated/baochuan-baseline.blend'
+p=argparse.ArgumentParser();p.add_argument('--ship',default='baochuan',choices=['baochuan','machuan','liangchuan','zuochuan','zhanchuan']);p.add_argument('--master',type=Path);args=p.parse_args(sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else [])
+master=(args.master or ROOT/'models'/args.ship/f'{args.ship}-master.blend').resolve();baseline=ROOT/'models'/args.ship/'generated'/f'{args.ship}-baseline.blend'
 if master.exists():raise RuntimeError(f'Master already exists and will not be overwritten: {master}')
 bpy.ops.wm.open_mainfile(filepath=str(baseline))
 scene=bpy.context.scene;scene['artifact_role']='authoring_master';scene['baseline_sha256']=hashlib.sha256(baseline.read_bytes()).hexdigest();scene['pipeline_version']=1
@@ -11,15 +11,15 @@ bevel_prefixes=('Exposed post','Door jamb','Front panel','Window sill wall','Win
 for o in bpy.data.objects:
     if o.type!='MESH':continue
     # Detail modifiers remain editable and are intentionally omitted from the web control mesh.
-    if o.name.startswith(bevel_prefixes):
+    if args.ship=='baochuan' and o.name.startswith(bevel_prefixes):
         bevel=o.modifiers.new('DETAIL_Timber edge rounding','BEVEL');bevel.width=min(.018,min(o.dimensions)*.12);bevel.segments=3;bevel.limit_method='ANGLE'
         o['bake_normal']=True
-    if o.name.startswith('Battened sail panels'):
+    if args.ship=='baochuan' and o.name.startswith('Battened sail panels'):
         # Join coincident bay boundaries before subdivision, retaining the control shape.
         bm=bmesh.new();bm.from_mesh(o.data);bmesh.ops.remove_doubles(bm,verts=list(bm.verts),dist=.000001);bm.to_mesh(o.data);bm.free()
         sub=o.modifiers.new('DETAIL_Sail surface smoothing','SUBSURF');sub.levels=2;sub.render_levels=2;sub.boundary_smooth='PRESERVE_CORNERS'
     if o.parent and o.parent.get('feature')=='rig':o['authoring_note']='Control mesh editable; DETAIL_ modifiers are master-only.'
-for name in ['Baochuan_full','Baochuan_section']:
+for name in [args.ship.title()+'_full',args.ship.title()+'_section']:
     bpy.data.objects[name]['source_role']='master'
 scene['workflow']='Edit this master. Export reads it without saving. Regenerating the baseline never changes it. DETAIL_ modifiers are master-only; WEB_ modifiers are web-only; other shape modifiers are kept.'
 bpy.context.preferences.filepaths.save_version=1

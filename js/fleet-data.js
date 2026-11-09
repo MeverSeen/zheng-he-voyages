@@ -65,6 +65,21 @@ window.ZH_FLEET = (function () {
     rudder:{text:'舵杆上端延至艉部平台，短舵柄与舵承之间留出操作位置。舵叶比例、悬挂方式和平台均为构造示意；尚未验证转舵所需机械增益、升降机构或受力。',src:'craft'},
     anchor:{text:'绞盘前移，避开前部舱口，锚缆经舷侧导缆点引向绞盘。操作位与主甲板通路已用人体尺度做局部净空检查；这不替代完整的作业流程或船舶工程验证。',src:'craft'}
   };
-  return {refinedParts:refinedParts,chiToM:.311, sources:sources, types:types, parts:parts, voyages:voyages,
+  var fleetRefinedCommon={
+    hull:{text:'独立精修模型采用分带船板、护舷材与有厚度的船壳，保留尖底和方艉的类型示意。各船尺度、板厚和具体线型为建模选择，不能据此认定原船实制。',src:'songHull'},
+    sails:{text:'按主帆、首帆、艉帆区分比例、斜顶、帆肚与5—8幅分段，帆骨尾端连接控帆支索。前部一面辅帆提供展开、半收与收拢示范，只表现构件位置。五至八桅的船型体系和具体索路仍为假设，未计算受力或绳长守恒。',src:'tiangong'},
+    bulkheads:{text:'剖视显示有厚度的隔舱、肋骨、甲板梁、支柱和架高舱底板。隔舱取120毫米厚是本模型选择；货物和床位在完整与剖视中保持原位，布局不代表原船测绘。',src:'bulkhead'},
+    rudder:{text:'舵杆延至艉部操作平台，配短舵柄和支承。平台、舵叶比例和悬挂仍为示意，未核算机械增益、升降方式或操舵载荷。',src:'craft'},
+    anchor:{text:'船首锚索经舷侧导缆点接入绞盘，绞盘避开前舱口；舱口盖分片叠放，战船窄处将盖板转向后放在开口后方。主甲板通路与绞盘操作位进行局部净空检查，不等同于完整作业流程验证。',src:'craft'}
+  };
+  var fleetCabins={
+    machuan:'马船采用两层艉楼与退让露台，舱内配置空马栏、侧栏和饲槽，表示马匹运输的用途分配。马栏尺寸、饲喂方式、通风与载运能力未获原船资料证实；模型未模拟装卸马匹或动物活动。',
+    liangchuan:'粮船采用一层低艉楼，舱内设置架高垫板与分组粮袋，留出舱口和甲板通路。储粮分配、包装和防潮构造均为用途示意，未核算载重量、含水率或粮储管理。',
+    zuochuan:'坐船采用两层艉楼，舱内以独立卧铺、床脚与储物箱表现起居空间。楼高和床铺按人体尺度设置，人数、床位分配与通风安排仍是建模假设。',
+    zhanchuan:'战船采用一层紧凑艉楼，保留开敞甲板与侧部盾板，舱内配置器械柜和长杆器械。武备形式、数量与作战岗位为展示选择，不推定存在后世舷侧炮列。'
+  };
+  var refinedPartsByType={baochuan:refinedParts};
+  Object.keys(fleetCabins).forEach(id=>refinedPartsByType[id]={...fleetRefinedCommon,cabins:{text:fleetCabins[id],src:'museum'}});
+  return {refinedParts:refinedParts,refinedPartsByType:refinedPartsByType,chiToM:.311, sources:sources, types:types, parts:parts, voyages:voyages,
     caution:'示意复原：尺度方案与船体细节的证据不同。船楼、帆装和内部布局未有完整原船图纸，勿作精确历史模型。'};
 })();

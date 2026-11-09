@@ -2,19 +2,38 @@ import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import * as THREE from 'three';
 import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js';
 import {disposeObject} from './ships.js';
-// Build embeds both GLBs so the standalone page never fetches model files.
-const urls=typeof __SHIP_ASSETS__!=='undefined'?__SHIP_ASSETS__:{full:'assets/ships/baochuan-full.glb',section:'assets/ships/baochuan-section.glb'};
-const cache=new Map();
-export async function prepareBlenderShips({loader=new GLTFLoader()}={}){
-  await Promise.all(Object.entries(urls).map(async([key,url])=>{
-    const gltf=await loader.loadAsync(url);
-    let root;gltf.scene.traverse(o=>{if(o.userData.metadata)root=o;});
-    if(!root)throw new Error('Ship metadata missing');
-    cache.set(key,root);
-  }));
+import {shipTypes,shipModes} from './ship-assets.js';
+// The offline build embeds every ship, but only the selected pair is decoded.
+const urls=typeof __SHIP_ASSETS__!=='undefined'?__SHIP_ASSETS__:Object.fromEntries(shipTypes.map(id=>[id,Object.fromEntries(shipModes.map(mode=>[mode,`assets/ships/${id}-${mode}.glb`]))]));
+const cache=new Map(),pending=new Map(),typeEpoch=new Map();let generation=0;
+export async function prepareBlenderShips({loader=new GLTFLoader(),typeId='baochuan'}={}){
+  if(!shipTypes.includes(typeId))throw new Error('Unknown ship '+typeId);
+  const keys=shipModes.map(mode=>typeId+':'+mode);
+  if(keys.every(key=>cache.has(key)))return true;
+  if(pending.has(typeId))return pending.get(typeId);
+  if(!urls[typeId]||!shipModes.every(mode=>typeof urls[typeId][mode]==='string'))throw new Error('Ship assets missing for '+typeId);
+  const epoch=generation,localEpoch=typeEpoch.get(typeId)||0;
+  const load=(async()=>{
+    const roots=await Promise.allSettled(shipModes.map(async mode=>{
+      const gltf=await loader.loadAsync(urls[typeId][mode]);
+      let root;gltf.scene.traverse(o=>{if(o.userData.metadata)root=o;});
+      if(!root||JSON.parse(root.userData.metadata).typeId!==typeId){disposeObject(gltf.scene);throw new Error('Ship metadata mismatch');}
+      return [typeId+':'+mode,root];
+    }));
+    const error=roots.find(r=>r.status==='rejected');
+    if(error||epoch!==generation||localEpoch!==(typeEpoch.get(typeId)||0)){
+      for(const r of roots)if(r.status==='fulfilled')disposeCachedRoot(r.value[1]);
+      if(error)throw error.reason;
+      return false;
+    }
+    for(const r of roots)cache.set(...r.value);
+    return true;
+  })();
+  pending.set(typeId,load);
+  try{return await load;}finally{if(pending.get(typeId)===load)pending.delete(typeId);}
 }
-export function buildBlenderShip(cutaway=false){
-  const source=cache.get(cutaway?'section':'full');if(!source)return null;
+export function buildBlenderShip(cutaway=false,typeId='baochuan'){
+  const source=cache.get(typeId+':'+(cutaway?'section':'full'));if(!source)return null;
   const root=source.clone(true),metadata=JSON.parse(root.userData.metadata),groups={},materialCopies=new Map();
   // Instances own geometry/materials; cached textures are shared until the cache is disposed.
   const cloneMaterial=m=>{if(!materialCopies.has(m.uuid))materialCopies.set(m.uuid,m.clone());return materialCopies.get(m.uuid);};
@@ -51,12 +70,22 @@ export function setBlenderSailState(root,state='set'){
   root.traverse(o=>{if(o.userData.sail_demo&&o.userData.sail_state)o.visible=o.userData.sail_state===state;});
   root.userData.sailState=state;
 }
-export function disposeBlenderShips(){
+function disposeCachedRoot(root){
   const textures=new Set();
-  for(const root of cache.values()){
-    root.traverse(o=>{if(o.material)for(const m of (Array.isArray(o.material)?o.material:[o.material]))for(const value of Object.values(m))if(value?.isTexture)textures.add(value);});
-    disposeObject(root);
-  }
+  root.traverse(o=>{if(o.material)for(const m of (Array.isArray(o.material)?o.material:[o.material]))for(const value of Object.values(m))if(value?.isTexture)textures.add(value);});
+  disposeObject(root);
   for(const texture of textures){texture.dispose();texture.image?.close?.();}
-  cache.clear();
+}
+export function releaseBlenderShip(typeId){
+  typeEpoch.set(typeId,(typeEpoch.get(typeId)||0)+1);
+  pending.delete(typeId);
+  for(const mode of shipModes){
+    const key=typeId+':'+mode,root=cache.get(key);
+    if(root){disposeCachedRoot(root);cache.delete(key);}
+  }
+}
+export function disposeBlenderShips(){
+  generation++;
+  for(const typeId of shipTypes)releaseBlenderShip(typeId);
+  cache.clear();pending.clear();
 }

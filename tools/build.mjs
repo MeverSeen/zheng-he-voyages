@@ -2,8 +2,9 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import {build} from 'esbuild';
-import {checkShipAssets} from './check-ship-assets.mjs';
-checkShipAssets();
+import {checkAllShipAssets} from './check-ship-assets.mjs';
+import {shipTypes,shipModes} from '../three/ship-assets.js';
+checkAllShipAssets();
 const root=path.resolve(import.meta.dirname,'..'),dist=path.join(root,'dist');
 const read=p=>fs.readFileSync(path.join(root,p),'utf8');
 const safeJs=s=>s.replace(/<\/script/gi,'<\\/script');
@@ -18,7 +19,7 @@ for(const page of ['index','voyages','fleet','world']) {
   html=html.replace(/<link rel="stylesheet" href="((?:vendor|css|worldmap)\/[^"]+)">/g,(_,href)=>'<style>\n'+read(href)+'\n</style>');
   html=html.replace(/<script src="([^"]+)"><\/script>/g,(_,src)=>'<script>\n'+safeJs(read(src))+'\n</script>');
   for(const match of [...html.matchAll(/<script type="module" src="([^"]+)"><\/script>/g)]) {
-    const result=await build({entryPoints:[path.join(root,match[1])],bundle:true,format:'iife',minify:true,write:false,alias:aliases,legalComments:'inline',define:{__SHIP_ASSETS__:JSON.stringify(Object.fromEntries(['full','section'].map(k=>[k,'data:model/gltf-binary;base64,'+fs.readFileSync(path.join(root,'assets/ships/baochuan-'+k+'.glb')).toString('base64')])))}});
+    const result=await build({entryPoints:[path.join(root,match[1])],bundle:true,format:'iife',minify:true,write:false,alias:aliases,legalComments:'inline',define:{__SHIP_ASSETS__:JSON.stringify(Object.fromEntries(shipTypes.map(id=>[id,Object.fromEntries(shipModes.map(mode=>[mode,'data:model/gltf-binary;base64,'+fs.readFileSync(path.join(root,`assets/ships/${id}-${mode}.glb`)).toString('base64')]))])))}});
     html=html.replace(match[0],()=>'<script>\n'+safeJs(result.outputFiles[0].text)+'\n</script>');
   }
   html=html.replace(/<script type="importmap">[\s\S]*?<\/script>/g,'');
@@ -31,6 +32,6 @@ for(const page of ['index','voyages','fleet','world']) {
 }
 if(!artifactOut) {
   const target=path.join(dist,'artifact');fs.mkdirSync(target,{recursive:true});
-  for(const name of ['index.html','voyages.html','fleet.html','world.html','css','js','three','vendor','data','assets','worldmap'])fs.cpSync(path.join(root,name),path.join(target,name),{recursive:true,filter:src=>!src.endsWith('.blend')&&!src.endsWith('.blend1')&&!(/baochuan-(preview|deckhouse|rig)\.png$/.test(src))&&!/worldmap[\\/](data|scripts)/.test(src)&&!src.endsWith('.mjs')});
+  for(const name of ['index.html','voyages.html','fleet.html','world.html','css','js','three','vendor','data','assets','worldmap'])fs.cpSync(path.join(root,name),path.join(target,name),{recursive:true,filter:src=>!src.endsWith('.blend')&&!src.endsWith('.blend1')&&!(/(baochuan|machuan|liangchuan|zuochuan|zhanchuan)-(preview|deckhouse|rig|section)\.png$/.test(src))&&!/worldmap[\\/](data|scripts)/.test(src)&&!src.endsWith('.mjs')});
   console.log('dist/artifact: multi-file static site');
 }

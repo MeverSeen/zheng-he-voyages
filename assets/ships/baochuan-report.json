@@ -1,5 +1,6 @@
 {
   "schemaVersion": 1,
+  "typeId": "baochuan",
   "source": {
     "master": "models/baochuan/baochuan-master.blend",
     "sha256": "0176a33a5ac4e1685fbb1d0ef386cce7dd9e06c154bc860da9b96580632fb985",
