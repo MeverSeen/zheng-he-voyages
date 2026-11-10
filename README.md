@@ -2,6 +2,8 @@
 
 本站用交互地图、图表和三维模型，详细呈现郑和于明永乐三年至宣德八年（1405—1433）七次下西洋的经过：航线、停靠港口、分船队（分䑸）去向、重要事件、当时的世界政局、各次人员与船队，以及船只复原。
 
+**在线浏览：<https://meverseen.github.io/zheng-he-voyages/>**
+
 ## 页面
 
 | 页面 | 内容 |
@@ -43,7 +45,7 @@
 ## 打开方式
 
 - **离线单文件**：`dist/` 下的 `index.html`、`world.html`、`voyages.html`、`fleet.html` 都已内联全部脚本、样式和数据（天下全图内嵌地形底图，舰队页内嵌宝船模型），双击即可浏览。几个文件放在同一目录，就可以互相跳转。`dist/zheng-he-voyages-standalone.html` 是航海图的兼容文件名。
-- **GitHub Pages**：在仓库 Settings → Pages 中选择 `main` 分支的根目录，即可通过 `https://<用户名>.github.io/<仓库名>/` 访问。
+- **在线**：<https://meverseen.github.io/zheng-he-voyages/>，由 GitHub Pages 从 `main` 分支根目录发布，推送后一两分钟内更新。离线单文件也可在线下载，例如 <https://meverseen.github.io/zheng-he-voyages/dist/index.html>。
 - **本地服务**：
 
   ```bash
@@ -74,7 +76,11 @@ npm run build
   npm i -D playwright && npx playwright install chromium
   ```
 
-  每个页面在桌面 1440×900、手机 390×844 和昼夜两种配色下打开，再执行几步典型操作（切换航次、回放、点选政权、切换标签、切换舰队等）。脚本检查控制台报错、请求失败和横向滚动，截图存在 `.screens/`。源码页面和 `dist/` 离线单文件各检查一遍；Google Fonts 一律拦截，按字体无法访问的情况检查。
+  每个页面在桌面 1440×900、手机 390×844 和昼夜两种配色下打开，再执行几步典型操作（切换航次、回放、点选政权、切换标签、切换舰队等）。脚本检查控制台报错、请求失败和横向滚动，截图存在 `.screens/`。源码页面和 `dist/` 离线单文件各检查一遍；Google Fonts 一律拦截，按字体无法访问的情况检查。检查线上网站：
+
+  ```bash
+  node tools/check-pages.mjs --url https://meverseen.github.io/zheng-he-voyages/
+  ```
 
 修改 `js/data.js` 后运行 `npm run check`。修改政局数据 `worldmap/polities/1415.mjs` 后，要重新生成政局文件：
 

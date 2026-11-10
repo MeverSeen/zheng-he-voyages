@@ -3,6 +3,7 @@
 //
 //   node tools/check-pages.mjs              检查源码页面（脚本自带静态服务器）
 //   node tools/check-pages.mjs --dist       检查 dist/ 下的离线单文件（file://，先运行 npm run build）
+//   node tools/check-pages.mjs --url https://meverseen.github.io/zheng-he-voyages/   检查线上网站
 //   --out <目录>   截图目录，默认 .screens/（已加入 .gitignore）
 //   --pages a,b    只检查部分页面，如 --pages world,fleet
 //
@@ -15,7 +16,7 @@ import {createRequire} from 'node:module';
 
 const root = path.resolve(import.meta.dirname, '..');
 const args = process.argv.slice(2), opt = (k, d) => { const i = args.indexOf(k); return i >= 0 ? args[i + 1] : d; };
-const dist = args.includes('--dist');
+const dist = args.includes('--dist'), url = opt('--url');
 const out = path.resolve(root, opt('--out', '.screens'));
 let chromium;
 try { ({chromium} = createRequire(import.meta.url)('playwright')); }
@@ -63,7 +64,8 @@ const VIEWPORTS = {
 // 源码模式用的静态服务器
 const TYPES = {'.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.jpg': 'image/jpeg', '.png': 'image/png', '.svg': 'image/svg+xml', '.glb': 'model/gltf-binary'};
 let server, base;
-if (dist) base = 'file://' + path.join(root, 'dist') + '/';
+if (url) base = url.endsWith('/') ? url : url + '/';
+else if (dist) base = 'file://' + path.join(root, 'dist') + '/';
 else {
   server = http.createServer((req, res) => {
     const file = path.join(root, decodeURIComponent(new URL(req.url, 'http://x').pathname));
@@ -109,6 +111,6 @@ for (const page of pages) for (const vp of Object.keys(VIEWPORTS)) {
 }
 await browser.close();
 server?.close();
-console.log(`\n${dist ? 'dist/ 离线单文件' : '源码页面'}：${pages.join('、')}；截图在 ${path.relative(root, out) || '.'}/`);
+console.log(`\n${url ? '线上 ' + base : dist ? 'dist/ 离线单文件' : '源码页面'}：${pages.join('、')}；截图在 ${path.relative(root, out) || '.'}/`);
 console.log(failed ? `${failed} 项有问题` : '全部通过：无报错、无横向滚动');
 process.exit(failed ? 1 : 0);
