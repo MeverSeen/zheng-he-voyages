@@ -4,12 +4,13 @@
   "type": "module",
   "scripts": {
     "build": "node tools/build.mjs && node tools/check-build.mjs",
-    "check": "node tools/check-fleet.mjs && node tools/check-blender-ships.mjs && node tools/check-routes.mjs",
+    "check": "node tools/check-fleet.mjs && node tools/check-all-blender-ships.mjs && node tools/check-routes.mjs",
     "model:baseline": "node tools/ship-pipeline.mjs baseline",
     "model:init-master": "node tools/ship-pipeline.mjs init-master",
     "model:export": "node tools/ship-pipeline.mjs export",
     "model:render": "node tools/ship-pipeline.mjs render",
     "model:check": "node tools/ship-pipeline.mjs check",
+    "model:all": "node tools/ship-pipeline.mjs rebuild-all",
     "check:pages": "node tools/check-pages.mjs && node tools/check-pages.mjs --dist"
   },
   "devDependencies": {

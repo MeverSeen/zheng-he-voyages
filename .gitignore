@@ -4,7 +4,7 @@ node_modules/
 dist/artifact/
 
 # Reproducible Blender interchange and automatic backup
-tools/blender/baochuan-base.json
+tools/blender/*-base.json
 *.blend1
 
 # 世界底图原始下载数据（worldmap/scripts/fetch_world.py 生成）

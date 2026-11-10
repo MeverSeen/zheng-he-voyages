@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 1,
+  "typeId": "liangchuan",
+  "source": {
+    "master": "models/liangchuan/liangchuan-master.blend",
+    "sha256": "57c4644607047a234f04b11a5e999d2f9e7958277cb8ee8071394401e52ba417",
+    "baselineSha256": "f8f59d763e5d907111faeb262176a447e46b7c6f07a4b19854683738e252b7e6",
+    "pipelineVersion": 1
+  },
+  "testOnly": false,
+  "full": {
+    "triangles": 24624,
+    "masterTriangles": 47584,
+    "dimensions": {
+      "L": 43,
+      "B": 11.8
+    },
+    "file": "liangchuan-full.glb",
+    "sha256": "2a88684a099398d77d9b210ac25fc01ebc46cf761bfeddb7f9db6616932b52f0",
+    "normalTexture": {
+      "file": "liangchuan-full-normal.png",
+      "width": 1024,
+      "height": 1024,
+      "objects": 128,
+      "sha256": "cbc9f70fb1d3098beeb8ca6d910c810f5db5a420f61869c417c173efa9290258",
+      "maxRedDeviation": 0.5
+    },
+    "colorTexture": {
+      "file": "liangchuan-full-color.png",
+      "width": 1024,
+      "height": 1024,
+      "sha256": "6e6d5befa90e72f34c09b3420059f2ffb524a27a011c9cb59f02cc35c00cf5bb"
+    }
+  },
+  "section": {
+    "triangles": 18736,
+    "masterTriangles": 37472,
+    "dimensions": {
+      "L": 43,
+      "B": 11.8
+    },
+    "file": "liangchuan-section.glb",
+    "sha256": "4559d4902efebfc1900f3393bd164933598d6295847aed0ac3bc2871c8e7997e",
+    "normalTexture": {
+      "file": "liangchuan-section-normal.png",
+      "width": 1024,
+      "height": 1024,
+      "objects": 103,
+      "sha256": "777878fbfbff08070a5f0276d73cdfebe293cf44e6da161173ecf82cc44b67b3",
+      "maxRedDeviation": 0.5
+    },
+    "colorTexture": {
+      "file": "liangchuan-section-color.png",
+      "width": 1024,
+      "height": 1024,
+      "sha256": "103731e176e4c89f63f8aa4399037fec8b7d4c9fb072c9724e4c74d50d21cd86"
+    }
+  }
+}

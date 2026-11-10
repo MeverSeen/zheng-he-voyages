@@ -86,29 +86,35 @@ node worldmap/scripts/build_polities.mjs 1415 --center ming --ports js/data.js
 
 ## Blender 母版与网页模型
 
-二千料尺度宝船默认使用 Blender 导出的网页模型，可关闭精修选项对照参数化版本。现在将三类资产分开保存：
+五类船均使用独立 Blender 母版；单船页默认尝试加载对应的网页模型，可关闭“精修模型”对照参数化版本。舰队总览仍使用轻量实例模型。每类船分为三组资产：
 
 | 用途 | 文件 | 更新方式 |
 | --- | --- | --- |
-| 可再生成的参数底稿 | `models/baochuan/generated/baochuan-baseline.blend` | `npm run model:baseline`，只更新底稿 |
-| 独立精修母版 | `models/baochuan/baochuan-master.blend` | 在 Blender 中编辑、保存；无三万面限制 |
-| 网页完整/剖视模型 | `assets/ships/baochuan-full.glb`、`baochuan-section.glb` | `npm run model:export` 从已保存母版导出 |
+| 可再生成的参数底稿 | `models/<ship>/generated/<ship>-baseline.blend` | `npm run model:baseline -- --ship <ship>`，只更新底稿 |
+| 独立精修母版 | `models/<ship>/<ship>-master.blend` | 在 Blender 中编辑、保存；无三万面限制 |
+| 网页完整/剖视模型 | `assets/ships/<ship>-{full,section}.glb` | `npm run model:export -- --ship <ship>` 从已保存母版导出 |
 
-日常精修时，打开母版编辑并保存，然后运行：
+日常精修时，打开对应母版编辑并保存，然后运行（以下以马船为例）：
 
 ```bash
-npm run model:export
+npm run model:export -- --ship machuan
+npm run model:render -- --ship machuan
+npm run model:check -- --ship machuan
 npm run check
 npm run build
 ```
 
-`npm run model:init-master` 只用于母版不存在时的首次初始化，已有母版会拒绝覆盖。重新生成参数底稿不会更新母版或网页资产；导出也不改写母版。完整/剖视的船楼木构件倒角已分别烘焙为1024像素法线图并嵌入GLB。网页保留三万面预算；母版的细分和倒角可独立调整。
+`npm run model:init-master -- --ship <ship>` 只用于该船母版不存在时的首次初始化，已有文件会拒绝覆盖。重新生成参数底稿不会更新母版或网页资产；导出也不改写母版。网页保留三万面预算；母版的细分和倒角可独立调整。
+
+`npm run model:all` 会重建五类参数底稿，只为缺失的母版初始化，然后从已保存母版导出、渲染。它不会将已有母版退回参数版本。若生成脚本改变了造型，应先制作研究副本并检查，再明确采用到母版。
 
 `npm run model:render` 生成母版与实际网页GLB的检查图；`npm run model:check` 验证底稿隔离、禁止覆盖母版、编辑传递和只读导出。需要安装 Blender；非默认安装路径可用 `BLENDER_BIN` 指定。模型资产记录母版指纹，母版修改后未重新导出时，网页构建会提示先导出。
 
-详细的修改器约定、烘焙范围和编辑步骤见 [母版工作说明](models/baochuan/README.md)。原 `assets/ships/baochuan.blend` 已迁移为独立底稿与母版，后续精修应打开上表中的母版文件。
+详细的修改器约定、烘焙范围和五类船操作步骤见 [母版工作说明](models/README.md)。后续精修应打开各船目录中的母版文件，不能以网页GLB或参数底稿覆盖它。
 
-形制核对见 `docs/FLEET-PLAN.md`；九桅九主帆、三层艉楼及细部尺寸仍为建模假设。制作流程调整没有改变这些历史依据的边界。
+形制核对见 `docs/FLEET-PLAN.md`；九桅九帆、三层艉楼及细部尺寸仍为建模假设。制作流程调整没有改变这些历史依据的边界。
+
+2026-11-05已完成宝船的船楼、帆装与操作空间调整。2026-11-06开始将马船、粮船、坐船、战船迁入同一母版流程；其用途布局、资料边界和验收状态见 [五类船重建记录](docs/FLEET-REBUILD-2026-11-06.md)。
 
 ## 目录结构
 

@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 1,
+  "typeId": "zuochuan",
+  "source": {
+    "master": "models/zuochuan/zuochuan-master.blend",
+    "sha256": "850d647fa2937cfb2bc803a3a6276d9486ad23bdcacb5e7053fa99196b1233f9",
+    "baselineSha256": "f00a2d00081b8d673761673f3f05328c89b6b5b192e6623ad19d45e850cc5849",
+    "pipelineVersion": 1
+  },
+  "testOnly": false,
+  "full": {
+    "triangles": 20840,
+    "masterTriangles": 51336,
+    "dimensions": {
+      "L": 37,
+      "B": 8.8
+    },
+    "file": "zuochuan-full.glb",
+    "sha256": "8fb0d86d12c562ac9882ff402655a2dc02113afaed5de9a9180b8b73f8c01549",
+    "normalTexture": {
+      "file": "zuochuan-full-normal.png",
+      "width": 1024,
+      "height": 1024,
+      "objects": 174,
+      "sha256": "6d38995c7ce8b44c37990b8bc5d537eb32b17605d4c4ca8084e564a3dc7ca645",
+      "maxRedDeviation": 0.5
+    },
+    "colorTexture": {
+      "file": "zuochuan-full-color.png",
+      "width": 1024,
+      "height": 1024,
+      "sha256": "e9e2ce8d9f8f0e73431e0d5df847661f68edc01b5102c16c3b2a25c2d3b1a519"
+    }
+  },
+  "section": {
+    "triangles": 14704,
+    "masterTriangles": 38864,
+    "dimensions": {
+      "L": 37,
+      "B": 8.8
+    },
+    "file": "zuochuan-section.glb",
+    "sha256": "9f371f7fb83c46ff437dfdfb9fdb0429214bd5962bbff9d22c2f0cb1502d990e",
+    "normalTexture": {
+      "file": "zuochuan-section-normal.png",
+      "width": 1024,
+      "height": 1024,
+      "objects": 136,
+      "sha256": "0b97ed8dc50198f13d75038d23294daa7c5176aa7826fe96be5c35574e097772",
+      "maxRedDeviation": 0.5
+    },
+    "colorTexture": {
+      "file": "zuochuan-section-color.png",
+      "width": 1024,
+      "height": 1024,
+      "sha256": "e7cfe6490679ef50cdd50028f75c96aae5df834736cdadbcddb6e28f124a86d8"
+    }
+  }
+}

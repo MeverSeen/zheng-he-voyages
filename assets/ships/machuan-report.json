@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 1,
+  "typeId": "machuan",
+  "source": {
+    "master": "models/machuan/machuan-master.blend",
+    "sha256": "c0823511cf0c5d8ef2dd9a53c35942a6856962e00423f639bf592841c0057cd9",
+    "baselineSha256": "3b4cd69aef5a38f2148a59db850e9737dd6347b2293ebb2d9143b59dfe06e146",
+    "pipelineVersion": 1
+  },
+  "testOnly": false,
+  "full": {
+    "triangles": 23628,
+    "masterTriangles": 58844,
+    "dimensions": {
+      "L": 49,
+      "B": 11.5
+    },
+    "file": "machuan-full.glb",
+    "sha256": "f81ce53aed9056505119a93e9f8eadaf22d91f7833a20bd87e6e805f9d7786ce",
+    "normalTexture": {
+      "file": "machuan-full-normal.png",
+      "width": 1024,
+      "height": 1024,
+      "objects": 199,
+      "sha256": "27ca90ee8563420c332a1bda20558640e7c5470c6317cf36603494927368c2e7",
+      "maxRedDeviation": 0.4843
+    },
+    "colorTexture": {
+      "file": "machuan-full-color.png",
+      "width": 1024,
+      "height": 1024,
+      "sha256": "b477ee8f3259ccba6638c6575a06d2b91aa95a9ad427e7d1766706111bede39f"
+    }
+  },
+  "section": {
+    "triangles": 17340,
+    "masterTriangles": 44812,
+    "dimensions": {
+      "L": 49,
+      "B": 11.5
+    },
+    "file": "machuan-section.glb",
+    "sha256": "8a465b7a6bf20bad8bb6f9cafa29018dc9d43e773599b0a93702d68e0d6ad1ea",
+    "normalTexture": {
+      "file": "machuan-section-normal.png",
+      "width": 1024,
+      "height": 1024,
+      "objects": 153,
+      "sha256": "b0d3359cae27a5208b3983c333f1c91f180d3e91e9d61a8966291672c1973554",
+      "maxRedDeviation": 0.5
+    },
+    "colorTexture": {
+      "file": "machuan-section-color.png",
+      "width": 1024,
+      "height": 1024,
+      "sha256": "4f361cd9b55e661f5a0e1f57858c907b46a1c611706378dda8d63dbd314cc801"
+    }
+  }
+}
