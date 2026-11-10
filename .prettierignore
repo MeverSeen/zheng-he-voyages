@@ -1,0 +1,15 @@
+# Limit formatting to the fleet review files.
+**
+!.prettierrc.json
+!fleet.html
+!css/
+!css/fleet.css
+!three/
+!three/fleet-page.js
+!three/fleet.js
+!three/scene.js
+!three/ships.js
+!three/blender-ships.js
+!js/
+!js/fleet-data.js
+!js/fleet-info.js
