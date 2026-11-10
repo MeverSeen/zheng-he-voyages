@@ -2,10 +2,13 @@
 <html lang="zh-CN">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>舰队复原 · 七下西洋</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>郑和舰队复原</title>
+    <meta name="claude:viewport-fit-sides" content="cover" />
     <meta name="description" content="郑和船只的三维示意复原：船体、硬帆、隔舱与艉舵，以及七次船队数量记载。" />
-    <!-- prettier-ignore -->
+    
+    
+    
     <style>
 /*
  * 郑和七下西洋 · 共用样式（设计令牌、页眉导航、按钮、引文、印章标记、表格）
@@ -249,7 +252,6 @@ figcaption { font-size: var(--t-xs); color: var(--muted); font-family: var(--f-u
 }
 
 </style>
-    <!-- prettier-ignore -->
     <style>
 :root {
   --wood: #6b4528;
@@ -257,46 +259,35 @@ figcaption { font-size: var(--t-xs); color: var(--muted); font-family: var(--f-u
   --sail: #d5bd86;
   --rope: #44392b;
 }
-* {
-  box-sizing: border-box;
-}
-body {
-  margin: 0;
-  background: var(--paper);
-  color: var(--ink);
-}
-button,
-select,
-input {
+:where(.fleet-page) button,
+:where(.fleet-page) select,
+:where(.fleet-page) input {
   font: inherit;
 }
-button,
-select {
+:where(.fleet-page) button,
+:where(.fleet-page) select {
   color: var(--ink);
   background: var(--paper);
   border: 1px solid var(--rule);
   border-radius: 4px;
   padding: 7px 11px;
 }
-button {
+:where(.fleet-page) button {
   cursor: pointer;
 }
-button:hover {
+:where(.fleet-page) button:hover {
   border-color: var(--accent);
 }
-button[aria-pressed='true'] {
+:where(.fleet-page) button[aria-pressed='true'] {
   background: var(--accent);
   border-color: var(--accent);
   color: var(--paper);
 }
-button:focus-visible,
-select:focus-visible,
-input:focus-visible {
+:where(.fleet-page) button:focus-visible,
+:where(.fleet-page) select:focus-visible,
+:where(.fleet-page) input:focus-visible {
   outline: 3px solid var(--accent);
   outline-offset: 3px;
-}
-[hidden] {
-  display: none !important;
 }
 .fleet-page {
   max-width: 1600px;
@@ -643,9 +634,6 @@ input:focus-visible {
   .options {
     gap: 12px;
   }
-  .masthead {
-    flex-wrap: wrap;
-  }
 }
 
 </style>
@@ -724,7 +712,6 @@ input:focus-visible {
 })();
 
 </script>
-
   </head>
   <body data-page="fleet">
     <header class="masthead">
@@ -1502,10 +1489,10 @@ window.ZH_FLEET = (function () {
 #endif`,aomap_fragment:`#ifdef USE_AOMAP
 	float ambientOcclusion = ( texture2D( aoMap, vAoMapUv ).r - 1.0 ) * aoMapIntensity + 1.0;
 	reflectedLight.indirectDiffuse *= ambientOcclusion;
-	#if defined( USE_CLEARCOAT )
+	#if defined( USE_CLEARCOAT ) 
 		clearcoatSpecularIndirect *= ambientOcclusion;
 	#endif
-	#if defined( USE_SHEEN )
+	#if defined( USE_SHEEN ) 
 		sheenSpecularIndirect *= ambientOcclusion;
 	#endif
 	#if defined( USE_ENVMAP ) && defined( STANDARD )
@@ -1958,7 +1945,7 @@ vec4 LinearTosRGB( in vec4 value ) {
 	#else
 		uniform sampler2D envMap;
 	#endif
-
+	
 #endif`,envmap_pars_fragment:`#ifdef USE_ENVMAP
 	uniform float reflectivity;
 	#if defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( PHONG ) || defined( LAMBERT )
@@ -1975,7 +1962,7 @@ vec4 LinearTosRGB( in vec4 value ) {
 		#define ENV_WORLDPOS
 	#endif
 	#ifdef ENV_WORLDPOS
-
+		
 		varying vec3 vWorldPosition;
 	#else
 		varying vec3 vReflect;
@@ -2792,7 +2779,7 @@ IncidentLight directLight;
 	vec4 sampledDiffuseColor = texture2D( map, vMapUv );
 	#ifdef DECODE_VIDEO_TEXTURE
 		sampledDiffuseColor = vec4( mix( pow( sampledDiffuseColor.rgb * 0.9478672986 + vec3( 0.0521327014 ), vec3( 2.4 ) ), sampledDiffuseColor.rgb * 0.0773993808, vec3( lessThanEqual( sampledDiffuseColor.rgb, vec3( 0.04045 ) ) ) ), sampledDiffuseColor.w );
-
+	
 	#endif
 	diffuseColor *= sampledDiffuseColor;
 #endif`,map_pars_fragment:`#ifdef USE_MAP

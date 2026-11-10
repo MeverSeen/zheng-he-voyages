@@ -16,13 +16,13 @@ for(const page of ['index','voyages','fleet','world']) {
   let html=read(page+'.html');
   // 天下全图的地形底图由脚本加载，离线版改为内嵌（worldmap.js 优先读取 WM_RASTER_DATA）
   if(page==='world')html=html.replace('<script src="worldmap/worldmap.js"></script>',()=>'<script>window.WM_RASTER_DATA='+JSON.stringify(Object.fromEntries(['world','io'].map(k=>['assets/terrain_'+k+'.jpg','data:image/jpeg;base64,'+fs.readFileSync(path.join(root,'worldmap/assets/terrain_'+k+'.jpg')).toString('base64')])))+';</script>\n<script src="worldmap/worldmap.js"></script>');
-  html=html.replace(/<link rel="stylesheet" href="((?:vendor|css|worldmap)\/[^"]+)">/g,(_,href)=>'<style>\n'+read(href)+'\n</style>');
+  html=html.replace(/<link\s+rel="stylesheet"\s+href="((?:vendor|css|worldmap)\/[^"]+)"\s*\/?>/g,(_,href)=>'<style>\n'+read(href)+'\n</style>');
   html=html.replace(/<script src="([^"]+)"><\/script>/g,(_,src)=>'<script>\n'+safeJs(read(src))+'\n</script>');
   for(const match of [...html.matchAll(/<script type="module" src="([^"]+)"><\/script>/g)]) {
     const result=await build({entryPoints:[path.join(root,match[1])],bundle:true,format:'iife',minify:true,write:false,alias:aliases,legalComments:'inline',define:{__SHIP_ASSETS__:JSON.stringify(Object.fromEntries(shipTypes.map(id=>[id,Object.fromEntries(shipModes.map(mode=>[mode,'data:model/gltf-binary;base64,'+fs.readFileSync(path.join(root,`assets/ships/${id}-${mode}.glb`)).toString('base64')]))])))}});
     html=html.replace(match[0],()=>'<script>\n'+safeJs(result.outputFiles[0].text)+'\n</script>');
   }
-  html=html.replace(/<script type="importmap">[\s\S]*?<\/script>/g,'');
+  html=html.replace(/^[\t ]*<script type="importmap">[\s\S]*?<\/script>[\t ]*\n?/gm,'');
   // Font fallback is local; no network is required to render the offline pages.
   html=html.replace(/<link[^>]+href="https:\/\/fonts\.[^"]+"[^>]*>/g,'');
   if(artifactOut)html=html.replace(/<!doctype html>/i,'').replace(/<\/?(?:html|head|body)\b[^>]*>/gi,'');
