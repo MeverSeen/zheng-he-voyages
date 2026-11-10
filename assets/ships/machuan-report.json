@@ -3,57 +3,57 @@
   "typeId": "machuan",
   "source": {
     "master": "models/machuan/machuan-master.blend",
-    "sha256": "c0823511cf0c5d8ef2dd9a53c35942a6856962e00423f639bf592841c0057cd9",
+    "sha256": "04d6b94bcc36e47bf49f1d4890b84cc3397121c674f8b6b34dc9668eff5003c9",
     "baselineSha256": "3b4cd69aef5a38f2148a59db850e9737dd6347b2293ebb2d9143b59dfe06e146",
     "pipelineVersion": 1
   },
   "testOnly": false,
   "full": {
-    "triangles": 23628,
-    "masterTriangles": 58844,
+    "triangles": 24116,
+    "masterTriangles": 59684,
     "dimensions": {
       "L": 49,
       "B": 11.5
     },
     "file": "machuan-full.glb",
-    "sha256": "f81ce53aed9056505119a93e9f8eadaf22d91f7833a20bd87e6e805f9d7786ce",
+    "sha256": "f3386acc6838113b320a21d9f713d5b536a0877483607630b993be57caa978c9",
     "normalTexture": {
       "file": "machuan-full-normal.png",
       "width": 1024,
       "height": 1024,
-      "objects": 199,
-      "sha256": "27ca90ee8563420c332a1bda20558640e7c5470c6317cf36603494927368c2e7",
+      "objects": 201,
+      "sha256": "1d6e9a90e434097ebd9db8755b16935899a5010740f04ece68597d87a85cf3be",
       "maxRedDeviation": 0.4843
     },
     "colorTexture": {
       "file": "machuan-full-color.png",
       "width": 1024,
       "height": 1024,
-      "sha256": "b477ee8f3259ccba6638c6575a06d2b91aa95a9ad427e7d1766706111bede39f"
+      "sha256": "09b1998378835586a7825a2c8c96b8989bfc1181d7fa8c1b33586b0bbb34d833"
     }
   },
   "section": {
-    "triangles": 17340,
-    "masterTriangles": 44812,
+    "triangles": 17596,
+    "masterTriangles": 45244,
     "dimensions": {
       "L": 49,
       "B": 11.5
     },
     "file": "machuan-section.glb",
-    "sha256": "8a465b7a6bf20bad8bb6f9cafa29018dc9d43e773599b0a93702d68e0d6ad1ea",
+    "sha256": "724a332da54840a029fb2be45a5b10e9a03c574f0b361011c40712295ac7cb78",
     "normalTexture": {
       "file": "machuan-section-normal.png",
       "width": 1024,
       "height": 1024,
-      "objects": 153,
-      "sha256": "b0d3359cae27a5208b3983c333f1c91f180d3e91e9d61a8966291672c1973554",
-      "maxRedDeviation": 0.5
+      "objects": 154,
+      "sha256": "19856aaf8e5f10f484aa9cfca367091ce7994bbf28180f80fce9532d954168fc",
+      "maxRedDeviation": 0.4961
     },
     "colorTexture": {
       "file": "machuan-section-color.png",
       "width": 1024,
       "height": 1024,
-      "sha256": "4f361cd9b55e661f5a0e1f57858c907b46a1c611706378dda8d63dbd314cc801"
+      "sha256": "70ed43006ce250ea44d571fb684d7ba1840d69da9c1b95a2363b4d8c46952cf3"
     }
   }
 }

@@ -11,10 +11,10 @@ bevel_prefixes=('Exposed post','Door jamb','Front panel','Window sill wall','Win
 for o in bpy.data.objects:
     if o.type!='MESH':continue
     # Detail modifiers remain editable and are intentionally omitted from the web control mesh.
-    if args.ship=='baochuan' and o.name.startswith(bevel_prefixes):
+    if args.ship=='baochuan' and o.name.startswith(bevel_prefixes) and not any(m.name.startswith('DETAIL_') for m in o.modifiers):
         bevel=o.modifiers.new('DETAIL_Timber edge rounding','BEVEL');bevel.width=min(.018,min(o.dimensions)*.12);bevel.segments=3;bevel.limit_method='ANGLE'
         o['bake_normal']=True
-    if args.ship=='baochuan' and o.name.startswith('Battened sail panels'):
+    if args.ship=='baochuan' and o.name.startswith('Battened sail panels') and not any(m.type=='SUBSURF' for m in o.modifiers):
         # Join coincident bay boundaries before subdivision, retaining the control shape.
         bm=bmesh.new();bm.from_mesh(o.data);bmesh.ops.remove_doubles(bm,verts=list(bm.verts),dist=.000001);bm.to_mesh(o.data);bm.free()
         sub=o.modifiers.new('DETAIL_Sail surface smoothing','SUBSURF');sub.levels=2;sub.render_levels=2;sub.boundary_smooth='PRESERVE_CORNERS'

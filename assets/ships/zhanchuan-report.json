@@ -3,57 +3,57 @@
   "typeId": "zhanchuan",
   "source": {
     "master": "models/zhanchuan/zhanchuan-master.blend",
-    "sha256": "c82559c12786011568cae9995cb5496247bbbe2dfa564c3e767d2e95a0d43d76",
+    "sha256": "b19a6fa7605472aab601ca5ef72f16cd2c849a358fc8c6284e94a3eb3c2e6721",
     "baselineSha256": "602dacb8e441f165eccae33173e83eb6a279de68e9d032c70c3e7bfaa4b515ce",
     "pipelineVersion": 1
   },
   "testOnly": false,
   "full": {
-    "triangles": 18836,
-    "masterTriangles": 37780,
+    "triangles": 19264,
+    "masterTriangles": 38560,
     "dimensions": {
       "L": 30,
       "B": 6.8
     },
     "file": "zhanchuan-full.glb",
-    "sha256": "edaac8d728f3c98585d69c75c75b8a163f53dae14382b695c633e5846eb6a40f",
+    "sha256": "146dc3dbc94a3fba6cd01db50b222dd83a955f011c72ad23be8d8fde6a95c25a",
     "normalTexture": {
       "file": "zhanchuan-full-normal.png",
       "width": 1024,
       "height": 1024,
-      "objects": 107,
-      "sha256": "0e2bfb8bd5d35bf1df7cb564b7488323235937ed348ed97d66fc5a3ee3303ec3",
-      "maxRedDeviation": 0.4882
+      "objects": 109,
+      "sha256": "d49c0838f3bc7160cb957bbc75d4e1bc3ae48691728db60f604bd39ad96293a5",
+      "maxRedDeviation": 0.5
     },
     "colorTexture": {
       "file": "zhanchuan-full-color.png",
       "width": 1024,
       "height": 1024,
-      "sha256": "9a33a291a6df11bab63e620c92b6785d73ba87f0bcd27f23813ff30696fc75e0"
+      "sha256": "79527ef680b3b52234e4d5f4834913c9942858dfa549d2b7ccac02cdb470c4c3"
     }
   },
   "section": {
-    "triangles": 13044,
-    "masterTriangles": 28820,
+    "triangles": 13276,
+    "masterTriangles": 29228,
     "dimensions": {
       "L": 30,
       "B": 6.8
     },
     "file": "zhanchuan-section.glb",
-    "sha256": "dc8913acbde4b15af4bbe8bfa37a4c0eaa9e424168b640d8f3ee50a9206f2588",
+    "sha256": "d3b6dd8424033dc91f24fd4c0c34ac18e5288268e70d30a0cbcac8270be5d21f",
     "normalTexture": {
       "file": "zhanchuan-section-normal.png",
       "width": 1024,
       "height": 1024,
-      "objects": 88,
-      "sha256": "350331ff4693266ae02632992f4f36cb396c7bb2612c096496efb8bf11fe313e",
+      "objects": 89,
+      "sha256": "304dfe0883386b6fce353217bbf6c98e3bf94cd75d077cf6df0fb52ae575389b",
       "maxRedDeviation": 0.5
     },
     "colorTexture": {
       "file": "zhanchuan-section-color.png",
       "width": 1024,
       "height": 1024,
-      "sha256": "275f77f753c96da85282e1aa10ffdf0d2f08f249366b0b75101a7578d526aab1"
+      "sha256": "979df0a7cc77901cde3dd5f01138ac77cf9410407dcefa8d039839bb5b5aff9c"
     }
   }
 }

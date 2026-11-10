@@ -4,23 +4,24 @@ from pathlib import Path
 from mathutils import Vector
 
 ROOT=Path(__file__).resolve().parents[2]
-p=argparse.ArgumentParser()
-p.add_argument('--ship',required=True,choices=['machuan','liangchuan','zuochuan','zhanchuan'])
-p.add_argument('--out',type=Path)
-args=p.parse_args(sys.argv[sys.argv.index('--')+1:])
-out=args.out or ROOT/'models'/args.ship/'generated'
-out.mkdir(parents=True,exist_ok=True)
-base_path=ROOT/'tools/blender'/f'{args.ship}-base.json'
-base=json.loads(base_path.read_text())
-bpy.ops.wm.read_factory_settings(use_empty=True)
-C=runpy.run_path(str(ROOT/'tools/blender/fleet-components.py'))
-mesh,box,rod,empty=(C[k] for k in ['mesh','box','rod','empty'])
-TIMBER,PANEL,DECK,DARK,ROPE,IRON,RED=(C[k] for k in ['TIMBER','PANEL','DECK','DARK','ROPE','IRON','RED'])
-SACK=C['material']('Woven grain sacks',(.32,.26,.14),.98)
-spec=base['full']['spec']
-L,B,D,F=(base['full']['metadata'][k] for k in ('L','B','D','F'))
-C['set_dimensions'](base['full']['metadata'])
-deck_y,width=C['deck_height'],C['hull_width']
+def configure(options):
+    global args, out, base_path, base, C, H, mesh, box, rod, empty
+    global TIMBER, PANEL, DECK, DARK, ROPE, IRON, RED, SACK, spec, L, B, D, F, deck_y, width
+    args = options
+    out = args.out or ROOT / 'models' / args.ship / 'generated'
+    out.mkdir(parents=True, exist_ok=True)
+    base_path = ROOT / 'tools/blender' / f'{args.ship}-base.json'
+    base = json.loads(base_path.read_text())
+    C = runpy.run_path(str(ROOT / 'tools/blender/fleet-components.py'))
+    H = runpy.run_path(str(ROOT / 'tools/blender/ship-form-geometry.py'))
+    mesh, box, rod, empty = (C[k] for k in ['mesh', 'box', 'rod', 'empty'])
+    TIMBER, PANEL, DECK, DARK, ROPE, IRON, RED = (C[k] for k in ['TIMBER', 'PANEL', 'DECK', 'DARK', 'ROPE', 'IRON', 'RED'])
+    SACK = C['material']('Woven grain sacks', (.32, .26, .14), .98)
+    spec = base['full']['spec']
+    L, B, D, F = (base['full']['metadata'][k] for k in ('L', 'B', 'D', 'F'))
+    C['set_dimensions'](base['full']['metadata'])
+    H['set_dimensions'](base['full']['metadata'])
+    deck_y, width = C['deck_height'], C['hull_width']
 
 def weld(obj):
     bm=bmesh.new();bm.from_mesh(obj.data)
@@ -36,32 +37,18 @@ def design(meta):
       'zhanchuan':[(-.445,-.34,.54,2.10,1.00,2,.70)]
     }[args.ship]
     house=[(a*L,f*L,w*B,h,f*L-landing,bays,win) for a,f,w,h,landing,bays,win in entries]
-    main_count=2 if spec['model']['masts']>=7 else 1
-    stations=spec['model']['rig']
-    mains=sorted(range(len(stations)),key=lambda i:stations[i][2],reverse=True)[:main_count]
-    rigs=[]
-    for i,(along,across,rise,breadth) in enumerate(stations):
-        x,z,height,sw=along*L,across*B,rise*L,breadth*L*.92
-        role='mizzen' if i==0 else 'main' if i in mains else 'fore' if i>=len(stations)-2 else 'auxiliary'
-        if L<40 and abs(across)>=.20:z=math.copysign(B*(.29 if along>.15 else .34),across)
-        if role=='main':
-            z=0
-            for h in meta['layout']['hatches']:
-                clearance=h['w']/2+.60
-                if abs(x-h['x'])<clearance:x=h['x']+clearance
-        panels=8 if role=='main' else 5 if role in ['fore','mizzen'] else 6
-        rigs.append((x,z,height,sw,panels,role))
+    rigs = rig_design(meta)
     return dict(house=house,houseBase=deck_y(house[0][0])+.30,rigs=rigs,
                 role=spec['model']['cargo'],basis='Comparative display hypothesis; not an original ship plan')
 
+def rig_design(meta):
+    return C['rig_design'](meta)
+
+
 def shell(meta,groups,section):
-    def surface(t,q,side):
-        x=(t-.5)*L;w=width(x);top=deck_y(x)
-        knots=[(0,0,-D),(.18,.30,-D*.88),(.40,.64,-D*.52),(.60,.78,-D*.25),(1,1,top)]
-        for a,b in zip(knots,knots[1:]):
-            if q<=b[0]+1e-9:
-                u=(q-a[0])/(b[0]-a[0]);return (x,a[2]+(b[2]-a[2])*u,side*w*(a[1]+(b[1]-a[1])*u))
-    N,bands=32,12
+    H['set_dimensions'](meta)
+    surface = H['surface']
+    N, bands = 32, 6
     thickness=.14 if L>40 else .12
     for side in [-1] if section else [-1,1]:
         verts=[surface(j/N,k/bands,side) for k in range(bands+1) for j in range(N+1)]
@@ -71,38 +58,78 @@ def shell(meta,groups,section):
                 a=k*(N+1)+j;f=(a,a+1,a+N+2,a+N+1);faces.append(f if side<0 else tuple(reversed(f)))
         o=mesh('Port planked shell' if side<0 else 'Starboard planked shell',verts,faces,groups['hull'],[TIMBER,PANEL],True)
         for f in o.data.polygons:f.material_index=(f.index//N)%3==0
-        weld(o);mod=o.modifiers.new('Hull plank thickness','SOLIDIFY');mod.thickness=thickness;mod.offset=-1
+        weld(o)
+        if sum(p.normal.y for p in o.data.polygons) * (-side) < 0:
+            for polygon in o.data.polygons:
+                polygon.flip()
+        mod=o.modifiers.new('Hull plank thickness','SOLIDIFY');mod.thickness=thickness;mod.offset=-1
         o['shell_thickness']=thickness
         for q in [.50,.58,.66,.74,.82,.90,.98]:
             pts=[surface(j/N,q,side) for j in range(N+1)]
             verts=[(x,y+dy,z+side*.018) for x,y,z in pts for dy in [-.012,.012]]
             mesh('Caulk seam',verts,[(j*2,j*2+2,j*2+3,j*2+1) for j in range(N)],groups['hull'],[DARK])
-        for q in [.75,.94,1]:
+        for q in [.72, .86, .96, 1]:
             for j in range(N):
                 a,b=surface(j/N,q,side),surface((j+1)/N,q,side)
                 rod('Rubbing strake' if q<1 else 'Sheer cap',a,b,.075,groups['hull'],TIMBER)
-    for t in [0,1]:
-        pts=[surface(t,j/bands,-1) for j in range(bands+1)]
-        pts+= [(pts[-1][0],pts[-1][1],0)] if section else [surface(t,j/bands,1) for j in range(bands,-1,-1)]
-        o=mesh('Stern transom' if t==0 else 'Bow closure',pts,[tuple(range(len(pts)))],groups['hull'],[PANEL]);weld(o)
-        mod=o.modifiers.new('End planking thickness','SOLIDIFY');mod.thickness=thickness
-    rod('Keel',(-L*.49,-D,0),(L*.49,-D,0),.20,groups['hull'],DARK,6)
+    for t in [0, 1]:
+        profile = [surface(t, j / bands, -1) for j in range(bands + 1)]
+        profile += [surface(t, j / bands, 1) for j in range(bands, -1, -1)]
+        sides = [-1] if section else [-1, 1]
+        for side in sides:
+            slot = meta['form'].get('rudderSlotWidth', max(.64, B * .055)) / 2 if t == 0 else 0
+            pts = H['clip_transom'](profile, side, slot)
+            o = mesh('Stern transom' if t == 0 else 'Bow closure', pts,
+                     [tuple(range(len(pts)))], groups['hull'], [PANEL])
+            weld(o)
+            if sum(p.normal.x for p in o.data.polygons) * (-1 if t == 0 else 1) < 0:
+                for polygon in o.data.polygons:
+                    polygon.flip()
+            mod = o.modifiers.new('End planking thickness', 'SOLIDIFY')
+            mod.thickness = thickness
+            mod.offset = -1
+    keel_a = H['surface'](0, 0, -1)
+    keel_b = H['surface'](1, 0, -1)
+    rod('Keel', keel_a, keel_b, .20, groups['hull'], DARK, 6)
     meta['refinement']['structure']=dict(shellThickness=thickness,bulkheadThickness=.12,frameInset=.24,exactDimensions='model assumptions')
 
 def deck_and_frames(meta,groups,section):
     hatches=meta['layout']['hatches'];floor=-D*.42
     cuts=sorted(set([i/32 for i in range(33)]+[(h['x']+sign*h['w']/2)/L+.5 for h in hatches for sign in [-1,1]]))
-    for a,b in zip(cuts,cuts[1:]):
-        x=((a+b)/2-.5)*L;w=width(x);h=next((h for h in hatches if abs(x-h['x'])<h['w']/2),None)
-        ranges=[(-w,-h['d']/2),(h['d']/2,w)] if h else [(-w,w)]
-        for za,zb in ranges:
-            if section:zb=min(zb,0)
-            if zb>za:box('Main deck plank',x,deck_y(x)-.10,(za+zb)/2,(b-a)*L,.20,zb-za,groups['cabins'],DECK)
+    for a, b in zip(cuts, cuts[1:]):
+        x = ((a + b) / 2 - .5) * L
+        hatch = next((h for h in hatches if abs(x - h['x']) < h['w'] / 2), None)
+        # Each plank cell follows the actual shell at both longitudinal ends.
+        # Outer bottom corners also follow the flare and end rake.
+        ranges = [('port', -hatch['d'] / 2), (hatch['d'] / 2, 'starboard')] if hatch else [('port', 'starboard')]
+        for left, right in ranges:
+            if section:
+                if left != 'port' and left >= 0:
+                    continue
+                right = 0 if right == 'starboard' else min(0, right)
+            verts = []
+            for drop in [.20, 0]:
+                for t, edge in [(a, left), (b, left), (b, right), (a, right)]:
+                    _, top_width, top = H['shape'](t)
+                    yy = top - drop
+                    xx = H['station_x'](t, yy)
+                    ww = H['half_beam'](xx, yy) - .02
+                    zz = -ww if edge == 'port' else ww if edge == 'starboard' else edge
+                    verts.append((xx, yy, zz))
+            faces = [(0, 3, 2, 1), (4, 5, 6, 7), (0, 1, 5, 4), (3, 7, 6, 2), (0, 4, 7, 3), (1, 2, 6, 5)]
+            mesh('Main deck plank', verts, faces, groups['cabins'], [DECK])
     n=spec['model']['compartments']
     for i in range(1,n):
-        x=(i/n-.5)*L;w=width(x)*.96;top=deck_y(x)-.22
-        profile=[(-w,top),(-w*.78,-D*.25),(-w*.64,-D*.52),(0,-D)]
-        profile+= [(0,top)] if section else [(w*.64,-D*.52),(w*.78,-D*.25),(w,top)]
+        x = (i / n - .5) * L
+        top = deck_y(x) - .22
+        profile = [(0, -D + .24)]
+        port = []
+        for k in range(1, 7):
+            _, y, z = H['surface'](i / n, k / 6, -1)
+            y = min(top, y + .12)
+            port.append((-max(0, H['half_beam'](x, y) - .24), y))
+        profile = list(reversed(port)) + profile
+        profile += [(0, top)] if section else [(-z, y) for z, y in port]
         count=len(profile);verts=[(x+dx,y,z) for dx in [-.06,.06] for z,y in profile]
         faces=[tuple(reversed(range(count))),tuple(range(count,2*count))]+[(j,(j+1)%count,(j+1)%count+count,j+count) for j in range(count)]
         mesh('Structural bulkhead',verts,faces,groups['bulkheads'],[PANEL])
@@ -184,13 +211,7 @@ def cargo(meta,groups,section):
     meta['refinement']['purpose']=dict(kind=kind,placements=len(meta['layout']['cargo']),capacityVerified=False)
 
 def steering_and_anchors(meta,groups,section):
-    stern=deck_y(-L/2);stock=-L/2-.20
-    rod('Rudder stock',(stock,-D*1.2,0),(stock,stern+1.05,0),.19,groups['rudder'],TIMBER,8)
-    box('Rudder blade',stock-.35,-D*.4,0,L*.035,D*1.4,.22,groups['rudder'],PANEL,True)
-    rod('Tiller',(stock,stern+.95,0),(-L*.45,stern+.85,0),.10,groups['rudder'],TIMBER,6)
-    for z in [-.4,.4]:box('Rudder bearing',-L/2,stern+.35,z,.35,.70,.16,groups['rudder'],TIMBER,True)
-    # Leave the aft centreline for the tiller; the helmsman stands to port.
-    box('Steering platform',-L*.475,stern-.05,-.65 if section else 0,L*.04,.14,1.30 if section else 2.60,groups['rudder'],DECK)
+    C['build_rudder'](meta, groups, section)
     h=meta['layout']['hatches'][-1];wx=max(L*.37,h['x']+h['w']/2+1.4);wy=deck_y(wx)
     for z in [-.66,.66]:box('Windlass cheek',wx,wy+.48,z,.30,.96,.24,groups['anchor'],TIMBER,True)
     rod('Windlass barrel',(wx,wy+.83,-.95),(wx,wy+.83,.95),.22,groups['anchor'],DARK,10)
@@ -205,7 +226,6 @@ def steering_and_anchors(meta,groups,section):
         rod('Cable to windlass',lead,(wx,wy+.83,side*.82),.03,groups['anchor'],ROPE)
         box('Hawse bolster',*lead,.35,.20,.25,groups['anchor'],TIMBER,True)
     meta['refinement']['windlass']=dict(x=wx,z=0,hatchClearance=wx-.50-(h['x']+h['w']/2))
-    meta['refinement']['rudder']=dict(stockLength=stern+1.05+D*1.2,operation='short tiller; mechanical advantage unverified')
     lane=-(B*.11+.58)
     start=meta['design']['house'][0][1]+3.1;end=wx-1.1
     points=[dict(x=x,y=deck_y(x),z=lane) for x in [start+(end-start)*i/24 for i in range(25)]]
@@ -213,35 +233,46 @@ def steering_and_anchors(meta,groups,section):
     meta['refinement']['accessChecks']=[dict(id='main',label='主甲板通路',x=0,y=deck_y(0),z=lane,width=.65,headroom=1.70),
       dict(id='windlass',label='绞盘操作位',x=wx-.90,y=deck_y(wx-.90),z=-1.0,width=.65,headroom=1.70)]
 
-for mode in ['full','section']:
-    section=mode=='section';meta=base[mode]['metadata'];meta['design']=design(meta)
-    meta['refinement']=dict(revision=1,houseLevels=spec['model']['decks'],evidence='type comparison; exact dimensions and arrangement hypothetical')
-    root=bpy.data.objects.new(args.ship.title()+'_'+mode,None);bpy.context.scene.collection.objects.link(root)
-    groups={part:empty(part,root,'component') for part in ['hull','sails','bulkheads','rudder','anchor','cabins']}
-    for part,g in groups.items():g['part']=part
-    shell(meta,groups,section);deck_and_frames(meta,groups,section)
-    C['build_house'](meta,groups,section);C['build_rigs'](meta,groups,section)
-    cargo(meta,groups,section);steering_and_anchors(meta,groups,section)
-    root['metadata']=json.dumps(meta,separators=(',',':'))
-    root['source_role']='parameter_baseline'
-    coll=bpy.data.collections.new(root.name);bpy.context.scene.collection.children.link(coll)
-    for o in [root]+list(root.children_recursive):
-        for old in list(o.users_collection):old.objects.unlink(o)
-        coll.objects.link(o)
-    if section:coll.hide_render=True;coll.hide_viewport=True
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--ship', required=True, choices=['machuan', 'liangchuan', 'zuochuan', 'zhanchuan'])
+    parser.add_argument('--out', type=Path)
+    options = parser.parse_args(sys.argv[sys.argv.index('--') + 1:])
+    bpy.ops.wm.read_factory_settings(use_empty=True)
+    configure(options)
+    for mode in ['full','section']:
+        section=mode=='section';meta=base[mode]['metadata'];meta['design']=design(meta)
+        meta['refinement']=dict(revision=1,houseLevels=spec['model']['decks'],evidence='type comparison; exact dimensions and arrangement hypothetical')
+        root=bpy.data.objects.new(args.ship.title()+'_'+mode,None);bpy.context.scene.collection.objects.link(root)
+        groups={part:empty(part,root,'component') for part in ['hull','sails','bulkheads','rudder','anchor','cabins']}
+        for part,g in groups.items():g['part']=part
+        shell(meta,groups,section);deck_and_frames(meta,groups,section)
+        C['build_house'](meta,groups,section);C['build_rigs'](meta,groups,section)
+        cargo(meta,groups,section);steering_and_anchors(meta,groups,section)
+        root['metadata']=json.dumps(meta,separators=(',',':'))
+        root['source_role']='parameter_baseline'
+        coll=bpy.data.collections.new(root.name);bpy.context.scene.collection.children.link(coll)
+        for o in [root]+list(root.children_recursive):
+            for old in list(o.users_collection):old.objects.unlink(o)
+            coll.objects.link(o)
+        if section:coll.hide_render=True;coll.hide_viewport=True
 
-scene=bpy.context.scene;scene['artifact_role']='parameter_baseline';scene['ship_type']=args.ship;scene['baseline_input_sha256']=hashlib.sha256(base_path.read_bytes()).hexdigest()
-scene.unit_settings.system='METRIC';scene.unit_settings.scale_length=1
-scene.render.engine='CYCLES';scene.cycles.samples=16;scene.cycles.device='CPU';scene.world=bpy.data.worlds.new('Studio world');scene.world.color=(.28,.28,.28)
-cam=bpy.data.objects.new('Review camera',bpy.data.cameras.new('Review camera'));scene.collection.objects.link(cam);scene.camera=cam
-cam.location=(L*1.3,-L*1.6,L);target=Vector((0,0,L*.14));cam.rotation_euler=(target-cam.location).to_track_quat('-Z','Y').to_euler();cam.data.type='ORTHO';cam.data.ortho_scale=L*1.35
-for name,position,energy,size in [('Key',(L*.4,-L*.6,L),L*L*18,L*.7),('Fill',(-L*.5,L*.4,L*.6),L*L*12,L*.6)]:
-    light=bpy.data.lights.new(name,'AREA');o=bpy.data.objects.new(name,light);scene.collection.objects.link(o);o.location=position;o.rotation_euler=(Vector((0,0,F))-o.location).to_track_quat('-Z','Y').to_euler();light.energy=energy;light.size=size
-scene.render.resolution_x=1400;scene.render.resolution_y=1000;scene.render.resolution_percentage=100;scene.render.image_settings.file_format='PNG'
-for screen in bpy.data.screens:
-    for area in screen.areas:
-        if area.type=='VIEW_3D':
-            area.spaces.active.region_3d.view_distance=L*1.5;area.spaces.active.region_3d.view_location=target;area.spaces.active.region_3d.view_rotation=cam.rotation_euler.to_quaternion()
-bpy.context.preferences.filepaths.save_version=0
-bpy.ops.wm.save_as_mainfile(filepath=str(out/f'{args.ship}-baseline.blend'))
-print('Saved fleet baseline:',args.ship)
+    scene=bpy.context.scene;scene['artifact_role']='parameter_baseline';scene['ship_type']=args.ship;scene['baseline_input_sha256']=hashlib.sha256(base_path.read_bytes()).hexdigest()
+    scene.unit_settings.system='METRIC';scene.unit_settings.scale_length=1
+    scene.render.engine='CYCLES';scene.cycles.samples=16;scene.cycles.device='CPU';scene.world=bpy.data.worlds.new('Studio world');scene.world.color=(.28,.28,.28)
+    cam=bpy.data.objects.new('Review camera',bpy.data.cameras.new('Review camera'));scene.collection.objects.link(cam);scene.camera=cam
+    cam.location=(L*1.3,-L*1.6,L);target=Vector((0,0,L*.14));cam.rotation_euler=(target-cam.location).to_track_quat('-Z','Y').to_euler();cam.data.type='ORTHO';cam.data.ortho_scale=L*1.35
+    for name,position,energy,size in [('Key',(L*.4,-L*.6,L),L*L*18,L*.7),('Fill',(-L*.5,L*.4,L*.6),L*L*12,L*.6)]:
+        light=bpy.data.lights.new(name,'AREA');o=bpy.data.objects.new(name,light);scene.collection.objects.link(o);o.location=position;o.rotation_euler=(Vector((0,0,F))-o.location).to_track_quat('-Z','Y').to_euler();light.energy=energy;light.size=size
+    scene.render.resolution_x=1400;scene.render.resolution_y=1000;scene.render.resolution_percentage=100;scene.render.image_settings.file_format='PNG'
+    for screen in bpy.data.screens:
+        for area in screen.areas:
+            if area.type=='VIEW_3D':
+                area.spaces.active.region_3d.view_distance=L*1.5;area.spaces.active.region_3d.view_location=target;area.spaces.active.region_3d.view_rotation=cam.rotation_euler.to_quaternion()
+    bpy.context.preferences.filepaths.save_version=0
+    bpy.ops.wm.save_as_mainfile(filepath=str(out/f'{args.ship}-baseline.blend'))
+    print('Saved fleet baseline:',args.ship)
+
+
+if __name__ == '__main__':
+    main()

@@ -9,7 +9,36 @@ export function buildShip(typeId, { variant = 'estimated', lod = 0, cutaway = fa
   const { L, B } = dims,
     D = dims.draft ?? spec.model.draft,
     F = dims.freeboard ?? spec.model.freeboard,
-    segments = lod === 2 ? 14 : 48;
+    segments = lod === 2 ? 14 : 36;
+  // Shared form coefficients. The Blender builders use the same values in the
+  // baseline metadata; they are display/type comparisons, not a measured hull.
+  const form = {
+    sternTopWidthRatio: 0.58,
+    bowTopWidthRatio: 0.35,
+    endSlopeRatio: 0.035,
+    endBlendRatio: 0.12,
+    sectionPoints: 13,
+    rubbingStrakes: 3,
+    rudderSlotWidth: Math.max(0.64, B * 0.055),
+    widthCurve: { sinePower: 0.7, midshipRatio: 1 },
+    sectionKnots: [
+      { top: true, width: -1 },
+      { depth: 0.08, width: -0.99 },
+      { depth: 0.28, width: -0.95 },
+      { depth: 0.5, width: -0.83 },
+      { depth: 0.73, width: -0.58 },
+      { depth: 0.9, width: -0.27 },
+      { depth: 1, width: 0 },
+      { depth: 0.9, width: 0.27 },
+      { depth: 0.73, width: 0.58 },
+      { depth: 0.5, width: 0.83 },
+      { depth: 0.28, width: 0.95 },
+      { depth: 0.08, width: 0.99 },
+      { top: true, width: 1 },
+    ],
+    endRake: { sternBottomForward: 0.035, bowBottomAft: 0.035 },
+    frameInset: 0.24,
+  };
   const layout = { hatches: [], masts: [], cargo: [], decks: [] };
   const timber = Math.min(0.22, L * 0.0035),
     storey = 2.25;
@@ -46,6 +75,32 @@ export function buildShip(typeId, { variant = 'estimated', lod = 0, cutaway = fa
     m.position.set(x, y, z);
     return m;
   };
+  const deckPanel = (a, b, z0a, z1a, z0b, z1b) => {
+    const vertex = (t, drop, z) => {
+      const y = shape(t).y - drop,
+        shell = shellPoint(t, y, 1),
+        width = Math.max(0, shell[2] - 0.02);
+      return [shell[0], y, Math.max(-width, Math.min(width, z))];
+    };
+    const vertices = [
+      ...vertex(a, 0, z0a),
+      ...vertex(a, 0, z1a),
+      ...vertex(b, 0, z0b),
+      ...vertex(b, 0, z1b),
+      ...vertex(a, 0.2, z0a),
+      ...vertex(a, 0.2, z1a),
+      ...vertex(b, 0.2, z0b),
+      ...vertex(b, 0.2, z1b),
+    ];
+    const indices = [
+      0, 1, 2, 1, 3, 2, 4, 6, 5, 5, 6, 7, 0, 2, 4, 4, 2, 6, 1, 5, 3, 5, 7, 3, 0, 4, 1, 1, 4, 5, 2, 3, 6, 3, 7, 6,
+    ];
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+    geometry.setIndex(indices);
+    geometry.computeVertexNormals();
+    return mesh(geometry, mats.plank, groups.cabins);
+  };
   const rod = (a, b, r, mat, g) => {
     const av = new THREE.Vector3(...a),
       bv = new THREE.Vector3(...b),
@@ -56,30 +111,57 @@ export function buildShip(typeId, { variant = 'estimated', lod = 0, cutaway = fa
     return m;
   };
   function shape(t) {
-    const w = ((B * 0.5) / 1.0218) * (0.34 * (1 - t) + 0.1 * t + 0.8 * Math.pow(Math.sin(Math.PI * t), 0.65));
+    const endRatio = form.sternTopWidthRatio * (1 - t) + form.bowTopWidthRatio * t;
+    const halfBeamRatio =
+      endRatio + (form.widthCurve.midshipRatio - endRatio) * Math.pow(Math.sin(Math.PI * t), form.widthCurve.sinePower);
+    const w = B * 0.5 * halfBeamRatio;
     const sheer = F + L * (0.045 * Math.pow(1 - t, 5) + 0.032 * Math.pow(t, 6));
     return { x: (t - 0.5) * L, w, y: sheer };
   }
   function ring(t) {
     const s = shape(t);
+    const endX = (y) => {
+      const sternFade = Math.pow(Math.max(0, 1 - t / form.endBlendRatio), 2);
+      const bowFade = Math.pow(Math.max(0, 1 - (1 - t) / form.endBlendRatio), 2);
+      const depth = (s.y - y) / (s.y + D);
+      return s.x + L * depth * (form.endRake.sternBottomForward * sternFade - form.endRake.bowBottomAft * bowFade);
+    };
+    const point = (y, z) => [endX(y), y, z];
+    return form.sectionKnots.map((k) => point(k.top ? s.y : -D * k.depth, s.w * k.width));
+  }
+  // Interpolate directly on either half of the current thirteen-point shell.
+  // This keeps waterlines, plank lines and frames attached after an end rake.
+  function shellPoint(t, y, side) {
+    const r = ring(t);
+    const half = side < 0 ? r.slice(0, 7) : r.slice(6).reverse();
+    const clampedY = Math.max(-D, Math.min(shape(t).y, y));
+    for (let index = 0; index < half.length - 1; index++) {
+      const upper = half[index],
+        lower = half[index + 1];
+      if (clampedY <= upper[1] && clampedY >= lower[1]) {
+        const blend = (clampedY - upper[1]) / (lower[1] - upper[1]);
+        return upper.map((value, axis) => value + (lower[axis] - value) * blend);
+      }
+    }
+    return half.at(-1);
+  }
+  function framePoint(t, y, side) {
+    const point = shellPoint(t, y - 0.1, side);
+    if (point[2] === 0) return [point[0], point[1] + 0.1, 0];
     return [
-      [s.x, s.y, -s.w],
-      [s.x, -D * 0.25, -s.w * 0.78],
-      [s.x, -D * 0.88, -s.w * 0.3],
-      [s.x, -D, 0],
-      [s.x, -D * 0.88, s.w * 0.3],
-      [s.x, -D * 0.25, s.w * 0.78],
-      [s.x, s.y, s.w],
+      point[0],
+      point[1] + 0.1,
+      point[2] - Math.sign(point[2]) * Math.min(form.frameInset, Math.abs(point[2]) * 0.35),
     ];
   }
   const verts = [],
     idx = [];
   for (let i = 0; i <= segments; i++) ring(i / segments).forEach((p) => verts.push(...p));
   for (let i = 0; i < segments; i++)
-    for (let j = 0; j < 6; j++) {
-      if (cutaway && j >= 3) continue;
-      const a = i * 7 + j,
-        b = a + 7;
+    for (let j = 0; j < form.sectionPoints - 1; j++) {
+      if (cutaway && j >= 6) continue;
+      const a = i * form.sectionPoints + j,
+        b = a + form.sectionPoints;
       idx.push(a, b, a + 1, b, b + 1, a + 1);
     }
   const geo = new THREE.BufferGeometry();
@@ -88,20 +170,57 @@ export function buildShip(typeId, { variant = 'estimated', lod = 0, cutaway = fa
   geo.computeVertexNormals();
   mats.wood.side = THREE.DoubleSide;
   mesh(geo, mats.wood, groups.hull);
-  // Close the bow and transom with cross-section polygons.
-  for (const t of [0, 1]) {
-    const r = ring(t),
-      v = [];
-    for (let j = 1; j < r.length - 1; j++) {
-      if (cutaway && j >= 3) continue;
-      v.push(...r[0], ...r[j], ...r[j + 1]);
+  const sternRing = ring(0),
+    bowRing = ring(1);
+  layout.ends = {
+    stern: {
+      topX: sternRing[0][0],
+      bottomX: sternRing[6][0],
+      topWidth: sternRing[12][2] - sternRing[0][2],
+      slotWidth: form.rudderSlotWidth,
+    },
+    bow: { topX: bowRing[0][0], bottomX: bowRing[6][0], topWidth: bowRing[12][2] - bowRing[0][2] },
+  };
+  // Clip an end contour against a vertical Z plane. It keeps the stern slot
+  // geometrically empty instead of covering it with a dark placeholder.
+  function clipEndByZ(points, boundary, keepBelow) {
+    const clipped = [];
+    let previous = points.at(-1),
+      previousInside = keepBelow ? previous[2] <= boundary : previous[2] >= boundary;
+    for (const current of points) {
+      const currentInside = keepBelow ? current[2] <= boundary : current[2] >= boundary;
+      if (currentInside !== previousInside) {
+        const blend = (boundary - previous[2]) / (current[2] - previous[2]);
+        clipped.push(previous.map((value, index) => value + (current[index] - value) * blend));
+      }
+      if (currentInside) clipped.push(current);
+      previous = current;
+      previousInside = currentInside;
     }
+    return clipped;
+  }
+  function endPanel(points) {
+    if (points.length < 3) return;
+    const center = points
+      .reduce((sum, point) => sum.map((value, index) => value + point[index]), [0, 0, 0])
+      .map((value) => value / points.length);
+    const v = [];
+    for (let index = 0; index < points.length; index++)
+      v.push(...center, ...points[index], ...points[(index + 1) % points.length]);
     const g = new THREE.BufferGeometry();
     g.setAttribute('position', new THREE.Float32BufferAttribute(v, 3));
     g.computeVertexNormals();
     mesh(g, mats.wood, groups.hull);
   }
-  rod([-L * 0.49, -D, 0], [L * 0.49, -D, 0], L * 0.006, mats.dark, groups.hull);
+  // The transom has a through-slot on its centreline. A cutaway shows only
+  // the port half, while its bow closes cleanly to the section plane.
+  const slotHalf = form.rudderSlotWidth * 0.5;
+  const stern = ring(0);
+  endPanel(clipEndByZ(stern, -slotHalf, true));
+  if (!cutaway) endPanel(clipEndByZ(stern, slotHalf, false));
+  const bow = ring(1);
+  endPanel(cutaway ? clipEndByZ(bow, 0, true) : bow);
+  rod(ring(0)[6], ring(1)[6], L * 0.006, mats.dark, groups.hull);
   if (lod === 0)
     for (const side of [-1, 1]) {
       if (cutaway && side === 1) continue;
@@ -109,10 +228,10 @@ export function buildShip(typeId, { variant = 'estimated', lod = 0, cutaway = fa
         const points = [],
           q = k / 8;
         for (let i = 0; i <= segments; i++) {
-          const a = shape(i / segments);
-          points.push(
-            new THREE.Vector3(a.x, -D * 0.25 + (a.y + D * 0.25) * q, side * a.w * (0.78 + 0.22 * q) + side * 0.015),
-          );
+          const t = i / segments,
+            a = shape(t),
+            point = shellPoint(t, -D * 0.25 + (a.y + D * 0.25) * q, side);
+          points.push(new THREE.Vector3(point[0], point[1], point[2] + side * 0.015));
         }
         groups.hull.add(
           new THREE.Line(
@@ -125,7 +244,8 @@ export function buildShip(typeId, { variant = 'estimated', lod = 0, cutaway = fa
   // Hatch openings are real holes, shared by full and section geometry.
   const n = spec.model.compartments;
   for (const i of [...new Set([Math.floor(n * 0.34), Math.floor(n * 0.58), Math.floor(n * 0.78)])]) {
-    const x = ((i + 0.5) / n - 0.5) * L;
+    const firstWarHatch = typeId === 'zhanchuan' && i === Math.floor(n * 0.34);
+    const x = ((i + 0.5) / n - 0.5) * L + (firstWarHatch ? 0.4 : 0);
     layout.hatches.push({ x, z: 0, w: (L / n) * 0.52, d: B * 0.22, y: shape(x / L + 0.5).y });
   }
   const cuts = [
@@ -139,17 +259,22 @@ export function buildShip(typeId, { variant = 'estimated', lod = 0, cutaway = fa
       b = cuts[i + 1];
     if (b - a < 1e-8) continue;
     const mid = shape((a + b) / 2),
+      start = shape(a),
+      end = shape(b),
       hole = layout.hatches.find((h) => Math.abs(mid.x - h.x) < h.w / 2);
     const ranges = hole
       ? [
-          [-mid.w, -hole.d / 2],
-          [hole.d / 2, mid.w],
+          [-start.w, -hole.d / 2, -end.w, -hole.d / 2],
+          [hole.d / 2, start.w, hole.d / 2, end.w],
         ]
-      : [[-mid.w, mid.w]];
-    for (let [z0, z1] of ranges) {
-      if (cutaway) z1 = Math.min(z1, 0);
-      if (z1 <= z0) continue;
-      box(mid.x, mid.y - 0.1, (z0 + z1) / 2, (b - a) * L, 0.2, z1 - z0, mats.plank, groups.cabins);
+      : [[-start.w, start.w, -end.w, end.w]];
+    for (let [z0a, z1a, z0b, z1b] of ranges) {
+      if (cutaway) {
+        z1a = Math.min(z1a, 0);
+        z1b = Math.min(z1b, 0);
+      }
+      if (z1a <= z0a || z1b <= z0b) continue;
+      deckPanel(a, b, z0a, z1a, z0b, z1b);
     }
   }
   for (const h of layout.hatches) {
@@ -193,28 +318,42 @@ export function buildShip(typeId, { variant = 'estimated', lod = 0, cutaway = fa
     for (const side of [-1, 1]) {
       if (cutaway && side === 1) continue;
       for (let j = 0; j < segments; j++) {
-        const a = shape(j / segments),
-          b = shape((j + 1) / segments);
-        for (const level of [0.18, 0.6, 1])
-          rod([a.x, a.y * level, a.w * side], [b.x, b.y * level, b.w * side], L * 0.0024, mats.trim, groups.hull);
-        rod([a.x, a.y + F * 0.26, a.w * side], [b.x, b.y + F * 0.26, b.w * side], L * 0.0025, mats.red, groups.cabins);
-        if (j % 2 === 0)
-          rod([a.x, a.y, a.w * side], [a.x, a.y + F * 0.26, a.w * side], L * 0.0025, mats.red, groups.cabins);
+        const ta = j / segments,
+          tb = (j + 1) / segments,
+          a = shape(ta),
+          b = shape(tb);
+        for (const level of [0.18, 0.6, 1]) {
+          const pa = shellPoint(ta, a.y * level, side),
+            pb = shellPoint(tb, b.y * level, side);
+          pa[2] -= side * L * 0.0024;
+          pb[2] -= side * L * 0.0024;
+          rod(pa, pb, L * 0.0024, mats.trim, groups.hull);
+        }
+        const railA = shellPoint(ta, a.y, side),
+          railB = shellPoint(tb, b.y, side);
+        rod(
+          [railA[0], railA[1] + F * 0.26, railA[2]],
+          [railB[0], railB[1] + F * 0.26, railB[2]],
+          L * 0.0025,
+          mats.red,
+          groups.cabins,
+        );
+        if (j % 2 === 0) rod(railA, [railA[0], railA[1] + F * 0.26, railA[2]], L * 0.0025, mats.red, groups.cabins);
       }
     }
     for (let i = 1; i < spec.model.compartments; i++) {
       const t = i / spec.model.compartments,
         r = ring(t),
         v = [];
-      const end = cutaway ? 3 : 6;
+      const end = cutaway ? 6 : 12;
       for (let j = 1; j < end; j++) v.push(...r[0], ...r[j], ...r[j + 1]);
-      if (cutaway) v.push(...r[0], ...r[3], r[3][0], shape(t).y, 0);
+      if (cutaway) v.push(...r[0], ...r[6], r[6][0], shape(t).y, 0);
       const g = new THREE.BufferGeometry();
       g.setAttribute('position', new THREE.Float32BufferAttribute(v, 3));
       g.computeVertexNormals();
       mats.plank.side = THREE.DoubleSide;
       mesh(g, mats.plank, groups.bulkheads);
-      if (cutaway) for (let j = 0; j < 3; j++) rod(r[j], r[j + 1], L * 0.003, mats.dark, groups.bulkheads);
+      if (cutaway) for (let j = 0; j < 6; j++) rod(r[j], r[j + 1], L * 0.003, mats.dark, groups.bulkheads);
     }
   }
   // Frames, keelson, deck beams and a raised cargo sole remain in place in section.
@@ -224,7 +363,10 @@ export function buildShip(typeId, { variant = 'estimated', lod = 0, cutaway = fa
       const t = i / 24,
         r = ring(t),
         w = shape(t).w;
-      for (let j = 0; j < (cutaway ? 3 : 6); j++) rod(r[j], r[j + 1], timber * 0.5, mats.wood, groups.bulkheads);
+      for (let j = 0; j < (cutaway ? 6 : 12); j++) {
+        const side = j < 6 ? -1 : 1;
+        rod(framePoint(t, r[j][1], side), framePoint(t, r[j + 1][1], side), timber * 0.5, mats.wood, groups.bulkheads);
+      }
       const hatch = layout.hatches.find((h) => Math.abs(r[0][0] - h.x) < h.w / 2 + timber);
       for (let [a, b] of hatch
         ? [
@@ -350,8 +492,8 @@ export function buildShip(typeId, { variant = 'estimated', lod = 0, cutaway = fa
       }
     }
   detail = 'rig';
-  // Explicit unequal stations: main sails amidships, smaller end sails.
-  // This is a display hypothesis, not a historical rigging survey.
+  // Unequal stations retain smaller end sails. The balanced-lug-like outline,
+  // mast fraction and one-sided cloth belly are display hypotheses.
   const stations = spec.model.rig;
   for (const station of stations) {
     const [along, across, rise, breadth] = station,
@@ -364,7 +506,10 @@ export function buildShip(typeId, { variant = 'estimated', lod = 0, cutaway = fa
     const bottom = Math.max(base + height * 0.2, along < -0.4 ? houseBase + spec.model.decks * storey + 0.45 : 0),
       sh = base + height * 0.92 - bottom;
     const foot = across === 0 ? -D + 0.45 : -D * 0.2;
-    layout.masts.push({ x, z, base, height, sw, foot });
+    const sailFront = x + sw * 0.28;
+    const sailBack = x - sw * 0.72;
+    const mastFraction = (sailFront - x) / (sailFront - sailBack);
+    layout.masts.push({ x, z, base, height, sw, foot, sailFront, sailBack, mastFraction });
     rod([x, foot, z], [x + L * 0.008, base + height, z], L * 0.004, mats.wood, groups.sails);
     if (lod < 2) {
       box(x, foot - 0.1, z, L * 0.035, 0.4, B * 0.06, mats.dark, groups.bulkheads);
@@ -378,11 +523,11 @@ export function buildShip(typeId, { variant = 'estimated', lod = 0, cutaway = fa
       for (let c = 0; c <= cols; c++) {
         const u = c / cols,
           q = r / rows,
-          width = sw * (1 - 0.35 * q);
+          width = sailFront - sailBack;
         v.push(
-          x + (u - 0.18) * width + q * L * 0.008,
-          bottom + q * sh,
-          z + Math.sin(u * Math.PI) * sw * 0.12 + u * sw * 0.28,
+          sailFront - u * width + q * L * 0.008 - u * u * sw * 0.08,
+          bottom + q * sh + u * q * L * 0.024,
+          z + sw * (0.055 + Math.sin(u * Math.PI) * 0.12),
         );
       }
     for (let r = 0; r < rows; r++)
@@ -409,19 +554,75 @@ export function buildShip(typeId, { variant = 'estimated', lod = 0, cutaway = fa
         }
       }
     if (lod === 0) {
-      // Halyard and a fan of sheets lead from the battens to a deck belaying point.
+      // Halyard and sheets branch from the batten tails to one deck belaying
+      // point, following the same windward side as the cloth belly.
       rod([x, base + 0.4, z], [x + L * 0.008, base + height, z + L * 0.003], L * 0.0006, mats.rope, groups.sails);
       for (let r = 0; r < rows; r += 2) {
         const j = (r * (cols + 1) + cols) * 3;
-        rod(v.slice(j, j + 3), [x - sw * 0.28, base + 0.4, z + sw * 0.22], L * 0.00055, mats.rope, groups.sails);
+        rod(v.slice(j, j + 3), [x - sw * 0.5, base + 0.4, z + sw * 0.25], L * 0.00055, mats.rope, groups.sails);
       }
     }
   }
   detail = 'baseline';
-  // Stern rudder and head-stock.
-  rod([-L * 0.5, F * 1.3, 0], [-L * 0.5, -D * 1.25, 0], L * 0.006, mats.dark, groups.rudder);
-  box(-L * 0.505, -D * 0.45, 0, L * 0.043, D * 1.5, B * 0.025, mats.wood, groups.rudder);
-  rod([-L * 0.5, F * 1.3, 0], [-L * 0.4, F * 1.3, 0], L * 0.004, mats.dark, groups.rudder);
+  // Suspended lifting rudder: stock through a stern slot, broad blade below
+  // the keel, then a forward tiller beneath the stern platform.
+  const rudderTop = shape(0).y + 1.05;
+  const rudderBladeBottom = -D * 1.42;
+  const rudderStock = rudderTop - rudderBladeBottom;
+  const rudderX = -L * 0.5 + 0.2;
+  const rudder = {
+    stockX: rudderX,
+    stockBottom: rudderBladeBottom,
+    stockTop: rudderTop,
+    stockRadius: Math.min(0.29, L * 0.006),
+    bladeX: rudderX - L * 0.025,
+    bladeTop: -D * 0.25,
+    bladeY: (-D * 0.25 + rudderBladeBottom) / 2,
+    bladeWidth: L * 0.072,
+    bladeHeight: -D * 0.25 - rudderBladeBottom,
+    bladeThickness: Math.min(0.32, B * 0.025),
+    tillerEndX: -L * 0.45,
+  };
+  layout.rudder = {
+    ...rudder,
+    slotWidth: form.rudderSlotWidth,
+    slotX: rudderX,
+  };
+  // Timber cheeks frame the open slot. They are separate from the clipped
+  // transom faces, leaving water and the lifting stock a true central passage.
+  for (const side of [-1, 1])
+    box(
+      rudderX,
+      F * 0.38,
+      side * (layout.rudder.slotWidth * 0.5 + B * 0.018),
+      L * 0.02,
+      F * 1.25,
+      B * 0.035,
+      mats.dark,
+      groups.rudder,
+    );
+  rod([rudderX, rudderTop, 0], [rudderX, rudderBladeBottom, 0], rudder.stockRadius, mats.dark, groups.rudder);
+  box(
+    rudder.bladeX,
+    rudder.bladeY,
+    0,
+    rudder.bladeWidth,
+    rudder.bladeHeight,
+    rudder.bladeThickness,
+    mats.wood,
+    groups.rudder,
+  );
+  for (const y of [-D * 0.42, -D * 0.72, -D * 1.02])
+    box(rudderX, y, 0, L * 0.086, L * 0.012, rudder.bladeThickness + 0.09, mats.dark, groups.rudder);
+  for (const side of [-1, 1])
+    rod(
+      [rudder.bladeX, rudder.bladeTop, side * rudder.bladeThickness * 0.5],
+      [rudderX, rudderTop + F * 0.08, side * layout.rudder.slotWidth * 0.38],
+      L * 0.00075,
+      mats.rope,
+      groups.rudder,
+    );
+  rod([rudderX, rudderTop, 0], [rudder.tillerEndX, rudderTop, 0], L * 0.004, mats.dark, groups.rudder);
   // Paired stocked anchors at the bow, including shank, arms and cable.
   if (lod < 2)
     for (const side of [-1, 1]) {
@@ -465,11 +666,11 @@ export function buildShip(typeId, { variant = 'estimated', lod = 0, cutaway = fa
   for (const side of [-1, 1])
     for (let j = 0; j <= segments; j++) {
       const t = side === -1 ? j / segments : 1 - j / segments,
-        s = shape(t);
-      const q = (-0.15 + D * 0.25) / (s.y + D * 0.25);
-      waterline.push([s.x, side * s.w * (0.78 + 0.22 * q)]);
+        point = shellPoint(t, -0.15, side);
+      waterline.push([point[0], point[2]]);
     }
   ship.userData = {
+    formRevision: 4,
     waterline,
     typeId,
     variant,
@@ -479,6 +680,10 @@ export function buildShip(typeId, { variant = 'estimated', lod = 0, cutaway = fa
     D,
     F,
     layout,
+    form,
+    rudderStock,
+    rudderBladeBottom,
+    rudder,
     groups,
     anchors: {
       hull: [0, 0, B * 0.45],

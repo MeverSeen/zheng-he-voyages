@@ -45,13 +45,25 @@
     .join('');
   let refined = false,
     selectedPart = 'hull',
-    selectedShip = 'baochuan';
+    selectedShip = 'baochuan',
+    selectedVariant = 'estimated';
   function part(id) {
     selectedPart = id;
     const base = F.parts.find((p) => p.id === id) || F.parts[0],
       p = { ...base, ...(refined ? F.refinedPartsByType?.[selectedShip]?.[base.id] : {}) };
+    let text = p.text;
+    if (base.id === 'rudder') {
+      const ship = F.types[selectedShip],
+        variant = ship.variants[selectedVariant] || ship.variants.estimated,
+        draft = variant.draft ?? ship.model.draft,
+        freeboard = variant.freeboard ?? ship.model.freeboard,
+        stock = freeboard + variant.L * 0.045 + 1.05 + draft * 1.42;
+      text += ' 当前所选模型的舵杆长度为 ' + stock.toFixed(2) + ' 米。';
+      if (!text.includes('11.07'))
+        text += ' 1957年南京宝船厂遗址出土铁力木舵杆长11.07米；与本页两套尺度的对应关系未定，不能据此反推船长。';
+    }
     $('part-detail').innerHTML =
-      '<h4>' + p.name + '</h4><p>' + p.text + '</p><p class="source-link">依据：' + link(p.src) + '</p>';
+      '<h4>' + p.name + '</h4><p>' + text + '</p><p class="source-link">依据：' + link(p.src) + '</p>';
     document
       .querySelectorAll('[data-part]')
       .forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.part === p.id)));
@@ -59,6 +71,7 @@
   function ship(id, variant, options = {}) {
     refined = !!options.refined;
     selectedShip = id;
+    selectedVariant = variant;
     part(selectedPart);
     const s = F.types[id],
       v = s.variants[variant] || s.variants.estimated;

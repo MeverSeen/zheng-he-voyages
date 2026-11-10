@@ -3,57 +3,57 @@
   "typeId": "zuochuan",
   "source": {
     "master": "models/zuochuan/zuochuan-master.blend",
-    "sha256": "850d647fa2937cfb2bc803a3a6276d9486ad23bdcacb5e7053fa99196b1233f9",
+    "sha256": "146bddc1de0af6fd0b6c122673905be375c995afcd2ecab33738b73817d9c86f",
     "baselineSha256": "f00a2d00081b8d673761673f3f05328c89b6b5b192e6623ad19d45e850cc5849",
     "pipelineVersion": 1
   },
   "testOnly": false,
   "full": {
-    "triangles": 20840,
-    "masterTriangles": 51336,
+    "triangles": 21304,
+    "masterTriangles": 52152,
     "dimensions": {
       "L": 37,
       "B": 8.8
     },
     "file": "zuochuan-full.glb",
-    "sha256": "8fb0d86d12c562ac9882ff402655a2dc02113afaed5de9a9180b8b73f8c01549",
+    "sha256": "913e9e1b94079008c6e5379e054121727dbb5a324151e3c52bd70cc36532240f",
     "normalTexture": {
       "file": "zuochuan-full-normal.png",
       "width": 1024,
       "height": 1024,
-      "objects": 174,
-      "sha256": "6d38995c7ce8b44c37990b8bc5d537eb32b17605d4c4ca8084e564a3dc7ca645",
-      "maxRedDeviation": 0.5
+      "objects": 176,
+      "sha256": "86ef5dc00db525e97701bc6483481040fd794eac5bdfe215f97ed663cb444712",
+      "maxRedDeviation": 0.4843
     },
     "colorTexture": {
       "file": "zuochuan-full-color.png",
       "width": 1024,
       "height": 1024,
-      "sha256": "e9e2ce8d9f8f0e73431e0d5df847661f68edc01b5102c16c3b2a25c2d3b1a519"
+      "sha256": "af8efb050a10b44910bc5fb5c059685b5fde9d4a87b900a894ed70555f7e4df1"
     }
   },
   "section": {
-    "triangles": 14704,
-    "masterTriangles": 38864,
+    "triangles": 14948,
+    "masterTriangles": 39284,
     "dimensions": {
       "L": 37,
       "B": 8.8
     },
     "file": "zuochuan-section.glb",
-    "sha256": "9f371f7fb83c46ff437dfdfb9fdb0429214bd5962bbff9d22c2f0cb1502d990e",
+    "sha256": "94666c21ed9f6db23057a7ae7d3108474b67850c54a66967b757d383a433b267",
     "normalTexture": {
       "file": "zuochuan-section-normal.png",
       "width": 1024,
       "height": 1024,
-      "objects": 136,
-      "sha256": "0b97ed8dc50198f13d75038d23294daa7c5176aa7826fe96be5c35574e097772",
-      "maxRedDeviation": 0.5
+      "objects": 137,
+      "sha256": "5ece80eff60b1d61d1e326fcca63e8f7492698f1d539c898df5b4aaeb3189c1e",
+      "maxRedDeviation": 0.4843
     },
     "colorTexture": {
       "file": "zuochuan-section-color.png",
       "width": 1024,
       "height": 1024,
-      "sha256": "e7cfe6490679ef50cdd50028f75c96aae5df834736cdadbcddb6e28f124a86d8"
+      "sha256": "bca872a286d2a746f383e8261ab302c3067b6df22820aa044e4eb1ee0f08b46b"
     }
   }
 }

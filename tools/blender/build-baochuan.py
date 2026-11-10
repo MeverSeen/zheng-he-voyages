@@ -12,6 +12,7 @@ OUT.mkdir(parents=True,exist_ok=True)
 if bpy.data.filepath and Path(bpy.data.filepath).name=='baochuan-master.blend':
     raise RuntimeError('Generate the baseline in a separate background process; the master is never a generator target.')
 refine=runpy.run_path(str(ROOT/'tools/blender/refine-superstructure.py'))['refine']
+form_geometry=runpy.run_path(str(ROOT/'tools/blender/ship-form-geometry.py'))
 BASE=json.loads((ROOT/'tools/blender/baochuan-base.json').read_text())
 bpy.ops.object.select_all(action='SELECT'); bpy.ops.object.delete(use_global=False)
 for c in list(bpy.data.collections):
@@ -48,6 +49,7 @@ def strip(name,points,radius,parent,material):
 roots=[]
 for mode,base in BASE.items():
     section=mode=='section'; meta=base['metadata']; L,B,D,F=[meta[k] for k in ('L','B','D','F')]
+    form_geometry['set_dimensions'](meta)
     root=bpy.data.objects.new('Baochuan_'+mode,None); bpy.context.collection.objects.link(root); roots.append(root)
     root['metadata']=json.dumps(meta,separators=(',',':')); root['authoring']='Blender prototype; research interpretation, not an archaeological reconstruction'
     groups={}
@@ -65,18 +67,11 @@ for mode,base in BASE.items():
         bm=bmesh.new();bm.from_mesh(o.data);bmesh.ops.remove_doubles(bm,verts=list(bm.verts),dist=.00001);bm.to_mesh(o.data);bm.free()
         if item['part']=='sails' and item['doubleSided']:
             for poly in o.data.polygons:poly.use_smooth=True
-    def shape(t):
-        w=B*.5/1.0218*(.34*(1-t)+.10*t+.80*math.sin(math.pi*t)**.65)
-        h=F+L*(.045*(1-t)**5+.032*t**6)
-        return ((t-.5)*L,w,h)
-    # Preserve deck footprint, keel and waterline baseline; soften the bilge between stations.
-    def surface(t,q,side):
-        x,w,h=shape(t)
-        knots=[(0,0,-D),(.18,.30,-D*.88),(.40,.64,-D*.52),(.60,.78,-D*.25),(1,1,h)]
-        for a,b in zip(knots,knots[1:]):
-            if q<=b[0]+1e-9:
-                u=(q-a[0])/(b[0]-a[0]);return (x,a[2]+(b[2]-a[2])*u,side*w*(a[1]+(b[1]-a[1])*u))
-    N=32;bands=14
+    shape=form_geometry['shape'];surface=form_geometry['surface']
+    clip_transom=form_geometry['clip_transom']
+    # Six bands per side plus their shared keel create the current 13-point
+    # transverse section. Coordinates come from exported ``meta.form``.
+    N=32;bands=6
     for side in [-1] if section else [-1,1]:
         verts=[];faces=[]
         for band in range(bands):
@@ -92,13 +87,26 @@ for mode,base in BASE.items():
             q=band/bands
             if q<.45:continue
             strip('Plank seam',[(x,y,z+side*.018) for x,y,z in [surface(j/N,q,side) for j in range(N+1)]],.012,groups['hull'],seam)
-        for q in [.72,.94]:
+        for q in [.68,.84,.96]:
             strip('Timber rubbing strake',[(x,y,z+side*.055) for x,y,z in [surface(j/N,q,side) for j in range(N+1)]],.075,groups['hull'],wood[1])
-    # Separate closed transom and stem surfaces, with a center cut edge for the section.
+    # Separate raked end surfaces. The stern is split by the actual centre
+    # slot, so the suspended rudder does not visually enter an intact transom.
     for t in [0,1]:
-        profile=[surface(t,j/bands,-1) for j in range(bands+1)]
-        profile+=([(profile[-1][0],profile[-1][1],0)] if section else [surface(t,j/bands,1) for j in range(bands,-1,-1)])
-        mesh('Stern transom' if t==0 else 'Bow closure',profile,[tuple(range(len(profile)))],groups['hull'],[wood[2]])
+        port=[surface(t,j/bands,-1) for j in range(bands+1)]
+        starboard=[surface(t,j/bands,1) for j in range(bands,-1,-1)]
+        profile=port+starboard
+        if t==0:
+            slot_half=meta['form']['rudderSlotWidth']/2
+            sides=[-1] if section else [-1,1]
+            for side in sides:
+                clipped=clip_transom(profile,side,slot_half)
+                name='Stern transom port' if side<0 else 'Stern transom starboard'
+                mesh(name,clipped,[tuple(range(len(clipped)))],groups['hull'],[wood[2]])
+        elif section:
+            half=port+[(port[-1][0],port[-1][1],0)]
+            mesh('Bow closure',half,[tuple(range(len(half)))],groups['hull'],[wood[2]])
+        else:
+            mesh('Bow closure',profile,[tuple(range(len(profile)))],groups['hull'],[wood[2]])
     # Explicit shell thickness at the sheer, independent of the railing.
     for side in [-1] if section else [-1,1]:
         strip('Sheer cap timber',[surface(j/N,1,side) for j in range(N+1)],.09,groups['hull'],wood[4])

@@ -2,50 +2,56 @@
 Derived from the treasure-ship study; dimensions and arrangements remain hypotheses.
 Each caller opens/creates its scene before importing this module.
 """
-import bpy, bmesh, json, math
+import bpy, bmesh, json, math, runpy
+from pathlib import Path
+
+H = runpy.run_path(str(Path(__file__).with_name("ship-form-geometry.py")))
 from mathutils import Vector
 
 def set_dimensions(meta):
-    global L,B,D,F
-    L,B,D,F=(meta[k] for k in ('L','B','D','F'))
+    global L, B, D, F, FORM
+    L, B, D, F = (meta[k] for k in ('L', 'B', 'D', 'F'))
+    FORM = meta['form']
+    H['set_dimensions'](meta)
+
 
 def deck_height(x):
-    t=x/L+.5
-    return F+L*(.045*(1-t)**5+.032*t**6)
+    return H['shape'](x / L + .5)[2]
+
 
 def hull_width(x):
-    t=max(0,min(1,x/L+.5))
-    return B*.5/1.0218*(.34*(1-t)+.10*t+.80*math.sin(math.pi*t)**.65)
+    return H['shape'](x / L + .5)[1]
+
 
 def shell_height(x, z):
-    """Exterior hull height at an athwartship position, in model coordinates."""
-    q=abs(z)/hull_width(x)
-    knots=[(0,-D),(.30,-D*.88),(.64,-D*.52),(.78,-D*.25),(1,deck_height(x))]
-    if q>1:raise RuntimeError('Mast foundation is wider than the hull')
-    for (a,ya),(b,yb) in zip(knots,knots[1:]):
-        if q<=b:return ya+(yb-ya)*(q-a)/(b-a)
+    if abs(z) > hull_width(x):
+        raise RuntimeError('Mast foundation is wider than the hull')
+    lo, hi = -D, deck_height(x)
+    for _ in range(32):
+        mid = (lo + hi) / 2
+        if H['half_beam'](x, mid) < abs(z):
+            lo = mid
+        else:
+            hi = mid
+    return (lo + hi) / 2
 
-def mast_foundation(x,z):
-    # Offset masts cannot extend into the narrow V-bottom. Seat them on a
-    # transverse timber above the shell; use the whole shoe footprint.
-    length,depth=(1.7,.85) if z==0 else (1.2,.60)
-    foot=max(-D+.45 if z==0 else -D*.20,
-             max(shell_height(xx,abs(z)+depth/2+.08) for xx in [x-length/2,x,x+length/2])+.62)
-    yy=foot-.56
-    def width_at(xx):
-        knots=[(-D,0),(-D*.88,.30),(-D*.52,.64),(-D*.25,.78),(deck_height(xx),1)]
-        for (a,wa),(b,wb) in zip(knots,knots[1:]):
-            if yy<=b:return hull_width(xx)*(wa+(wb-wa)*(yy-a)/(b-a))
-    span=min(width_at(xx) for xx in [x-.22,x,x+.22])-.16
-    return foot,span,length,depth
+
+def mast_foundation(x, z):
+    length, depth = (1.7, .85) if z == 0 else (1.2, .60)
+    foot = max(-D + .70, max(shell_height(xx, abs(z) + depth / 2 + .08)
+                            for xx in [x - length / 2, x, x + length / 2]) + .62)
+    span = min(H['half_beam'](xx, foot - .56) for xx in [x - .22, x, x + .22]) - .16
+    return foot, span, length, depth
+
 
 def frame_profile(x, side):
-    # Seat the ribs inside the planking instead of placing their centre on its exterior.
-    w=hull_width(x)
-    return [(x,-D+.24,0),(x,-D*.88+.18,side*max(0,w*.30-.24)),
-            (x,-D*.52+.16,side*max(0,w*.64-.24)),
-            (x,-D*.25+.12,side*max(0,w*.78-.24)),
-            (x,deck_height(x)-.24,side*max(0,w-.24))]
+    points = []
+    for k in range(7):
+        xx, y, _ = H['surface'](x / L + .5, k / 6, side)
+        y += .24 if k == 0 else -.24 if k == 6 else .12
+        z = 0 if k == 0 else side * max(0, H['half_beam'](xx, y - .10) - .24)
+        points.append((xx, y, z))
+    return points
 
 def xyz(p):
     return (p[0], -p[2], p[1])
@@ -311,16 +317,12 @@ def build_rigs(meta, groups, section):
         house_top = meta['design']['houseBase'] + sum(c[3] for c in meta['design']['house'])
         if index == 0 or x-sw*.8 < meta['design']['house'][0][1]:
             bottom = max(bottom, house_top+.55)
-        if index == 0:
-            # Set the mizzen above and across the aft shelter rather than through it.
-            direction = 1
-        else:
-            direction = -1
+        direction = -1
         tilt = .28 if role == 'main' else .16 if role == 'mizzen' else .22
         span = top - .7 - bottom - sw * tilt * .75
         if span < .65: raise RuntimeError('Insufficient sail height for '+meta['typeId'])
-        balance = .23 if role == 'main' else .29
-        boom_angle = .14 if role == 'main' else .22
+        balance = .28
+        boom_angle = .28
         row_q = [(r / rows) ** .89 for r in range(rows + 1)]
         g = empty('Mast and sail %02d' % (index + 1), groups['sails'], 'rig')
         g['rig_index'], g['rig_role'] = index, role
@@ -427,6 +429,49 @@ def build_rigs(meta, groups, section):
             if index == demo_index:
                 holder['batten_points'] = json.dumps([point(1, row, state) for row in range(rows + 1)])
                 holder['halyard_lift'] = json.dumps(lift)
-        masts.append(dict(x=x, z=z, base=base, height=height, sw=sw, foot=foot))
+        front, back = point(0, 0)[0], point(1, 0)[0]
+        masts.append(dict(x=x, z=z, base=base, height=height, sw=sw, foot=foot,
+                          sailFront=front, sailBack=back, mastFraction=(front - x) / (front - back)))
         detail['rigs'].append(dict(index=index, role=role, panels=rows, sheetBranches=rows, bottom=bottom, top=top, sailWidth=sw, sheetFoot=sheet_foot, balance=balance, yardRise=sw * tilt, rowFractions=row_q))
     meta['layout']['masts'] = masts
+
+
+def build_rudder(meta, groups, section):
+    """Use the parameter model's explicit rudder dimensions without scaling to a relic."""
+    dims = meta['rudder']
+    stock_x = dims['stockX']
+    bottom, top = dims['stockBottom'], dims['stockTop']
+    group = groups['rudder']
+    rod('Rudder stock', (stock_x, bottom, 0), (stock_x, top, 0), dims['stockRadius'], group, TIMBER, 8)
+    box('Rudder blade', dims['bladeX'], dims['bladeY'], 0,
+             dims['bladeWidth'], dims['bladeHeight'], dims['bladeThickness'], group, PANEL, True)
+    for q in [-.30, 0, .30]:
+        box('Rudder reinforcing rail', dims['bladeX'], dims['bladeY'] + dims['bladeHeight'] * q, 0,
+                 dims['bladeWidth'] + .08, .12, dims['bladeThickness'] + .09, group, TIMBER)
+    rod('Tiller', (stock_x, top - .12, 0), (dims['tillerEndX'], top - .22, 0), .12, group, TIMBER, 6)
+    stern = deck_height(-meta['L'] / 2)
+    slot = meta['layout']['rudder']['slotWidth']
+    for z in [-slot / 2 - .10, slot / 2 + .10]:
+        box('Rudder slot cheek', stock_x, stern + .35, z, .46, .75, .16, group, TIMBER, True)
+        rod('Rudder suspension line', (stock_x, stern + .70, z),
+                 (stock_x, bottom + .50, z), .028, group, ROPE)
+    # A standing platform stays beside the rudder slot; it does not close the opening.
+    for side in [-1] if section else [-1, 1]:
+        inner, outer = slot / 2 + .12, 1.5 if meta['typeId'] == 'baochuan' else 1.3
+        box('Steering standing platform', -meta['L'] * .475, stern - .06,
+                 side * (inner + outer) / 2, meta['L'] * .032, .16, outer - inner, group, DECK, True)
+    meta['refinement']['rudder'] = dict(stockLength=meta['rudderStock'],
+                                      operation='suspended lifting stock and forward tiller; mechanical advantage unverified')
+
+
+
+def rig_design(meta):
+    stations = meta['layout']['masts']
+    main_count = 2 if len(stations) >= 7 else 1
+    mains = sorted(range(len(stations)), key=lambda i: stations[i]['height'], reverse=True)[:main_count]
+    rigs = []
+    for i, mast in enumerate(stations):
+        role = 'mizzen' if i == 0 else 'main' if i in mains else 'fore' if i >= len(stations) - 2 else 'auxiliary'
+        panels = 8 if role == 'main' else 5 if role in ['fore', 'mizzen'] else 6
+        rigs.append((mast['x'], mast['z'], mast['height'], mast['sw'] * .92, panels, role))
+    return rigs
