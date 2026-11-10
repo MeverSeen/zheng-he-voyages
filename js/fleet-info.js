@@ -2,6 +2,7 @@
 (function () {
   const F = window.ZH_FLEET,
     $ = (id) => document.getElementById(id);
+  const NUM = ['', '一', '二', '三', '四', '五', '六', '七'];
   function esc(s) {
     return String(s ?? '').replace(
       /[&<>"']/g,
@@ -27,7 +28,7 @@
   for (let n = 1; n <= 7; n++) {
     const o = document.createElement('option');
     o.value = n;
-    o.textContent = '第' + n + '次';
+    o.textContent = '第' + NUM[n] + '次';
     $('voyage').appendChild(o);
   }
   $('part-list').innerHTML = F.parts.map((p) => '<button data-part="' + p.id + '">' + p.name + '</button>').join('');
@@ -87,8 +88,8 @@
     refined = false;
     part(selectedPart);
     const v = F.voyages[n];
-    $('info-title').textContent = '第' + n + '次船队';
-    $('model-name').textContent = '第' + n + '次船队';
+    $('info-title').textContent = '第' + NUM[n] + '次船队';
+    $('model-name').textContent = '第' + NUM[n] + '次船队';
     $('model-dimensions').textContent =
       mode === 'recorded' && !v.recorded.n
         ? '船数史料未载'
