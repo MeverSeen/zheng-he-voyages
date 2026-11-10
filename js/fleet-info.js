@@ -31,7 +31,18 @@
     o.textContent = '第' + NUM[n] + '次';
     $('voyage').appendChild(o);
   }
-  $('part-list').innerHTML = F.parts.map((p) => '<button data-part="' + p.id + '">' + p.name + '</button>').join('');
+  $('part-list').innerHTML = F.parts
+    .map(
+      (p, index) =>
+        '<button data-part="' +
+        p.id +
+        '"><span class="part-number" aria-hidden="true">' +
+        (index + 1) +
+        '</span>' +
+        p.name +
+        '</button>',
+    )
+    .join('');
   let refined = false,
     selectedPart = 'hull',
     selectedShip = 'baochuan';
@@ -118,9 +129,10 @@
       '">阅读该次航行档案 →</a></p>';
   }
   $('part-list').addEventListener('click', (e) => {
-    if (e.target.dataset.part) {
-      part(e.target.dataset.part);
-      window.dispatchEvent(new CustomEvent('fleet:part', { detail: e.target.dataset.part }));
+    const button = e.target.closest?.('button[data-part]');
+    if (button) {
+      part(button.dataset.part);
+      window.dispatchEvent(new CustomEvent('fleet:part', { detail: button.dataset.part }));
     }
   });
   $('ship-type').addEventListener('change', () => {

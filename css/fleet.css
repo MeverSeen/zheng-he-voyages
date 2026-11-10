@@ -166,6 +166,10 @@
   margin-right: 4px;
   color: var(--seal);
 }
+.hotspot-number,
+.part-number {
+  display: none;
+}
 .view-controls {
   display: flex;
   flex-wrap: wrap;
@@ -373,8 +377,33 @@
     font-size: 25px;
   }
   .hotspot {
+    display: grid;
+    width: 32px;
+    min-width: 32px;
+    height: 32px;
+    padding: 0;
+    place-items: center;
+    border-radius: 50%;
+    font: 13px var(--f-ui);
+    line-height: 1;
+  }
+  .hotspot::before,
+  .hotspot-name {
+    display: none;
+  }
+  .hotspot-number {
+    display: block;
+  }
+  .part-number {
+    display: inline-grid;
+    width: 16px;
+    height: 16px;
+    margin-right: 4px;
+    place-items: center;
+    border: 1px solid currentColor;
+    border-radius: 50%;
     font-size: 10px;
-    padding: 3px 5px;
+    line-height: 1;
   }
   .options {
     gap: 12px;

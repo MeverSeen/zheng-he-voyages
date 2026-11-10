@@ -23,6 +23,7 @@ const state = {
   part: 'hull',
 };
 const blenderStatus = new Map();
+const mobileViewport = matchMedia('(max-width: 760px)');
 let disposed = false,
   activeBlenderType = null;
 function refinedAvailable() {
@@ -217,11 +218,20 @@ function rebuild() {
   if (ship?.userData.modelSource === 'blender') setBlenderSailState(ship, $('sail-state').value);
   $('hotspots').replaceChildren();
   if (ship)
-    F.parts.forEach((p) => {
+    F.parts.forEach((p, index) => {
       const b = document.createElement('button');
       b.className = 'hotspot';
-      b.textContent = p.name;
       b.dataset.anchor = p.id;
+      b.dataset.index = String(index + 1);
+      b.setAttribute('aria-label', `${index + 1}：${p.name}`);
+      const number = document.createElement('span');
+      number.className = 'hotspot-number';
+      number.setAttribute('aria-hidden', 'true');
+      number.textContent = String(index + 1);
+      const name = document.createElement('span');
+      name.className = 'hotspot-name';
+      name.textContent = p.name;
+      b.append(number, name);
       b.addEventListener('click', () => highlight(p.id));
       $('hotspots').appendChild(b);
     });
@@ -248,12 +258,45 @@ function pick(hits) {
     }
   }
 }
+function placeMobileHotspots(hotspots, width, height) {
+  const edge = 16;
+  const spacing = 34;
+  const clamp = (value, max) => Math.max(edge, Math.min(max - edge, value));
+  const placed = [];
+  for (const hotspot of hotspots) {
+    let position;
+    for (let radius = 0; radius <= 8 && !position; radius++) {
+      for (let x = -radius; x <= radius && !position; x++) {
+        for (let y = -radius; y <= radius; y++) {
+          if (Math.max(Math.abs(x), Math.abs(y)) !== radius) continue;
+          const candidate = { x: clamp(hotspot.x + x * spacing, width), y: clamp(hotspot.y + y * spacing, height) };
+          if (
+            placed.every(
+              (other) => Math.abs(candidate.x - other.x) >= spacing || Math.abs(candidate.y - other.y) >= spacing,
+            )
+          ) {
+            position = candidate;
+            break;
+          }
+        }
+      }
+    }
+    // Six 32 px labels always fit in the mobile viewport. Keep the raw anchor
+    // only as a defensive fallback if the viewport has been made unusually small.
+    const next = position || { x: clamp(hotspot.x, width), y: clamp(hotspot.y, height) };
+    placed.push(next);
+    hotspot.button.style.left = next.x + 'px';
+    hotspot.button.style.top = next.y + 'px';
+  }
+}
 function labels() {
   raf = requestAnimationFrame(labels);
   if (document.hidden || !scene) return;
   const w = $('viewport').clientWidth,
     h = $('viewport').clientHeight;
   const show = state.mode === 'single' && $('labels').checked;
+  const mobile = mobileViewport.matches;
+  const mobileHotspots = [];
   for (const b of $('hotspots').children) {
     b.hidden = !show;
     if (!show) continue;
@@ -261,9 +304,16 @@ function labels() {
     ship.localToWorld(p);
     const v = scene.project(p);
     b.hidden = v.z > 1 || Math.abs(v.x) > 0.88 || Math.abs(v.y) > 0.85;
-    b.style.left = ((v.x + 1) * w) / 2 + 'px';
-    b.style.top = ((1 - v.y) * h) / 2 + 'px';
+    if (b.hidden) continue;
+    const x = ((v.x + 1) * w) / 2;
+    const y = ((1 - v.y) * h) / 2;
+    if (mobile) mobileHotspots.push({ button: b, x, y });
+    else {
+      b.style.left = x + 'px';
+      b.style.top = y + 'px';
+    }
   }
+  if (mobile) placeMobileHotspots(mobileHotspots, w, h);
   // A screen-aligned physical length at the controls target plane.
   const distance = scene.camera.position.distanceTo(scene.controls.target),
     metresPerPixel = (2 * distance * Math.tan(THREE.MathUtils.degToRad(scene.camera.fov / 2))) / h;

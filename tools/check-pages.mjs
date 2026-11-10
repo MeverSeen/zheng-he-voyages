@@ -6,6 +6,7 @@
 //   node tools/check-pages.mjs --url https://meverseen.github.io/zheng-he-voyages/   检查线上网站
 //   --out <目录>   截图目录，默认 .screens/（已加入 .gitignore）
 //   --pages a,b    只检查部分页面，如 --pages world,fleet
+//   CHECK_PAGES_CHANNEL=chrome npm run check:pages   可选使用本机 Chrome 的独立测试会话
 //
 // 需要 Playwright 与 Chromium，它们不在 devDependencies 中：npm i -D playwright && npx playwright install chromium。
 // Google Fonts 请求一律拦截，按"字体无法访问"的情况检查（中国大陆访问时常见）。
@@ -53,6 +54,7 @@ const STEPS = {
     ['单船复原', p => p.locator('#single-mode').click()],
     ['剖开右舷', p => p.locator('#cutaway').check()],
     ['侧视', p => p.locator('[data-view="side"]').click()],
+    ['手机热点', checkMobileHotspots],
   ],
   people: [],
 };
@@ -60,6 +62,27 @@ const VIEWPORTS = {
   desk: {viewport: {width: 1440, height: 900}},
   mobile: {viewport: {width: 390, height: 844}, isMobile: true, hasTouch: true},
 };
+
+async function checkMobileHotspots(page) {
+  const result = await page.locator('#hotspots .hotspot').evaluateAll((nodes) => {
+    if (innerWidth > 760) return {skipped: true};
+    const visible = nodes
+      .filter((node) => !node.hidden && getComputedStyle(node).display !== 'none')
+      .map((node) => ({label: node.getAttribute('aria-label'), rect: node.getBoundingClientRect()}))
+      .filter(({rect}) => rect.width > 0 && rect.height > 0);
+    const undersized = visible.filter(({rect}) => rect.width < 32 || rect.height < 32).map(({label, rect}) => `${label} (${rect.width}×${rect.height})`);
+    const overlaps = [];
+    for (let i = 0; i < visible.length; i++) for (let j = i + 1; j < visible.length; j++) {
+      const a = visible[i], b = visible[j];
+      if (a.rect.left < b.rect.right && a.rect.right > b.rect.left && a.rect.top < b.rect.bottom && a.rect.bottom > b.rect.top) overlaps.push(`${a.label} / ${b.label}`);
+    }
+    return {count: visible.length, undersized, overlaps};
+  });
+  if (result.skipped) return;
+  if (result.count < 2) throw new Error(`手机端仅有 ${result.count} 个可见热点`);
+  if (result.undersized.length) throw new Error('热点小于 32 px：' + result.undersized.join('；'));
+  if (result.overlaps.length) throw new Error('手机热点重叠：' + result.overlaps.join('；'));
+}
 
 // 源码模式用的静态服务器
 const TYPES = {'.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.jpg': 'image/jpeg', '.png': 'image/png', '.svg': 'image/svg+xml', '.glb': 'model/gltf-binary'};
@@ -78,7 +101,7 @@ else {
 }
 
 fs.mkdirSync(out, {recursive: true});
-const browser = await chromium.launch();
+const browser = await chromium.launch({channel: process.env.CHECK_PAGES_CHANNEL || undefined});
 let failed = 0;
 async function visit(page, vp, theme, steps) {
   const ctx = await browser.newContext({...VIEWPORTS[vp], deviceScaleFactor: 1, colorScheme: theme});
